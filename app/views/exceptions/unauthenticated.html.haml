@@ -1,0 +1,19 @@
+= page_title("Login")
+= error_messages_for(session.authentication)
+= form({:action => slice_url(:merb_auth_slice_password, :perform_login), :method => :post}) do
+  = hidden_field(:name => '_method', :value => 'PUT')
+  %table{:width => "30%", :cellpadding => "2", :cellspacing => "2", :border => "0", :style => "border: 0px;"}
+    %tr
+      %td{:width => "20%", :align => "right", :style => "border: 0px;"}
+        Email:
+      %td{:style => "border: 0px;"}
+        = text_field(:name => :email)
+    %tr
+      %td{:width => "20%", :align => "right", :style => "border: 0px;"}
+        Password:
+      %td{:style => "border: 0px;"}
+        = password_field(:name => :password)
+    %tr
+      %td{:width => "20%", :align => "right", :style => "border: 0px;"}
+      %td{:style => "border: 0px;"}
+        = submit("Login")

@@ -1,0 +1,12 @@
+!!! XML
+%ontology_term
+  %name= @ontology_term.name
+  %ontology_name= @ontology_term.ontology.name
+  %ncbo_ontology_id= @ontology_term.ontology.ncbo_id
+  %ncbo_term_id= @ontology_term.term_id
+  %ontology_term_id= @ontology_term.term_id.split("|").last
+  %annotations
+    - @direct_geo.keys.each do |accession|
+      %annotation
+        %geo_accession= accession
+        %description= @direct_geo[accession]

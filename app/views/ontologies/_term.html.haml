@@ -1,0 +1,5 @@
+%tr{:class => "#{cycle('rowWhite', 'rowBlue')}"}
+  %td{:valign => "top", :width => "60%"}
+    = link_to(term.name, resource(term))
+  %td{:valign => "top"}
+    = is_closure(term.annotations_count)

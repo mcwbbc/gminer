@@ -1,0 +1,8 @@
+%tr{ :class => cycle('rowWhite', 'rowBlue') }
+  %td{ :valign => "top", :width => "40%" }
+    = ontology_name
+  %td{ :valign => "top" }
+    - if session.user
+      = curate_link_list
+    - else
+      = term_list

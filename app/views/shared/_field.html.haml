@@ -1,0 +1,12 @@
+- if !field[:value].blank?
+  %tr
+    %td{ :valign => "top" }
+      == #{Extlib::Inflection.humanize(field[:name])}:
+    %td
+      %span{ :id => field[:name] }
+        = field[:value]
+- if item.annotations_for(field[:name]).any?
+  %tr
+    %td
+    %td
+      = annotations_for(item, field[:name])

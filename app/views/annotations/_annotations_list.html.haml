@@ -1,0 +1,28 @@
+%br
+- if @annotations.size == 0
+  %p
+    No annotations found...
+- else
+  %p
+    = found_count("annotations", @annotations)
+  %p
+  - if @annotations.total_pages > 1
+    = partial("shared/pagination", :items =>  @annotations, :format => :html)
+  %br
+  %table{:width => "100%", :border => "0", :cellpadding => "0", :cellspacing => "2"}
+    %thead
+      %tr.rowHeader
+        %td{:width => "20%"}
+          %b
+            GEO accession
+        %td{:width => "20%"}
+          %b
+            Field
+        %td{:width => "20%"}
+          %b
+            Term
+        %td{:width => "40%"}
+          %b
+            Ontology
+    %tbody#staffTable
+      = partial("annotation", :with => @annotations, :format => :html)

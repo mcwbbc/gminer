@@ -1,0 +1,20 @@
+---
+# This is a sample database file for the DataMapper ORM
+development: &defaults
+  # These are the settings for repository :default
+  adapter:  mysql
+  database: gminer_development
+  username: root
+  password: root
+  host: localhost
+ 
+test:
+  <<:       *defaults
+  database: gminer_test
+ 
+production:
+  <<:       *defaults
+  database: gminer_development
+ 
+rake:
+  <<: *defaults

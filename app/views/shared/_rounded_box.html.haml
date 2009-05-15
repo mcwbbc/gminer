@@ -1,0 +1,19 @@
+%div{ :style => "margin-top: 5px;" }
+  %b{ :class => css_class }
+    %b{ :class => "#{css_class}1" }
+      %b
+    %b{ :class => "#{css_class}2" }
+      %b
+    %b{ :class => "#{css_class}3" }
+    %b{ :class => "#{css_class}4" }
+    %b{ :class => "#{css_class}5" }
+  %div{ :class => "#{css_class}fg" }
+    = catch_content(:for_box)
+  %b{ :class => css_class }
+    %b{ :class => "#{css_class}5" }
+    %b{ :class => "#{css_class}4" }
+    %b{ :class => "#{css_class}3" }
+    %b{ :class => "#{css_class}2" }
+      %b
+    %b{ :class => "#{css_class}1" }
+      %b

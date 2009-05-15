@@ -1,0 +1,12 @@
+%h3
+  == Has #{annotation_count} #{annotation_type} annotations on #{items.size} GEO accession IDs.
+- if items.any? 
+  %table.paginated{ :cellspacing => "2", :border => "0", :width => "100%", :cellpadding => "0" }
+    %thead
+      %tr.rowHeader
+        %td{ :width => "20%" }
+          GEO accession
+        %td{ :width => "80%" }
+          Description
+    %tbody#dataTable
+      = partial("annotation", :with => items)

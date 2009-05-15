@@ -1,0 +1,5 @@
+%tr{:class => "#{cycle('rowWhite', 'rowBlue')}"}
+  %td{:valign => "top"}
+    = geo_link(short_annotation)
+  %td{:valign => "top"}
+    = @annotation_hash[short_annotation]

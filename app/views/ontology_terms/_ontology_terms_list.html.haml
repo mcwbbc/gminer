@@ -1,0 +1,25 @@
+%br
+- if @ontology_terms.size == 0
+  %p
+    No ontology terms found...
+- else
+  %p
+    = found_count("ontology terms", @ontology_terms)
+  %p
+  - if @ontology_terms.total_pages > 1
+    = partial("shared/pagination", :items =>  @ontology_terms, :format => :html)
+  %br
+  %table{:width => "100%", :border => "0", :cellpadding => "0", :cellspacing => "2"}
+    %thead
+      %tr.rowHeader
+        %td{:width => "50%"}
+          %b
+            Name
+        %td{:width => "20%"}
+          %b
+            Annotation Count
+        %td{:width => "30%"}
+          %b
+            Ontology Name
+    %tbody#staffTable
+      = partial("ontology_term", :with => @ontology_terms, :format => :html)

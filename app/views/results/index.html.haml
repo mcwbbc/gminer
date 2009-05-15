@@ -1,0 +1,6 @@
+= page_title("Results")
+%p
+  %form{:name => "sform", :action => "", :style => "display:inline"}
+    = text_field(:name => :query, :label => "Filter on GEO accession or term name: ", :value => params['query'],  :autocomplete => "off")
+#dataTable
+  = partial("results_list")

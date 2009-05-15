@@ -1,0 +1,5 @@
+%tr{:class => "#{cycle('rowWhite', 'rowBlue')}"}
+  %td{:valign => "top"}
+    = link_to(highlight(ontology.name, @q), resource(ontology))
+  %td{:valign => "top"}
+    = ontology.version

@@ -1,0 +1,15 @@
+%h3
+  == Has annotations that reference #{@annotation_hash.size} GEO accession IDs.
+- if @annotation_hash.any? 
+  %table.paginated{ :cellspacing => "2", :border => "0", :width => "100%", :cellpadding => "0"}
+    %thead
+      %tr.rowHeader
+        %td{ :width => "20%" }
+          GEO accession
+        %td{ :width => "80%" }
+          Description
+    %tbody#dataTable
+      = partial("short_annotation", :with => @annotation_hash.keys.sort, :layout => false, :format => :html)
+  %br{:clear => "all"}
+- else
+  No Results. Please update the filters.

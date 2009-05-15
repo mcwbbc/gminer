@@ -1,0 +1,26 @@
+#navigation
+  = link_to("Home", "/")
+  #user
+    = login_logout(session.user)
+  %h2
+    Views
+  %ul
+    %li
+      = link_to("Platforms", resource(:platforms))
+    %li
+      = link_to("Samples", resource(:samples))
+    %li
+      = link_to("Series", resource(:series_items))
+    %li
+      = link_to("Datasets", resource(:datasets))
+    %li
+      = link_to("Annotations", resource(:annotations))
+    %li
+      = link_to("Annotation Cloud", url(:cloud_annotations))
+    %li
+      = link_to("Ontologies", resource(:ontologies))
+    %li
+      = link_to("Ontology Terms", resource(:ontology_terms))
+    %li
+      = link_to("Results", resource(:results))
+%div

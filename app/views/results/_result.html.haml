@@ -1,0 +1,9 @@
+%tr{:class => "#{cycle('rowWhite', 'rowBlue')}"}
+  %td{:valign => "top"}
+    = geo_link(result.sample_geo_accession)
+  %td{:valign => "top"}
+    = pubmed_link(result.pubmed_id)
+  %td{:valign => "top"}
+    = result.id_ref
+  %td{:valign => "top"}
+    = result.ontology_term.name

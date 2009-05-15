@@ -1,0 +1,7 @@
+= partial("shared/annotation_counts")
+= page_title("Series")
+%p
+  %form{:name => "sform", :action => "", :style => "display:inline"}
+    = text_field(:name => :query, :label => "Filter on GEO accession or summary: ", :value => params['query'],  :autocomplete => "off")
+#dataTable
+  = partial("series_items_list")

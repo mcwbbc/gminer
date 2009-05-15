@@ -1,0 +1,7 @@
+= partial("shared/show_page_title", :title => "Series", :geo_accession => @platform.geo_accession)
+= link_to('Back', resource(:platforms))
+%br
+%br
+= partial("shared/children", :title => "Series", :items => @platform.series_items)
+= partial("shared/children", :title => "Samples", :items => @platform.samples)
+= partial("shared/annotations_table", :item => @platform)

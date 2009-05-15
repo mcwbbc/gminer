@@ -1,0 +1,27 @@
+%br
+- if @results.size == 0
+  %p
+    No results found...
+- else
+  %p
+    = found_count("results", @results)
+  %p
+  - if @results.total_pages > 1
+    = partial("shared/pagination", :items =>  @results, :format => :html)
+  %br
+  %table{:width => "100%", :border => "0", :cellpadding => "0", :cellspacing => "2"}
+    %thead
+      %td{ :width => "20%" }
+        %b
+          GEO accession
+      %td{ :width => "20%" }
+        %b
+          PubMed ID
+      %td{ :width => "20%" }
+        %b
+          ID ref
+      %td{ :width => "40%" }
+        %b
+          Term
+    %tbody#staffTable
+      = partial("result", :with => @results, :format => :html)

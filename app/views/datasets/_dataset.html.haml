@@ -1,0 +1,7 @@
+%tr{:class => "#{cycle('rowWhite', 'rowBlue')}"}
+  %td{:valign => "top"}
+    = link_to(highlight(dataset.geo_accession, @q), resource(dataset))
+  %td{:valign => "top"}
+    = pubmed_link(dataset.pubmed_id)
+  %td{:valign => "top"}
+    = highlight(dataset.title, @q)

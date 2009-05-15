@@ -1,0 +1,7 @@
+%tr{:class => "#{cycle('rowWhite', 'rowBlue')}"}
+  %td{:valign => "top"}
+    = link_to(highlight(ontology_term.name, @q), resource(ontology_term))
+  %td{:valign => "top"}
+    = is_closure(ontology_term.annotations_count)
+  %td{:valign => "top"}
+    = link_to(ontology_term.ontology.name, resource(ontology_term.ontology))

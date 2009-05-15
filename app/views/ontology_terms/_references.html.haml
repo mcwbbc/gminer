@@ -1,0 +1,8 @@
+%h4
+  = title
+%ul.reference
+  - terms.each do |term|
+    %li
+      = link_to(term.name, resource(term))
+%br
+%br

@@ -1,0 +1,7 @@
+= partial("shared/show_page_title", :title => "Series", :geo_accession => @dataset.geo_accession)
+= link_to('Back', resource(:datasets))
+%br
+%br
+= partial("shared/children", :title => "Platform", :items => [@dataset.platform]) if @dataset.platform
+= partial("shared/children", :title => "Series", :items => [@dataset.series_item]) if @dataset.series_item
+= partial("shared/annotations_table", :item => @dataset)

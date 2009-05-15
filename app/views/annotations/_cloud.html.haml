@@ -1,0 +1,10 @@
+%div.cloud-box
+  %div.cloud-box-title= title
+  %br
+  %div.cloud-box-content
+    %ol.tag-cloud
+      - term_cloud(terms, Constants::TAG_CLASSES) do |term, css_class|
+        %li
+          %span
+            == #{term.annotations_count} annotations for term
+          = link_to(term.name, "##{term.name}", :class => "result-term #{css_class}", :term_id => term.term_id)

@@ -1,0 +1,6 @@
+= page_title("Ontology Terms")
+%p
+  %form{:name => "sform", :action => "", :style => "display:inline"}
+    = text_field(:name => :query, :label => "Filter on name: ", :value => params['query'],  :autocomplete => "off")
+#dataTable
+  = partial("ontology_terms_list")

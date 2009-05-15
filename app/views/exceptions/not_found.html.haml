@@ -1,0 +1,9 @@
+#container
+  #header-container
+    404: Page not found
+    %hr
+  #main-container
+    %h3
+      Exception:
+    %p
+      = request.exceptions.first.message

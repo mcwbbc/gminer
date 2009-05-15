@@ -1,0 +1,9 @@
+%tr{:class => "#{cycle('rowWhite', 'rowBlue')}"}
+  %td{:valign => "top"}
+    = geo_link(annotation.geo_accession)
+  %td{:valign => "top"}
+    = annotation.field
+  %td{:valign => "top"}
+    = link_to(highlight(annotation.ontology_term.name, @q), resource(annotation.ontology_term))
+  %td{:valign => "top"}
+    = link_to(annotation.ontology_term.ontology.name, resource(annotation.ontology_term.ontology))

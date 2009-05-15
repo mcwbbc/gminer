@@ -1,0 +1,25 @@
+%br
+- if @series_items.size == 0
+  %p
+    No series found...
+- else
+  %p
+    = found_count("series", @series_items)
+  %p
+  - if @series_items.total_pages > 1
+    = partial("shared/pagination", :items =>  @series_items, :format => :html)
+  %br
+  %table{:width => "100%", :border => "0", :cellpadding => "0", :cellspacing => "2"}
+    %thead
+      %tr.rowHeader
+        %td{:width => "20%"}
+          %b
+            GEO accession
+        %td{:width => "10%"}
+          %b
+            PubMed
+        %td{:width => "70%"}
+          %b
+            Title
+    %tbody#staffTable
+      = partial("series_item", :with => @series_items, :format => :html)
