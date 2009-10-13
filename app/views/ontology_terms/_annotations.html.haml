@@ -9,4 +9,4 @@
         %td{ :width => "80%" }
           Description
     %tbody#dataTable
-      = partial("annotation", :with => items)
+      = render(:partial => "annotation", :collection => items)

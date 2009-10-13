@@ -1,4 +1,2 @@
-module Merb
-  module SeriesItemsHelper
-  end
-end # Merb
+module SeriesItemsHelper
+end

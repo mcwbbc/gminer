@@ -1,15 +1,10 @@
-class OntologyTerm
-  include DataMapper::Resource
+class OntologyTerm < ActiveRecord::Base
   
-  property :term_id, String, :length => 100, :key => true
-  property :ncbo_id, String, :length => 100
-  property :name, String, :length => 255
-  property :annotations_count, Integer, :default => 0 
+  belongs_to :ontology
+  has_many :annotations, :order => :geo_accession#, :dependent => :destroy
+  has_many :annotation_closures, :include => :annotation, :order => "annotations.geo_accession"#, :dependent => :destroy
 
-  belongs_to :ontology, :child_key => [:ncbo_id]
-  has n, :annotations, :child_key => [:ontology_term_id]#, :order => :geo_accession, :dependent => :destroy
-
-  has n, :annotation_closures, :child_key => [:ontology_term_id]#, :include => :annotation, :order => "annotations.geo_accession", :dependent => :destroy
+#  has n, :results, :foreign_key => :ontology_term_id#, :order => :sample_geo_accession, :dependent => :destroy # they exist, but don't associate in case of lazy load
 
   class << self
     def page(conditions, page=1, size=Constants::PER_PAGE)
@@ -30,6 +25,42 @@ class OntologyTerm
       query << " LIMIT #{options[:limit]}" if options[:limit] != nil
       cloud = OntologyTerm.find_by_sql(query)
     end
+
+    def persist(term_id, ncbo_id, term_name)
+      if !ot = OntologyTerm.first(:conditions => {:term_id => term_id})
+        ontology = Ontology.first(:conditions => {:ncbo_id => ncbo_id})
+        ot = ontology.ontology_terms.create(:term_id => term_id, :ncbo_id => ncbo_id, :name => term_name) if ontology
+      end
+    end
+
+  end
+
+  def to_param
+    self.term_id
+  end
+
+  def valid_annotation_percentage
+    if annotations_count > 0
+      (valid_annotation_count.to_f/annotations_count.to_f)*100
+    else
+      0
+    end
+  end
+
+  def audited_annotation_percentage
+    if annotations_count > 0
+      (audited_annotation_count.to_f/annotations_count.to_f)*100
+    else
+      0
+    end
+  end
+
+  def valid_annotation_count
+    Annotation.count(:conditions => {:ontology_term_id => self.id, :verified => true})
+  end
+
+  def audited_annotation_count
+    Annotation.count(:conditions => {:ontology_term_id => self.id, :audited => true})
   end
 
   def direct_geo_references
@@ -41,19 +72,17 @@ class OntologyTerm
   end
 
   def parent_closures
-    sql = "SELECT ontology_terms.*"
+    sql = "SELECT DISTINCT ontology_terms.*"
     sql << " FROM annotations, annotation_closures, ontology_terms"
-    sql << " WHERE annotations.ontology_term_id = '#{self.term_id}'"
-    sql << " AND annotations.geo_accession = annotation_closures.annotation_geo_accession"
-    sql << " AND annotations.field = annotation_closures.annotation_field"
-    sql << " AND ontology_terms.term_id = annotation_closures.ontology_term_id"
-    sql << " GROUP BY annotation_closures.ontology_term_id"
+    sql << " WHERE annotations.ontology_term_id = #{self.id}"
+    sql << " AND annotations.id = annotation_closures.annotation_id"
+    sql << " AND ontology_terms.id = annotation_closures.ontology_term_id"
     sql << " ORDER BY ontology_terms.name"
     terms = OntologyTerm.find_by_sql(sql)
   end
-
+   
   def child_closures
-    acs = AnnotationClosure.all(:ontology_term_id => self.term_id, :order => [DataMapper::Query::Direction.new(OntologyTerm.properties[:name], :asc)], :links => [:ontology_term])
+    acs = AnnotationClosure.all(:conditions => {:ontology_term_id => self.id}, :order => "ontology_terms.name", :include => [:ontology_term])
     terms = acs.inject([]) do |array, ac|
       array << ac.annotation.ontology_term
       array

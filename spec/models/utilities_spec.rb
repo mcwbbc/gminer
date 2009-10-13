@@ -23,41 +23,51 @@ describe Utilities do
   describe "load item" do
     it "should return a sample" do
       sample = mock(Sample)
-      Sample.should_receive(:get).with("GSM1234").and_return(sample)
+      Sample.should_receive(:first).with(:conditions => {:geo_accession => "GSM1234"}).and_return(sample)
       FakeClass.load_item("GSM1234").should == sample
     end
 
     it "should return a series" do
       series = mock(SeriesItem)
-      SeriesItem.should_receive(:get).with("GSE1234").and_return(series)
+      SeriesItem.should_receive(:first).with(:conditions => {:geo_accession => "GSE1234"}).and_return(series)
       FakeClass.load_item("GSE1234").should == series
     end
 
     it "should return a dataset" do
       dataset = mock(Dataset)
-      Dataset.should_receive(:get).with("GDS1234").and_return(dataset)
+      Dataset.should_receive(:first).with(:conditions => {:geo_accession => "GDS1234"}).and_return(dataset)
       FakeClass.load_item("GDS1234").should == dataset
     end
 
     it "should return a platform" do
       platform = mock(Platform)
-      Platform.should_receive(:get).with("GPL1234").and_return(platform)
+      Platform.should_receive(:first).with(:conditions => {:geo_accession => "GPL1234"}).and_return(platform)
       FakeClass.load_item("GPL1234").should == platform
     end
   end
 
   describe "persist (class)" do
     it "should check for an existing platform, and create a new one if it doesn't exist" do
-      FakeClass.should_receive(:first).with(:geo_accession => "GPL1234").and_return(nil)
+      FakeClass.should_receive(:first).with(:conditions => {:geo_accession => "GPL1234"}).and_return(nil)
       p = mock(Platform)
       FakeClass.should_receive(:new).with(:geo_accession => "GPL1234").and_return(p)
+      p.should_receive(:new_record?).and_return(true)
       p.should_receive(:persist).and_return(true)
       FakeClass.persist("GPL1234")
     end
 
-    it "should check for an existing platform, and do nothing if it existed" do
+    it "should check for an existing platform, and persist if forced" do
       p = mock(Platform)
-      FakeClass.should_receive(:first).with(:geo_accession => "GPL1234").and_return(p)
+      FakeClass.should_receive(:first).with(:conditions => {:geo_accession => "GPL1234"}).and_return(p)
+      p.should_receive(:new_record?).and_return(false)
+      p.should_receive(:persist).and_return(true)
+      FakeClass.persist("GPL1234", true)
+    end
+
+    it "should check for an existing platform, and do nothing if not forced" do
+      p = mock(Platform)
+      FakeClass.should_receive(:first).with(:conditions => {:geo_accession => "GPL1234"}).and_return(p)
+      p.should_receive(:new_record?).and_return(false)
       p.should_not_receive(:persist)
       FakeClass.persist("GPL1234")
     end
@@ -148,6 +158,9 @@ describe Utilities do
       fake.should_receive(:geo_accession).and_return("geo")
       fake.should_receive(:fields).and_return("fields")
       fake.should_receive(:descriptive_text).and_return("text")
+      fake.should_receive(:annotating_at).and_return(nil)
+      fake.should_receive(:annotated_at).and_return(nil)
+      fake.should_receive(:update_attributes).twice.and_return(true)
       Annotation.should_receive(:create_for).with("geo", "fields", "text").and_return(["annotation"])
       fake.create_annotations.should == ["annotation"]
     end
@@ -186,8 +199,7 @@ describe Utilities do
     it "should call find in the Annotation model" do
       fake = FakeClass.new
       fake.should_receive(:geo_accession).and_return("geo")
-      Annotation.should_receive(:find_by_sql).with("SELECT a.* FROM annotations AS a, ontology_terms AS t WHERE a.geo_accession = 'geo' AND a.ontology_term_id != 'none' AND a.ontology_term_id = t.term_id ORDER BY t.term_id").and_return(["annotation"])
-
+      Annotation.should_receive(:find_by_sql).with("SELECT a.* FROM annotations AS a, ontology_terms AS t WHERE a.geo_accession = 'geo' AND a.ontology_term_id != -1 AND a.ontology_term_id = t.id ORDER BY t.term_id").and_return(["annotation"])
       fake.annotations.should == ["annotation"]
     end
   end
@@ -196,8 +208,7 @@ describe Utilities do
     it "should call find in the Annotation model" do
       fake = FakeClass.new
       fake.should_receive(:geo_accession).and_return("geo")
-      Annotation.should_receive(:find_by_sql).with("SELECT a.* FROM annotations AS a, ontologies AS o, ontology_terms AS t WHERE a.geo_accession = 'geo' AND a.field = 'title' AND a.ontology_term_id != 'none' AND a.ontology_term_id = t.term_id AND t.ncbo_id = o.ncbo_id ORDER BY o.name, t.name").and_return(["annotation"])
-
+      Annotation.should_receive(:find_by_sql).with("SELECT a.* FROM annotations AS a, ontologies AS o, ontology_terms AS t WHERE a.geo_accession = 'geo' AND a.field = 'title' AND a.ontology_term_id != -1 AND a.ontology_term_id = t.id AND t.ncbo_id = o.ncbo_id ORDER BY o.name, t.name").and_return(["annotation"])
       fake.annotations_for("title").should == ["annotation"]
     end
   end
@@ -238,6 +249,41 @@ describe Utilities do
         Dir.should_receive(:mkdir).with("cheese").and_return(true)
         @fake.make_directory("cheese")
       end
+    end
+  end
+
+  describe "keys" do
+    before(:each) do
+      @connection = mock("connection")
+      @connection.stub!(:open_transactions).and_return(true)
+      @connection.stub!(:rollback_db_transaction).and_return(true)
+      @connection.stub!(:decrement_open_transactions).and_return(true)
+      ActiveRecord::Base.stub!(:connection).and_return(@connection)
+    end
+
+    describe "disable" do
+      it "should disable keys for the selected model" do
+        @connection.should_receive(:execute).with("ALTER TABLE fake_classes DISABLE KEYS;").and_return(true)
+        FakeClass.disable_keys
+      end
+    end
+
+    describe "enable" do
+      it "should enable keys for the selected model" do
+        @connection.should_receive(:execute).with("ALTER TABLE fake_classes ENABLE KEYS;").and_return(true)
+        FakeClass.enable_keys
+      end
+    end
+  end
+
+  describe "prev next" do
+    it "should return the previous and next items in the array" do
+      sample = Sample.spawn(:geo_accession => "GSM2")
+      s1 = Sample.spawn(:geo_accession => "GSM1")
+      s2 = Sample.spawn(:geo_accession => "GSM2")
+      s3 = Sample.spawn(:geo_accession => "GSM3")
+      Sample.should_receive(:all).with(:order => [:geo_accession]).and_return([s1,s2,s3])
+      sample.prev_next.should == ["GSM1", "GSM3"]
     end
   end
 

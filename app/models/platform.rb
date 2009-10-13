@@ -1,17 +1,13 @@
-class Platform
+class Platform < ActiveRecord::Base
+  
   include Utilities
   extend Utilities::ClassMethods
-  include DataMapper::Resource
 
   include HTTParty
     base_uri 'www.ncbi.nlm.nih.gov'
-  
-  property :geo_accession, String, :length => 25, :key => true
-  property :title, String, :length => 255
-  property :organism, String, :length => 255
 
-  has n, :series_items, :child_key => [:platform_geo_accession]
-  has n, :samples, :through => :series_items
+  has_many :series_items
+  has_many :samples, :through => :series_items
 
   class << self
     def page(conditions, page=1, size=Constants::PER_PAGE)
@@ -23,16 +19,16 @@ class Platform
     end
   end
 
+  def to_param
+    self.geo_accession
+  end
+
   def platform_path
-    "#{Constants::DATAFILES_PATH}/#{self.geo_accession}"
+    "#{Rails.root}/datafiles/#{self.geo_accession}"
   end
 
   def platform_filename
     "#{platform_path}/#{self.geo_accession}.soft"
-  end
-
-  def download
-    download_file if !File.exists?(platform_filename)
   end
 
   def download_file
@@ -42,32 +38,36 @@ class Platform
   end
 
   def download_series_files
-    download
+    download_file
     platform_hash["series_ids"].each do |series_id|
-      s = SeriesItem.new(:geo_accession => series_id, :platform_geo_accession => self.geo_accession)
+      s = SeriesItem.new(:geo_accession => series_id, :platform_id => self.id)
       s.download
     end
   end
 
   def persist
-    download
+    download_file
     self.title = join_item(platform_hash["title"])
     self.organism = join_item(platform_hash["organism"])
     save!
   end
 
   def create_series(array=platform_hash["series_ids"])
+    Detection.disable_keys
     array.each do |series_id|
-      ser = SeriesItem.first(:geo_accession => series_id)
+      ser = SeriesItem.first(:conditions => {:geo_accession => series_id})
       if !ser
         puts "creating series #{series_id}"
-        ser = SeriesItem.new(:geo_accession => series_id, :platform_geo_accession => self.geo_accession)
+        ser = SeriesItem.new(:geo_accession => series_id, :platform_id => self.id)
       else
         puts "updating series #{series_id}"
       end
       ser.persist
       ser.create_samples
     end
+    stime = Time.now
+    Detection.enable_keys
+    puts "enable keys took: #{Time.now-stime}"
   end
 
   def fields

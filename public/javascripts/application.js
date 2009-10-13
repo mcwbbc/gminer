@@ -8,6 +8,15 @@ $(function() {
 });
 
 $(function() {
+  $("div.tooltip").hover( function() {
+      $(this).find('.popup').show();
+    },
+    function() {
+      $(this).find('.popup').hide();
+  });
+});
+
+$(function() {
   $("a.annotation-term").mouseover( function() {
     $('#'+$(this).attr("field")).highlight($(this).html());
   }).mouseout( function() {
@@ -21,6 +30,7 @@ $(function() {
    });
 });
 
+// updates the clicked link's curation status
 $(function() {
   $("a.curate").live("click", function(){
     link = $(this);
@@ -30,13 +40,77 @@ $(function() {
   });
 });
 
+// marks all the checked boxes as valid, and removes the checkboxes from the form
+$(function() {
+  $("span.validate-all").live("click", function(){
+    boxes = processChecked(true);
+    $.post('/annotations/valid', boxes.serialize(), function(data){ }, "json");
+    return false;
+  });
+
+  $("span.invalidate-all").live("click", function(){
+    boxes = processChecked(false);
+    $.post('/annotations/invalid', boxes.serialize(), function(data){ }, "json");
+    return false;
+  });
+
+  $("a.check-all").live("click", function(){
+    setBoxes(true);
+    return false;
+  });
+
+  $("a.uncheck-all").live("click", function(){
+    setBoxes(false);
+    return false;
+  });
+
+  $(".context").live("click", function(){
+    $(this).children("div").toggle();
+    return false;
+  });
+
+});
+
+
+function setBoxes(status) {
+  boxes = $(":checkbox[name='selected_annotations[]']")
+  boxes.each(function() {
+    $(this).attr('checked', status);
+  });
+}
+
+
+function processChecked(isValid) {
+  boxes = $(":checkbox[name='selected_annotations[]']:checked")
+  boxes.each(function() {
+    link = $("#link-"+$(this).val());
+    if (isValid) {
+      markValid(link);
+    } else {
+      markInvalid(link);
+    }
+    $(this).remove();
+  });
+  return boxes;
+}
+
+function markValid(object) {
+  object.removeClass("unaudited");
+  object.removeClass("unverified");
+  object.addClass("verified");
+}
+
+function markInvalid(object) {
+  object.removeClass("unaudited");
+  object.removeClass("verified");
+  object.addClass("unverified");
+}
+
 function updateCSS(data, object) {
   if (data.result) {
-    object.removeClass("unverified");
-    object.addClass("verified");
+    markValid(object);
   } else {
-    object.removeClass("verified");
-    object.addClass("unverified");
+    markInvalid(object);
   }
 }
 
@@ -46,6 +120,10 @@ function filter_submit() {
   
   if ($("#ddown").length > 0) {
     m.ddown = $("#ddown").val();
+  }
+
+  if ($("#status").length > 0) {
+    m.status = $("#status").val();
   }
 
   if ($("#query").length > 0) {
@@ -58,6 +136,7 @@ function filter_submit() {
 // dynamically load the items based on query filter
 $(function() {
   $("#ddown").bind("change", filter_submit);
+  $("#status").bind("change", filter_submit);
   $("#query").bind("keyup", filter_submit);
 });
 

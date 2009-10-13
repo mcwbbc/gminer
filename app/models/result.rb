@@ -1,19 +1,17 @@
-class Result
+class Result < ActiveRecord::Base
   extend Utilities::ClassMethods
-  include DataMapper::Resource
   
-  property :sample_geo_accession, String, :length => 25, :key => true
-  property :id_ref, String, :length => 100, :key => true
-  property :ontology_term_id, String, :length => 100, :key => true
-  property :pubmed_id, String, :length => 25
+  validates_uniqueness_of :id_ref, :scope => :sample_id
+  validates_uniqueness_of :ontology_term_id, :scope => [:sample_id, :id_ref]
 
-  belongs_to :sample, :child_key => [:sample_geo_accession]
-  belongs_to :ontology_term, :child_key => [:ontology_term_id]
+  belongs_to :sample
+  belongs_to :ontology_term
 
   class << self
     def page(conditions, page=1, size=Constants::PER_PAGE)
-      paginate(:order => [:sample_geo_accession, :id_ref, :ontology_term_id],
+      paginate(:order => "samples.geo_accession, id_ref, ontology_terms.term_id",
                :conditions => conditions,
+               :include => [:sample, :ontology_term],
                :page => page,
                :per_page => size
                )

@@ -1,26 +1,29 @@
 #navigation
   = link_to("Home", "/")
   #user
-    = login_logout(session.user)
+    = signin_signout
   %h2
     Views
   %ul
     %li
-      = link_to("Platforms", resource(:platforms))
+      = link_to("Platforms", platforms_url)
     %li
-      = link_to("Samples", resource(:samples))
+      = link_to("Samples", samples_url)
     %li
-      = link_to("Series", resource(:series_items))
+      = link_to("Series", series_items_url)
     %li
-      = link_to("Datasets", resource(:datasets))
+      = link_to("Datasets", datasets_url)
     %li
-      = link_to("Annotations", resource(:annotations))
+      = link_to("Annotations", annotations_url)
+    - admin_only do
+      %li
+        = link_to("Annotations - Audit", audit_annotations_url)
     %li
-      = link_to("Annotation Cloud", url(:cloud_annotations))
+      = link_to("Annotation Cloud", cloud_annotations_url)
     %li
-      = link_to("Ontologies", resource(:ontologies))
+      = link_to("Ontologies", ontologies_url)
     %li
-      = link_to("Ontology Terms", resource(:ontology_terms))
+      = link_to("Ontology Terms", ontology_terms_url)
     %li
-      = link_to("Results", resource(:results))
+      = link_to("Results", results_url)
 %div

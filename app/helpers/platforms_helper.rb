@@ -1,5 +1,2 @@
-module Merb
-  module PlatformsHelper
-
-  end
-end # Merb
+module PlatformsHelper
+end

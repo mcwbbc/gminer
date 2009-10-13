@@ -9,7 +9,7 @@
         %td{ :width => "80%" }
           Description
     %tbody#dataTable
-      = partial("short_annotation", :with => @annotation_hash.keys.sort, :layout => false, :format => :html)
+      = render(:partial => "short_annotation", :collection => @annotation_hash.keys.sort)
   %br{:clear => "all"}
 - else
   No Results. Please update the filters.

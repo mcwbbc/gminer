@@ -7,7 +7,7 @@
     = found_count("samples", @samples)
   %p
   - if @samples.total_pages > 1
-    = partial("shared/pagination", :items =>  @samples, :format => :html)
+    = render(:partial => "shared/pagination", :locals => {:items => @samples})
   %br
   %table{:width => "100%", :border => "0", :cellpadding => "0", :cellspacing => "2"}
     %thead
@@ -22,4 +22,4 @@
           %b
             Sample title
     %tbody#staffTable
-      = partial("sample", :with => @samples, :format => :html)
+      = render(:partial => "sample", :collection => @samples)

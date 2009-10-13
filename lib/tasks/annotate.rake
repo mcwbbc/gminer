@@ -1,26 +1,26 @@
 namespace :annotate do
   desc "Annotate the platforms"
-  task(:platforms, :needs => :merb_env) do
+  task(:platforms, :needs => :environment) do
     annotate(Platform)
   end
 
   desc "Annotate the datasets"
-  task(:datasets, :needs => :merb_env) do
+  task(:datasets, :needs => :environment) do
     annotate(Dataset)
   end
 
   desc "Annotate the series"
-  task(:series, :needs => :merb_env) do
+  task(:series, :needs => :environment) do
     annotate(SeriesItem)
   end
 
   desc "Annotate the samples"
-  task(:samples, :needs => :merb_env) do
+  task(:samples, :needs => :environment) do
     annotate(Sample)
   end
 
   desc "Clean the annotations based on keywords"
-  task(:clean, :needs => :merb_env) do
+  task(:clean, :needs => :environment) do
     array = ENV['terms']
     if array
       terms = array.split(",")
@@ -37,12 +37,11 @@ namespace :annotate do
   end
 
   desc "Annotate all the items"
-  task(:all => [:platforms, :datasets, :series, :samples])
+  task(:create_jobs => [:platforms, :datasets, :series, :samples])
 
   def annotate(model)
-    model.all.each do |item| 
-      item.create_annotations
+    model.all.each do |geo_item|
+      Job.create_for(geo_item.geo_accession)
     end
   end
-  
 end

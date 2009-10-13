@@ -1,28 +1,11 @@
-class Sample
+class Sample < ActiveRecord::Base
   include Utilities
   extend Utilities::ClassMethods
-  include DataMapper::Resource
 
-  property :geo_accession, String, :length => 25, :key => true
-  property :series_geo_accession, String, :index => true
-  property :platform_geo_accession, String, :index => true
-  property :sample_type, String, :length => 255
-  property :source_name, String, :length => 255
-  property :organism, String, :length => 255
-  property :label, String, :length => 255
-  property :molecule, String, :length => 255
-  property :title, Text, :lazy => false
-  property :characteristics, Text
-  property :treatment_protocol, Text
-  property :extract_protocol, Text
-  property :label_protocol, Text
-  property :scan_protocol, Text
-  property :hyp_protocol, Text
-  property :description, Text
-  property :data_processing, Text
-
-  belongs_to :series_item, :child_key => [:series_geo_accession]
-  has n, :detections, :child_key => [:sample_geo_accession]
+  belongs_to :series_item
+  belongs_to :platform
+  has_many :detections
+#  has n, :results, :foreign_key => :sample_geo_accession # they exist, but don't associate in case of lazy load
 
   class << self
     def page(conditions, page=1, size=Constants::PER_PAGE)
@@ -44,26 +27,26 @@ class Sample
       sql << "AND annotations.ontology_term_id = ontology_terms.term_id "
       sql << "AND annotations.geo_accession = samples.geo_accession "
       sql << "GROUP BY samples.geo_accession"
-      samples = repository(:default).adapter.query(sql)
+      samples = Sample.find_by_sql(sql)
     end
 
     def create_results(passed = {})
       options = {:ontology_name => "Mouse adult gross anatomy", :field => "source_name"}.merge(passed)
       Sample.matching(options).each do |sample|
-        transaction do |txn|
+        Result.transaction do
           inserts = []
           earlier = Time.new
-          Detection.all(:sample_geo_accession => sample.geo_accession, :abs_call => 'P').each do |detection|
-            inserts.push "('#{sample.geo_accession}', '#{detection.id_ref}', '#{sample.pubmed_id}', '#{sample.ontology_term_id}')"
+          sample.detections.find(:all, :conditions => {:abs_call => 'P'}).each do |detection|
+            inserts.push "('#{sample.id}', '#{detection.id_ref}', '#{sample.pubmed_id}', '#{sample.ontology_term_id}')"
           end
 
           if inserts.any?
-            sql = "INSERT INTO results (sample_geo_accession, id_ref, pubmed_id, ontology_term_id) VALUES #{inserts.join(", ")}"
+            sql = "INSERT INTO results (sample_id, id_ref, pubmed_id, ontology_term_id) VALUES #{inserts.join(", ")}"
             begin
-              DataMapper.repository(:default).adapter.execute(sql)
+              ActiveRecord::Base.connection.execute(sql)
               puts "Sample #{sample.geo_accession} took #{Time.new-earlier}" if options[:debug]
-            rescue Exception => e
-              if e.message =~ /Duplicate entry/
+            rescue ActiveRecord::StatementInvalid => e
+              if e.message =~ /Mysql::Error: Duplicate entry/
                 puts "Mysql::Error: Duplicate entry #{sample.geo_accession} #{sample.ontology_term_id}"
               else
                 raise e
@@ -77,8 +60,12 @@ class Sample
     end
   end
 
+  def to_param
+    self.geo_accession
+  end
+
   def series_path
-    "#{Constants::DATAFILES_PATH}/#{self.platform_geo_accession}/#{self.series_geo_accession}"
+    "#{Rails.root}/datafiles/#{self.platform.geo_accession}/#{self.series_item.geo_accession}"
   end
 
   def local_sample_filename
@@ -153,7 +140,7 @@ class Sample
         if line =~ data_regex
           data = line.chomp.split("\t")
           if (data[id_ref_header_pos] && data[abs_call_header_pos])
-            inserts.push "('#{self.geo_accession}', '#{data[id_ref_header_pos].chomp}', '#{data[abs_call_header_pos].chomp}')"
+            inserts.push "('#{self.id}', '#{data[id_ref_header_pos].chomp}', '#{data[abs_call_header_pos].chomp}')"
           end
         end
       end
@@ -164,8 +151,8 @@ class Sample
     end
 
     if inserts.any?
-      sql = "INSERT INTO detections (sample_geo_accession, id_ref, abs_call) VALUES #{inserts.join(", ")}"
-      insert = DataMapper.repository(:default).adapter.execute(sql)
+      sql = "INSERT INTO detections (sample_id, id_ref, abs_call) VALUES #{inserts.join(", ")}"
+      ActiveRecord::Base.connection.execute(sql)
     end
 
   end

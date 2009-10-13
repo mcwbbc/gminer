@@ -1,0 +1,16 @@
+- title t('.title')
+= page_title(t('.title'))
+%br
+%p
+  = t('password_resets.instructions')
+.user-form
+  - form_tag(password_resets_path, :class => "formtastic") do
+    %fieldset.inputs
+      %ol
+        %li{:class => "string required error"}
+          = label_tag("email", t('label.email'))
+          = text_field_tag("email")
+    %fieldset.buttons
+      %ol
+        %li.commit
+          = submit_tag t(".submit")

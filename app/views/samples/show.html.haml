@@ -1,10 +1,10 @@
-= partial("shared/show_page_title", :title => "Series", :geo_accession => @sample.geo_accession)
-== Series: #{link_to(@sample.series_geo_accession, resource(@sample.series_item))}
+= render(:partial => "shared/show_page_title", :locals => {:title => "Sample", :geo_accession => @sample.geo_accession})
+== Series: #{link_to(@sample.series_item.geo_accession, series_item_url(@sample.series_item))}
 %br
-== Platform: #{link_to(@sample.platform_geo_accession, resource(@sample.series_item.platform))}
-%br
-%br
-= link_to('Back', resource(:samples))
+== Platform: #{link_to(@sample.platform.geo_accession, platform_url(@sample.series_item.platform))}
 %br
 %br
-= partial("shared/annotations_table", :item => @sample)
+= link_to('Back', samples_url)
+%br
+%br
+= render(:partial => "shared/annotations_table", :locals => {:item => @sample})

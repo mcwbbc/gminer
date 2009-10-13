@@ -3,6 +3,6 @@
 %ul.reference
   - terms.each do |term|
     %li
-      = link_to(term.name, resource(term))
+      = link_to(term.name, ontology_term_url(term))
 %br
 %br

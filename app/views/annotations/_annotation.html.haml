@@ -2,8 +2,11 @@
   %td{:valign => "top"}
     = geo_link(annotation.geo_accession)
   %td{:valign => "top"}
-    = annotation.field
+    - if admin_user?
+      = curate_link(annotation)
+      = ncbo_ontology_link(annotation.ontology_term)
+    - else
+      = link_to(highlight(annotation.ontology_term.name, @q), ontology_term_url(annotation.ontology_term))
+      = ncbo_ontology_link(annotation.ontology_term)
   %td{:valign => "top"}
-    = link_to(highlight(annotation.ontology_term.name, @q), resource(annotation.ontology_term))
-  %td{:valign => "top"}
-    = link_to(annotation.ontology_term.ontology.name, resource(annotation.ontology_term.ontology))
+    = annotation.in_context

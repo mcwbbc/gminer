@@ -8,4 +8,4 @@
         %li
           %span
             == #{term.annotations_count} annotations for term
-          = link_to(term.name, resource(term), :class => css_class)
+          = link_to(term.name, ontology_term_url(term), :class => css_class)

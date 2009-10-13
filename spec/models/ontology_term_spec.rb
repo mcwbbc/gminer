@@ -1,6 +1,42 @@
-require File.join( File.dirname(__FILE__), '..', "spec_helper" )
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe OntologyTerm do
+
+  describe "persist" do
+    describe "with existing" do
+      it "should not create" do
+        ot = OntologyTerm.generate
+        OntologyTerm.should_receive(:first).with(:conditions => {:term_id => "term_id"}).and_return(ot)
+        OntologyTerm.persist("term_id", "ncbo_id", "term_name").should == nil
+      end
+    end
+
+    describe "without existing" do
+      before(:each) do
+        @ot = OntologyTerm.generate
+        OntologyTerm.should_receive(:first).with(:conditions => {:term_id => "term_id"}).and_return(nil)
+      end
+
+      describe "with matching ontology" do
+        it "should create a new ontology_term" do
+          ontology = Ontology.generate
+          Ontology.should_receive(:first).with(:conditions => {:ncbo_id => "ncbo_id"}).and_return(ontology)
+          ontology_terms = mock("ontology_terms")
+          ontology.should_receive(:ontology_terms).and_return(ontology_terms)
+          ontology_terms.should_receive(:create).with(:term_id => "term_id", :ncbo_id => "ncbo_id", :name => "term_name").and_return(@ot)
+          OntologyTerm.persist("term_id", "ncbo_id", "term_name").should == @ot
+        end
+      end
+
+      describe "without matching ontology" do
+        it "should not save anyting" do
+          Ontology.should_receive(:first).with(:conditions => {:ncbo_id => "ncbo_id"}).and_return(nil)
+          OntologyTerm.persist("term_id", "ncbo_id", "term_name").should be_nil
+        end
+      end
+
+    end
+  end
 
   describe "cloud" do
     it "should return ontology terms with empty options" do
@@ -31,11 +67,11 @@ describe OntologyTerm do
 
   describe "child closures" do
     before(:each) do
-      @ot = Factory.build(:ontology_term)
+      @ot = OntologyTerm.generate
     end
 
     it "should return and empty array for no closures" do
-      AnnotationClosure.should_receive(:all).with(:ontology_term_id => "Properties_or_Attributes", :order => [DataMapper::Query::Direction.new(OntologyTerm.properties[:name], :asc)], :links => [:ontology_term]).and_return([])
+      AnnotationClosure.should_receive(:all).with(:conditions => {:ontology_term_id => @ot.id}, :order => "ontology_terms.name", :include => [:ontology_term]).and_return([])
       @ot.child_closures.should == []
     end
 
@@ -47,7 +83,7 @@ describe OntologyTerm do
       
       ac = mock(AnnotationClosure)
       ac.should_receive(:annotation).and_return(a)
-      AnnotationClosure.should_receive(:all).with(:ontology_term_id => "Properties_or_Attributes", :order => [DataMapper::Query::Direction.new(OntologyTerm.properties[:name], :asc)], :links => [:ontology_term]).and_return([ac])
+      AnnotationClosure.should_receive(:all).with(:conditions => {:ontology_term_id => @ot.id}, :order => "ontology_terms.name", :include => [:ontology_term]).and_return([ac])
 
       @ot.child_closures.should == [term]
     end
@@ -55,7 +91,7 @@ describe OntologyTerm do
 
   describe "parent closures" do
     before(:each) do
-      @ot = Factory.build(:ontology_term)
+      @ot = OntologyTerm.generate
     end
 
     it "should return and empty array for no annotations" do
@@ -64,14 +100,14 @@ describe OntologyTerm do
 
     it "should return an array of terms create by closure for this term" do
       term = mock(OntologyTerm)
-      OntologyTerm.should_receive(:find_by_sql).with("SELECT ontology_terms.* FROM annotations, annotation_closures, ontology_terms WHERE annotations.ontology_term_id = 'Properties_or_Attributes' AND annotations.geo_accession = annotation_closures.annotation_geo_accession AND annotations.field = annotation_closures.annotation_field AND ontology_terms.term_id = annotation_closures.ontology_term_id GROUP BY annotation_closures.ontology_term_id ORDER BY ontology_terms.name").and_return([term])
+      OntologyTerm.should_receive(:find_by_sql).with("SELECT DISTINCT ontology_terms.* FROM annotations, annotation_closures, ontology_terms WHERE annotations.ontology_term_id = #{@ot.id} AND annotations.id = annotation_closures.annotation_id AND ontology_terms.id = annotation_closures.ontology_term_id ORDER BY ontology_terms.name").and_return([term])
       @ot.parent_closures.should == [term]
     end
   end
 
   describe "closure geo references" do
     before(:each) do
-      @ot = Factory.build(:ontology_term)
+      @ot = OntologyTerm.generate
     end
 
     it "should return an empty array with no annotations" do
@@ -93,7 +129,7 @@ describe OntologyTerm do
 
   describe "direct geo references" do
     before(:each) do
-      @ot = Factory.build(:ontology_term)
+      @ot = OntologyTerm.generate
     end
 
     it "should return an empty array with no annotations" do
@@ -112,7 +148,7 @@ describe OntologyTerm do
 
   describe "link item" do
     before(:each) do
-      @ot = Factory.build(:ontology_term)
+      @ot = OntologyTerm.generate
       @item = mock("geo_item")
     end
 
@@ -133,4 +169,52 @@ describe OntologyTerm do
     end
   end
 
+  describe "to_param" do
+    it "should return the term_id as the param" do
+      ot = OntologyTerm.generate
+      ot.to_param.should == "13578|Cheese"
+    end
+  end
+
+  describe "valid annotation count" do
+    it "should return a number of the valid annotations" do
+      ot = OntologyTerm.generate
+      Annotation.should_receive(:count).with(:conditions => {:ontology_term_id => ot.id, :verified => true} ).and_return(1)
+      ot.valid_annotation_count.should == 1
+    end
+  end
+
+  describe "audited annotation count" do
+    it "should return a number of the audited annotations" do
+      ot = OntologyTerm.generate
+      Annotation.should_receive(:count).with(:conditions => {:ontology_term_id => ot.id, :audited => true} ).and_return(1)
+      ot.audited_annotation_count.should == 1
+    end
+  end
+
+  describe "valid_annotation_percentage" do
+    it "should return a percentage of the valid annotations" do
+      @ot = OntologyTerm.generate(:annotations_count => 2)
+      @ot.should_receive(:valid_annotation_count).and_return(1)
+      @ot.valid_annotation_percentage.should == 50.0
+    end
+
+    it "should return 0 if there are no valid" do
+      @ot = OntologyTerm.generate(:annotations_count => 0)
+      @ot.valid_annotation_percentage.should == 0
+    end
+  end
+
+  describe "audited_annotation_percentage" do
+    it "should return a percentage of the audited annotations" do
+      @ot = OntologyTerm.generate(:annotations_count => 2)
+      @ot.should_receive(:audited_annotation_count).and_return(1)
+      @ot.audited_annotation_percentage.should == 50.0
+    end
+
+    it "should return 0 if there are no valid" do
+      @ot = OntologyTerm.generate(:annotations_count => 0)
+      @ot.audited_annotation_percentage.should == 0
+    end
+  end
 end

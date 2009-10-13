@@ -1,6 +1,6 @@
 %tr{:class => "#{cycle('rowWhite', 'rowBlue')}"}
   %td{:valign => "top"}
-    = link_to(highlight(series_item.geo_accession, @q), resource(series_item))
+    = link_to(highlight(series_item.geo_accession, @q), series_item_url(series_item))
   %td{:valign => "top"}
     = pubmed_link(series_item.pubmed_id)
   %td{:valign => "top"}

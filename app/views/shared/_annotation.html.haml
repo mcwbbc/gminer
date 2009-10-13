@@ -2,7 +2,8 @@
   %td{ :valign => "top", :width => "40%" }
     = ontology_name
   %td{ :valign => "top" }
-    - if session.user
+    - if admin_user?
       = curate_link_list
+      = ncbo_ontology_link_list
     - else
       = term_list

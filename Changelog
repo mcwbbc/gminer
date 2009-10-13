@@ -1,2 +1,4 @@
 5/15/2009
 * Initial public release
+10/13/2009
+* Rewrite application in Rails due to failing support of Merb

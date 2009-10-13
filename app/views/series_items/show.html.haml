@@ -1,12 +1,12 @@
-= partial("shared/show_page_title", :title => "Series", :geo_accession => @series_item.geo_accession)
-== Platform: #{link_to(@series_item.platform_geo_accession, resource(@series_item.platform))}
+= render(:partial => "shared/show_page_title", :locals => {:title => "Series", :geo_accession => @series_item.geo_accession})
+== Platform: #{link_to(@series_item.platform.geo_accession, platform_url(@series_item.platform))}
 %br
 -if !@series_item.pubmed_id.blank?
   == PubMed: #{pubmed_link(@series_item.pubmed_id)}
   %br
   %br
-= link_to('Back', resource(:series_items))
+= link_to('Back', series_items_url)
 %br
 %br
-= partial("shared/children", :title => "Samples", :items => @series_item.samples)
-= partial("shared/annotations_table", :item => @series_item)
+= render(:partial => "shared/children", :locals => {:title => "Samples", :items => @series_item.samples})
+= render(:partial => "shared/annotations_table", :locals => {:item => @series_item})

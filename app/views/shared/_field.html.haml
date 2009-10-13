@@ -1,7 +1,7 @@
 - if !field[:value].blank?
   %tr
     %td{ :valign => "top" }
-      == #{Extlib::Inflection.humanize(field[:name])}:
+      = field[:name].humanize
     %td
       %span{ :id => field[:name] }
         = field[:value]

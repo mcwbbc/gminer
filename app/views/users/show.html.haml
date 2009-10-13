@@ -1,0 +1,40 @@
+- title t('.title')
+= page_title(t('.title'))
+= link_to t('link.edit'), edit_account_path
+%p
+%p
+  %b
+    = User.human_attribute_name('email')
+    \:
+  = h @user.email
+- admin_only do
+  %p
+    %b
+      = User.human_attribute_name('login_count')
+      \:
+    = h @user.login_count
+  %p
+    %b
+      = User.human_attribute_name('last_request_at')
+      \:
+    = h @user.last_request_at
+  %p
+    %b
+      = User.human_attribute_name('last_login_at')
+      \:
+    = h @user.last_login_at
+  %p
+    %b
+      = User.human_attribute_name('current_login_at')
+      \:
+    = h @user.current_login_at
+  %p
+    %b
+      = User.human_attribute_name('last_login_ip')
+      \:
+    = h @user.last_login_ip
+  %p
+    %b
+      = User.human_attribute_name('current_login_ip')
+      \:
+    = h @user.current_login_ip

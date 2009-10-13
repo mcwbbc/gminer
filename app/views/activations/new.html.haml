@@ -1,0 +1,12 @@
+= page_title(t('.title'))
+%br
+.user-form
+  %p
+    = t('.instruction')
+  - semantic_form_for(@user, :url => finish_activate_path(@user.id), :html => { :method => :post }) do |form|
+    = form.error_messages
+    - form.inputs do
+      = form.input :password
+      = form.input :password_confirmation
+    - form.buttons do
+      = form.commit_button t("label.activate")

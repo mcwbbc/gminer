@@ -1,7 +1,7 @@
-= partial("shared/show_page_title", :title => "Series", :geo_accession => @platform.geo_accession)
-= link_to('Back', resource(:platforms))
+= render(:partial => "shared/show_page_title", :locals => {:title => "Platform", :geo_accession => @platform.geo_accession})
+= link_to('Back', platforms_url)
 %br
 %br
-= partial("shared/children", :title => "Series", :items => @platform.series_items)
-= partial("shared/children", :title => "Samples", :items => @platform.samples)
-= partial("shared/annotations_table", :item => @platform)
+= render(:partial => "shared/children", :locals => {:title => "Series", :items => @platform.series_items})
+= render(:partial => "shared/children", :locals => {:title => "Samples", :items => @platform.samples})
+= render(:partial => "shared/annotations_table", :locals => {:item => @platform})

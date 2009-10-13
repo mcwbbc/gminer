@@ -1,10 +1,10 @@
-require File.join( File.dirname(__FILE__), '..', "spec_helper" )
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe SeriesItem do
 
   describe "download file" do
     it "should download the file via ftp" do
-      s = Factory.build(:series_item)
+      s = SeriesItem.generate
       s.should_receive(:series_path).and_return("path")
       s.should_receive(:make_directory).with("path").and_return(true)
       s.should_receive(:family_filename).and_return("filename")
@@ -22,7 +22,7 @@ describe SeriesItem do
 
   describe "persist" do
     it "should set the fields and save to the database" do
-      s = Factory.build(:series_item)
+      s = SeriesItem.generate
       s.stub!(:series_hash).and_return({"overall_design" => "ratdesign", "pubmed_id" => "1234", "summary" => "ratsummary", "title" => "title"})
       s.should_receive(:overall_design=).with("ratdesign").and_return(true)
       s.should_receive(:title=).with("title").and_return(true)
@@ -36,7 +36,7 @@ describe SeriesItem do
 
   describe "series hash" do
     it "should return the hash for the series by parsing the file" do
-      s = Factory.build(:series_item)
+      s = SeriesItem.generate
       s.should_receive(:fields).and_return(["fields"])
       s.should_receive(:local_series_filename).and_return("file.soft")
       s.should_receive(:file_hash).with(["fields"], "file.soft").and_return(true)
@@ -46,14 +46,15 @@ describe SeriesItem do
 
   describe "fields" do
     it "should return an array of hashes with field information" do
-      s = Factory.build(:series_item)
-      s.fields.should == [{:value=>"Series Title", :regex=>/^!Series_title = (.+)$/, :name=>"title"}, {:value=>"RS:1000", :regex=>/^!Series_summary = (.+)$/, :name=>"summary"}, {:value=>"rat strain series", :regex=>/^!Series_overall_design = (.+?)$/, :name=>"overall_design"}, {:value=>"12345", :regex=>/^!Series_pubmed_id = (\d+)$/, :name=>"pubmed_id"}, {:value=>"", :regex=>/^!Series_sample_id = (GSM\d+)$/, :name=>"sample_ids"}]
+      s = SeriesItem.generate
+      s.fields.should == [{:value=>"Series Title", :regex=>/^!Series_title = (.+)$/, :name=>"title"}, {:value=>"summary of series item", :regex=>/^!Series_summary = (.+)$/, :name=>"summary"}, {:value=>"rat strain series", :regex=>/^!Series_overall_design = (.+?)$/, :name=>"overall_design"}, {:value=>"12345", :regex=>/^!Series_pubmed_id = (\d+)$/, :name=>"pubmed_id"}, {:value=>"", :regex=>/^!Series_sample_id = (GSM\d+)$/, :name=>"sample_ids"}]
     end
   end
 
   describe "download" do
     it "should download the file if it doesn't exist" do
-      s = Factory.build(:series_item)
+      p = Platform.generate
+      s = SeriesItem.generate(:platform => p)
       File.should_receive(:exists?).with(/datafiles\/GPL1355\/GSE8700\/GSE8700_family.soft$/).and_return(false)
       s.should_receive(:download_file).and_return(true)
       s.should_receive(:split_series_file).and_return(true)
@@ -61,7 +62,8 @@ describe SeriesItem do
     end
 
     it "should do nothing if the file exists" do
-      s = Factory.build(:series_item)
+      p = Platform.generate
+      s = SeriesItem.generate(:platform => p)
       File.should_receive(:exists?).with(/datafiles\/GPL1355\/GSE8700\/GSE8700_family.soft$/).and_return(true)
       s.should_not_receive(:download_file)
       s.should_not_receive(:split_series_file)
@@ -71,28 +73,31 @@ describe SeriesItem do
 
   describe "series path" do
     it "should return the path for the series" do
-      s = Factory.build(:series_item)
+      p = Platform.generate
+      s = SeriesItem.generate(:platform => p)
       s.series_path.should match(/datafiles\/GPL1355\/GSE8700$/)
     end
   end
 
   describe "family filename" do
     it "should return the path for the family filename" do
-      s = Factory.build(:series_item)
+      s = SeriesItem.generate
       s.family_filename.should == "GSE8700_family.soft"
     end
   end
   
   describe "local family filename" do
     it "should return the path for the family filename" do
-      s = Factory.build(:series_item)
+      p = Platform.generate
+      s = SeriesItem.generate(:platform => p)
       s.local_family_filename.should match(/datafiles\/GPL1355\/GSE8700\/GSE8700_family.soft/)
     end
   end
   
   describe "local series filename" do
     it "should return the path for the series" do
-      s = Factory.build(:series_item)
+      p = Platform.generate
+      s = SeriesItem.generate(:platform => p)
       s.local_series_filename.should match(/datafiles\/GPL1355\/GSE8700\/GSE8700_series.soft/)
     end
   end
@@ -106,20 +111,21 @@ describe SeriesItem do
 
   describe "create samples" do
     it "should check if the sample exists, and do nothing if it does" do
-      se = Factory.build(:series_item)
+      se = SeriesItem.generate
       s = mock(Sample)
-      Sample.should_receive(:first).with(:geo_accession => "1").and_return(s)
+      Sample.should_receive(:first).with(:conditions => {:geo_accession => "1"}).and_return(s)
       se.create_samples(["1"])
     end
 
     it "should check if the sample exists, save it and create the detections if it doesn't exist" do
-      se = Factory.build(:series_item)
+      p = Platform.generate
+      se = SeriesItem.generate(:platform => p)
       s = mock(Sample)
       s.should_receive(:persist).and_return(true)
       s.should_receive(:create_detections).and_return(true)
       Sample.should_receive(:transaction).and_yield
-      Sample.should_receive(:first).with(:geo_accession => "1").and_return(nil)
-      Sample.should_receive(:new).with({:geo_accession=>"1", :series_geo_accession => "GSE8700", :platform_geo_accession=>"GPL1355"}).and_return(s)
+      Sample.should_receive(:first).with(:conditions => {:geo_accession => "1"}).and_return(nil)
+      Sample.should_receive(:new).with({:geo_accession=>"1", :series_item_id => se.id, :platform_id => p.id}).and_return(s)
       se.create_samples(["1"])
     end
   end
@@ -137,12 +143,20 @@ describe SeriesItem do
 "^SAMPLE = GSM215573",
 "!Sample_title = rat 2"
               ]
-      s = Factory.build(:series_item)
+      p = Platform.generate
+      s = SeriesItem.generate(:platform => p)
       File.should_receive(:open).with(/GSE8700_family.soft/, "r").and_return(array)
       s.should_receive(:write_file).with(/datafiles\/GPL1355\/GSE8700\/GSE8700_series.soft/, "^SERIES = GSE8700!SeriesItem_title = Expression data from epididymal fat tissues of diet induced obese rats!SeriesItem_geo_accession = GSE8700").and_return(true)
       s.should_receive(:write_file).with(/datafiles\/GPL1355\/GSE8700\/GSM215572_sample.soft/, "^SAMPLE = GSM215572!Sample_title = Diet Induced Obese rat C1").and_return(true)
       s.should_receive(:write_file).with(/datafiles\/GPL1355\/GSE8700\/GSM215573_sample.soft/, "^SAMPLE = GSM215573!Sample_title = rat 2").and_return(true)
       s.split_series_file
+    end
+  end
+
+  describe "to_param" do
+    it "should return the geo_accession as the param" do
+      s = SeriesItem.generate
+      s.to_param.should == "GSE8700"
     end
   end
 

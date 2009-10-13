@@ -1,18 +1,13 @@
-class Dataset
+class Dataset < ActiveRecord::Base
   include Utilities
   extend Utilities::ClassMethods
-  include DataMapper::Resource
-  
-  property :geo_accession, String, :length => 25, :key => true
-  property :platform_geo_accession, String, :length => 25, :index => true
-  property :reference_series, String, :length => 25
-  property :title, Text, :lazy => false
-  property :description, Text
-  property :organism, String, :length => 255
-  property :pubmed_id, String, :length => 25
 
-  belongs_to :platform, :child_key => [:platform_geo_accession]
-  belongs_to :series_item, :child_key => [:reference_series]
+  belongs_to :platform, :foreign_key => :platform_geo_accession
+  belongs_to :series_item, :foreign_key => :reference_series
+
+  def to_param
+    self.geo_accession
+  end
 
   class << self
     def page(conditions, page=1, size=Constants::PER_PAGE)
@@ -25,7 +20,7 @@ class Dataset
   end
 
   def dataset_path
-    "#{Constants::DATAFILES_PATH}/#{self.geo_accession}"
+    "#{Rails.root}/datafiles/#{self.geo_accession}"
   end
 
   def dataset_filename
@@ -69,7 +64,8 @@ class Dataset
     self.description = join_item(dataset_hash["description"])
     self.pubmed_id = join_item(dataset_hash["pubmed_id"])
     self.reference_series = join_item(dataset_hash["reference_series"])
-    self.platform_geo_accession = join_item(dataset_hash["platform_geo_accession"])
+    platform = Platform.first(:conditions => {:geo_accession => join_item(dataset_hash["platform_geo_accession"])} )
+    self.platform_id = platform.id
     save!
   end
 

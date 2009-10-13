@@ -1,7 +1,10 @@
-= partial("shared/annotation_counts")
+- admin_only do
+  = render(:partial => "shared/annotation_counts")
 = page_title("Datasets")
 %p
   %form{:name => "sform", :action => "", :style => "display:inline"}
-    = text_field(:name => :query, :label => "Filter on GEO accession or title: ", :value => params['query'],  :autocomplete => "off")
+    %label
+      Filter on GEO accession or title:
+    = text_field_tag(:query, params['query'], :autocomplete => 'off') 
 #dataTable
-  = partial("datasets_list")
+  = render(:partial => "datasets_list")

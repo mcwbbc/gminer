@@ -47,6 +47,11 @@ img {
   right: 20px;
 }
 
+#user {
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
 #user-bar {
   position: absolute;
   top: 10px;
@@ -185,7 +190,7 @@ img {
 
 /* Flash Messages */
 
-.notice, .success, .warning, .error, .validation {
+.notice, .success, .warning, .validation {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 13px;
   border: 1px solid;
@@ -194,22 +199,20 @@ img {
   background-repeat: no-repeat;
   background-position: 10px center;
 }
+
 .success {
   color: #4F8A10;
   background-color: #DFF2BF;
   background-image: url('/images/icons/success.png');
 }
+
 .notice {
   color: #00529B;
   background-color: #BDE5F8;
   background-image: url('/images/icons/notice.png');
 }
+
 .warning {
-  color: #9F6000;
-  background-color: #FEEFB3;
-  background-image: url('/images/icons/warning.png');
-}
-.error {
   color: #D8000C;
   background-color: #FFBABA;
   background-image: url('/images/icons/error.png');
@@ -267,8 +270,33 @@ img {
   background-color: yellow;
 }
 
+.lightred {
+  background-color: #ffffbb;
+  padding-right: 5px;
+  padding-left: 5px;
+}
+
 .red {
   background-color: red;
+}
+
+.validate-all, .invalidate-all {
+  border: 1px solid #000;
+  background: #ccccff;
+  padding: 5px;
+  cursor: pointer;
+}
+
+.context {
+  cursor: pointer;
+}
+
+.full-text {
+  padding: 5px;
+  margin: 5px;
+  border: 1px solid #000;
+  background: #fff;
+  display: none;
 }
 
 #annotation-count {
@@ -407,7 +435,7 @@ img {
   font-size: 1.5em;
 }
 
-.unverified, .verified {
+.unverified, .verified, .unaudited {
   border: 1px solid #000;
   color: #fff;
   margin: .1em;
@@ -415,11 +443,18 @@ img {
   line-height: 2em;
 }
 
+.unaudited {
+  background: #ee4;
+  color: #000;
+}
+
 .unverified {
+  color: #fff;
   background: #b22;
 }
 
 .verified {
+  color: #fff;
   background: #2b2;
 }
 
@@ -449,4 +484,20 @@ img {
 
 .nxt {
   right: 0em;
+}
+
+.tooltip {
+  position: relative;
+  cursor: help;
+}
+
+.popup {
+  position: absolute;
+  border: 1px solid #000;
+  color: #000;
+  background: #fff;
+  z-index: 10;
+  width: 300%;
+  padding: 1em;
+  display: none; /* keeps the popup hidden if no JS available */
 }

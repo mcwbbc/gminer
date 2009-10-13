@@ -1,8 +1,12 @@
-= partial("shared/annotation_counts")
+- admin_only do
+  = render(:partial => "shared/annotation_counts")
 = page_title("Annotations")
 %p
   %form{:name => "sform", :action => "", :style => "display:inline"}
     = ontology_search_dropdown(@current)
-    = text_field(:name => :query, :label => "Filter on term: ", :value => params['query'],  :autocomplete => "off")
+    %label
+      Filter on term:
+    = text_field_tag(:query, params['query'], :autocomplete => 'off') 
+
 #dataTable
-  = partial("annotations_list")
+  = render(:partial => "annotations_list")

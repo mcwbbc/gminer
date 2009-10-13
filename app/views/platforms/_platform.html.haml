@@ -1,6 +1,6 @@
 %tr{:class => "#{cycle('rowWhite', 'rowBlue')}"}
   %td{:valign => "top"}
-    = link_to(highlight(platform.geo_accession, @q), resource(platform))
+    = link_to(highlight(platform.geo_accession, @q), platform_url(platform))
   %td{:valign => "top"}
     = highlight(platform.organism, @q)
   %td{:valign => "top"}

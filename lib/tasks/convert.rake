@@ -1,7 +1,7 @@
 namespace :convert do
 
   desc "Convert the detections"
-  task(:detections, :needs => :merb_env) do
+  task(:detections, :needs => :environment) do
     convert(Detection)
   end
 

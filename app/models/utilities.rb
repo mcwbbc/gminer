@@ -2,30 +2,28 @@ module Utilities
 
   module ClassMethods
 
-    def find_in_batches(options = {})
-      batch_size = options.delete(:batch_size) || 1000
-      count = self.count
-      0.upto(count/batch_size) do |i|
+    def disable_keys
+      sql = "ALTER TABLE #{name.to_s.tableize} DISABLE KEYS;"
+      ActiveRecord::Base.connection.execute(sql)
+    end
 
-        offset = (i*batch_size)+1
-        records = self.all(:limit => batch_size, :offset => offset)
-
-        yield records
-      end
+    def enable_keys
+      sql = "ALTER TABLE #{name.to_s.tableize} ENABLE KEYS;"
+      ActiveRecord::Base.connection.execute(sql)
     end
 
     def field_names
-      array = self.properties.map { |property| property.name.to_s }
+      array = self.column_names
       array.delete("id")
       array
     end
 
-    def persist(geo_accession)
-      record = self.first(:geo_accession => geo_accession)
+    def persist(geo_accession, force=false)
+      record = self.first(:conditions => {:geo_accession => geo_accession})
       if !record
         record = self.new(:geo_accession => geo_accession)
-        record.persist
       end
+      record.persist if (record.new_record? || force)
     end
 
     def remove_stopwords(text)
@@ -59,13 +57,17 @@ module Utilities
         when /^GDS/
           m = Dataset
       end
-      m.get(key)
+      m.first(:conditions => {:geo_accession => key})
     end
-
   end
 
   def create_annotations
-    Annotation.create_for(self.geo_accession, fields, descriptive_text)
+    if (self.annotated_at.nil? && (self.annotating_at.nil? || self.annotating_at < 5.minutes.ago.to_datetime))
+      self.update_attributes(:annotating_at => Time.now)
+      a = Annotation.create_for(self.geo_accession, fields, descriptive_text)
+      self.update_attributes(:annotating_at => nil, :annotated_at => Time.now)
+      a
+    end
   end
 
   def descriptive_text
@@ -89,8 +91,8 @@ module Utilities
 #    Annotation.find(:all, :conditions => ["annotations.geo_accession = ? AND annotations.ontology_term_id != ?", self.geo_accession, "none"], :include => :ontology_term, :order => "ontology_terms.name", :group => "ontology_terms.term_id")
     query = "SELECT a.* FROM annotations AS a, ontology_terms AS t"
     query << " WHERE a.geo_accession = '#{self.geo_accession}'"
-    query << " AND a.ontology_term_id != 'none'"
-    query << " AND a.ontology_term_id = t.term_id"
+    query << " AND a.ontology_term_id != -1"
+    query << " AND a.ontology_term_id = t.id"
     query << " ORDER BY t.term_id"
     Annotation.find_by_sql(query)
   end
@@ -100,8 +102,8 @@ module Utilities
     query = "SELECT a.* FROM annotations AS a, ontologies AS o, ontology_terms AS t"
     query << " WHERE a.geo_accession = '#{self.geo_accession}'"
     query << " AND a.field = '#{field}'"
-    query << " AND a.ontology_term_id != 'none'"
-    query << " AND a.ontology_term_id = t.term_id"
+    query << " AND a.ontology_term_id != -1"
+    query << " AND a.ontology_term_id = t.id"
     query << " AND t.ncbo_id = o.ncbo_id"
     query << " ORDER BY o.name, t.name"
     Annotation.find_by_sql(query)

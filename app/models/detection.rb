@@ -1,9 +1,8 @@
-class Detection
-  include DataMapper::Resource
+class Detection < ActiveRecord::Base
+  extend Utilities::ClassMethods
   
-  property :sample_geo_accession, String, :length => 25, :key => true
-  property :id_ref, String, :length => 100, :key => true
-  property :abs_call, String, :length => 2, :key => true
+  validates_uniqueness_of :id_ref, :scope => :sample_id
+  validates_uniqueness_of :abs_call, :scope => [:sample_id, :id_ref]
 
   def present?
     self.abs_call == "P"

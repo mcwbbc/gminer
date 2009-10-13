@@ -1,5 +1,2 @@
-module Merb
-  module OntologiesHelper
-
-  end
-end # Merb
+module OntologiesHelper
+end

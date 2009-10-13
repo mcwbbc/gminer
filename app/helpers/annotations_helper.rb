@@ -1,11 +1,10 @@
-module Merb
-  module AnnotationsHelper
+module AnnotationsHelper
 
-    def ontology_search_dropdown(current)
-      select(:ddown, :label => "Ontology: ", :id => "ddown", :value_method=> :name, :text_method => :name, :collection => Ontology.all(:order => [:name]), :selected => current)
-    end
-
+  def ontology_search_dropdown(current)
+    select_tag(:ddown, options_from_collection_for_select(Ontology.which_have_annotations, :ncbo_id, :name, current))
   end
-end # Merb
 
-
+  def annotation_status_dropdown(current)
+    select_tag(:status, options_for_select(["Unaudited", "Valid", "Invalid", "All"], current))
+  end
+end

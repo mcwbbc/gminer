@@ -1,13 +1,20 @@
-class AnnotationClosure
-  include DataMapper::Resource
-  
-  property :id, Serial
-  property :annotation_geo_accession, String, :length => 25, :index => :geo_accession_field_ontology_term_id
-  property :annotation_field, String, :length => 25, :index => :geo_accession_field_ontology_term_id
-  property :annotation_ontology_term_id, String, :length => 25, :index => :geo_accession_field_ontology_term_id
-  property :ontology_term_id, String, :length => 100, :index => true
+class AnnotationClosure < ActiveRecord::Base
 
-  belongs_to :annotation, :child_key => [:annotation_ontology_term_id, :annotation_geo_accession, :annotation_field]
-  belongs_to :ontology_term, :child_key => [:ontology_term_id]
+  belongs_to :annotation
+  belongs_to :ontology_term
+
+  class << self
+
+    def persist(geo_accession, field_name, term_id, closure_term)
+      ot = OntologyTerm.first(:conditions => {:term_id => term_id})
+      if ot && a = ot.annotations.first(:conditions => {:geo_accession => geo_accession, :field => field_name})
+        ct = OntologyTerm.first(:conditions => {:term_id => closure_term})
+        if ct && !ac = a.annotation_closures.first(:conditions => {:ontology_term_id => ct.id})
+          a.annotation_closures.create(:ontology_term_id => ct.id)
+        end
+      end
+    end
+
+  end
 
 end

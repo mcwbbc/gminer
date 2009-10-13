@@ -2,9 +2,9 @@
 #filters
 #term-parameters
 #terms
-  = partial("cloud", :title => "Anatomy terms", :terms => @anatomy_terms)
+  = render(:partial => "cloud", :locals => {:title => "Anatomy terms", :terms => @anatomy_terms})
 #strains
-  = partial("cloud", :title => "Rat Strains", :terms => @rat_strain_terms)
+  = render(:partial => "cloud", :locals => {:title => "Rat Strains", :terms => @rat_strain_terms})
 %br{:clear => "all"}
 #annotations
-  = partial("annotations")
+  = render(:partial => "annotations")

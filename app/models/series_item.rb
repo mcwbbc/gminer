@@ -1,17 +1,9 @@
-class SeriesItem
+class SeriesItem < ActiveRecord::Base
   include Utilities
   extend Utilities::ClassMethods
-  include DataMapper::Resource
-  
-  property :geo_accession, String, :length => 25, :key => true
-  property :platform_geo_accession, String, :length => 25, :index => true
-  property :pubmed_id, String, :length => 25
-  property :title, String, :length => 255
-  property :summary, Text
-  property :overall_design, Text
 
-  belongs_to :platform, :child_key => [:platform_geo_accession]
-  has n, :samples, :child_key => [:series_geo_accession]
+  belongs_to :platform
+  has_many :samples
 
   class << self
     def page(conditions, page=1, size=Constants::PER_PAGE)
@@ -23,8 +15,12 @@ class SeriesItem
     end
   end
 
+  def to_param
+    self.geo_accession
+  end
+
   def series_path
-    "#{Constants::DATAFILES_PATH}/#{self.platform_geo_accession}/#{self.geo_accession}"
+    "#{Rails.root}/datafiles/#{self.platform.geo_accession}/#{self.geo_accession}"
   end
 
   def family_filename
@@ -82,12 +78,12 @@ class SeriesItem
 
   def create_samples(array=series_hash["sample_ids"])
     array.each do |sample_id|
-      sam = Sample.first(:geo_accession => sample_id)
+      sam = Sample.first(:conditions => {:geo_accession => sample_id})
       if !sam
         stime = Time.now
         puts "creating sample #{sample_id}"
         Sample.transaction do
-          sam = Sample.new(:platform_geo_accession => self.platform_geo_accession, :series_geo_accession => self.geo_accession, :geo_accession => sample_id)
+          sam = Sample.new(:platform_id => self.platform_id, :series_item_id => self.id, :geo_accession => sample_id)
           sam.persist
           sam.create_detections
         end
@@ -107,7 +103,6 @@ class SeriesItem
     File.open(local_family_filename, "r").each do |line|
       platform_flag = true if line =~ platform_start
       if m = line.match(start)
-        puts outfile
         write_file(outfile, text)
         text = ""
         outfile = "#{series_path}/#{m[1]}_sample.soft"
@@ -115,7 +110,6 @@ class SeriesItem
       text << line if !platform_flag
       platform_flag = false if line =~ platform_end
     end
-    puts outfile
     write_file(outfile, text)
   end
 

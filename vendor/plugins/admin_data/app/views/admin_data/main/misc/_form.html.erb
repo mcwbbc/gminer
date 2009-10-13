@@ -1,0 +1,22 @@
+<table cellspacing="3" cellpadding="3" width="100%;" class='with_border'>
+
+<% @klass.columns.each do |col| %>
+  <% col_limit = col.limit || 255 %>
+  <tr>
+    <td width="20%;">
+      <strong><%= col.name %>:</strong>
+      (<%= col.type.to_s %><%= (col.type == 'string') ? col.limit : '' %>)
+    </td>
+
+    <td>
+      <%= admin_data_form_field(@klass,@model,col) %>
+    </td>
+  </tr>
+  <% end %>
+
+  <tr>
+    <td colspan="3" align="center">
+      <%= submit_tag('Save', :class => 'submit-box', :disable_with => 'Please wait ...')%>
+   </td>
+  </tr>
+</table>

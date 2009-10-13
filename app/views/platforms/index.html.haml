@@ -1,7 +1,10 @@
-= partial("shared/annotation_counts")
+- admin_only do
+  = render(:partial => "shared/annotation_counts")
 = page_title("Platforms")
 %p
   %form{:name => "sform", :action => "", :style => "display:inline"}
-    = text_field(:name => :query, :label => "Filter on GEO accession or organism: ", :value => params['query'],  :autocomplete => "off")
+    %label
+      Filter on GEO accession or organism:
+    = text_field_tag(:query, params['query'], :autocomplete => 'off') 
 #dataTable
-  = partial("platforms_list")
+  = render(:partial => "platforms_list")

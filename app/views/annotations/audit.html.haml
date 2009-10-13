@@ -1,0 +1,11 @@
+= page_title("Audit Annotations")
+%p
+  %form{:name => "sform", :action => "", :style => "display:inline"}
+    %label
+      Filter on term:
+    = text_field_tag(:query, params['query'], :autocomplete => 'off') 
+    = ontology_search_dropdown(@current)
+    = annotation_status_dropdown(@status)
+
+#dataTable
+  = render(:partial => "audit_list")

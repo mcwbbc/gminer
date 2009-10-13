@@ -1,5 +1,2 @@
-module Merb
-  module SamplesHelper
-
-  end
-end # Merb
+module SamplesHelper
+end

@@ -1,0 +1,14 @@
+%tr{:class => "#{cycle('rowWhite', 'rowBlue')}"}
+  %td{:valign => "top", :align => 'center'}
+    - if !audit_annotation.audited?
+      = check_box_tag('selected_annotations[]', audit_annotation.id, true)
+  %td{:valign => "top"}
+    = audit_annotation.geo_accession
+  %td{:valign => "top"}
+    = curate_link(audit_annotation)
+    = ncbo_ontology_link(audit_annotation.ontology_term)
+  %td{:valign => "top"}
+    .context
+      = audit_annotation.in_context
+      .full-text
+        = audit_annotation.full_text_highlighted

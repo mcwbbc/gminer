@@ -1,5 +1,2 @@
-module Merb
-  module DatasetsHelper
-
-  end
-end # Merb
+module DatasetsHelper
+end
