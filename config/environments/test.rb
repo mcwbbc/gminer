@@ -28,5 +28,6 @@ config.action_mailer.delivery_method = :test
 # config.active_record.schema_format = :sql
 config.gem 'rr', :version => '>=0.10.4'
 config.gem 'webrat'
-config.gem 'thoughtbot-shoulda', :lib => 'shoulda', :source => 'http://gems.github.com'
+config.gem 'shoulda', :source => 'http://gemcutter.org'
 config.gem 'ffmike-test_benchmark', :lib => 'test_benchmark', :source => 'http://gems.github.com'
+config.gem 'inaction_mailer', :lib => 'inaction_mailer/force_load', :source => 'http://gemcutter.org'

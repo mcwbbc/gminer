@@ -26,13 +26,6 @@ module Utilities
       record.persist if (record.new_record? || force)
     end
 
-    def remove_stopwords(text)
-      Constants::STOPWORDS.split(",").each do |word|
-        text.gsub!(/(^|\s)(#{word})(\s|$)/i, " ")
-      end
-      text
-    end
-
     def strip_newlines(text)
       text.gsub(/[\r\n]+/, " ")
     end
@@ -59,42 +52,32 @@ module Utilities
       end
       m.first(:conditions => {:geo_accession => key})
     end
-  end
+  end #end of ClassMethods
 
-  def create_annotations
-    if (self.annotated_at.nil? && (self.annotating_at.nil? || self.annotating_at < 5.minutes.ago.to_datetime))
-      self.update_attributes(:annotating_at => Time.now)
-      a = Annotation.create_for(self.geo_accession, fields, descriptive_text)
-      self.update_attributes(:annotating_at => nil, :annotated_at => Time.now)
-      a
+  def count_by_ontology_array
+    hash = {}
+    Constants::ONTOLOGIES.keys.each do |key|
+      hash[Constants::ONTOLOGIES[key][:name]] = 0
     end
-  end
 
-  def descriptive_text
-    case self.geo_accession
-      when /^GSM/
-        "#{self.series_item.title} - #{self.title}"
-      when /^GSE/
-        self.title
-      when /^GPL/
-        self.title
-      when /^GDS/
-        self.title
+    ontology_hash = Ontology.all.inject({}) do |h, ontology|
+      h[ontology.id] = ontology.name
+      h
     end
+
+    annotations.each do |annotation|
+      if ontology_hash.has_key?(annotation.ontology_id)
+        count = hash[ontology_hash[annotation.ontology_id]] || 0
+        hash[ontology_hash[annotation.ontology_id]] = count + 1
+      end
+    end
+
+    array = hash.sort_by { |k,v| v }
+    array.reverse.map { |a| {:name => a[0], :amount => a[1]} }
   end
 
   def join_item(item)
     item.is_a?(Array) ? item.join(' ') : item
-  end
-
-  def annotations
-#    Annotation.find(:all, :conditions => ["annotations.geo_accession = ? AND annotations.ontology_term_id != ?", self.geo_accession, "none"], :include => :ontology_term, :order => "ontology_terms.name", :group => "ontology_terms.term_id")
-    query = "SELECT a.* FROM annotations AS a, ontology_terms AS t"
-    query << " WHERE a.geo_accession = '#{self.geo_accession}'"
-    query << " AND a.ontology_term_id != -1"
-    query << " AND a.ontology_term_id = t.id"
-    query << " ORDER BY t.term_id"
-    Annotation.find_by_sql(query)
   end
 
   def annotations_for(field)
@@ -146,6 +129,19 @@ module Utilities
     geo_accessions = self.class.all(:order => [:geo_accession]).map { |item| item.geo_accession }
     i = geo_accessions.index(self.geo_accession)
     [geo_accessions[i-1], geo_accessions[i+1]]
+  end
+
+  def descriptive_text
+    case self.geo_accession
+      when /^GSM/
+        "#{self.series_item.title} - #{self.title}"
+      when /^GSE/
+        self.title
+      when /^GPL/
+        self.title
+      when /^GDS/
+        self.title
+    end
   end
 
 end

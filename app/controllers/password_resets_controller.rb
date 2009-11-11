@@ -1,9 +1,9 @@
 class PasswordResetsController < ApplicationController
   before_filter :load_user_using_perishable_token, :only => [:edit, :update]
-  
+
   def new
   end
-  
+
   def create
     @user = User.find_by_email(params[:email])
     if @user
@@ -15,7 +15,7 @@ class PasswordResetsController < ApplicationController
       render :action => :new
     end
   end
-  
+
   def edit
   end
 

@@ -1,0 +1,11 @@
+%tr{:class => "#{cycle('rowWhite', 'rowBlue')}"}
+  %td{:valign => "top"}
+    = geo_link(job.geo_accession)
+  %td{:valign => "top"}
+    = job.field
+  %td{:valign => "top"}
+    = job.ontology.name
+  %td{:valign => "top"}
+    = date_or_pending(job.started_at)
+  %td{:valign => "top"}
+    = date_or_pending(job.finished_at)

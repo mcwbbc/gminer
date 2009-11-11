@@ -1,0 +1,20 @@
+- title t('.title')
+= page_title(t('.title'))
+%br
+%h2
+  Problems, Issues, Bugs
+= link_to("Create support ticket on Lighthouse", "http://mcwbbc.lighthouseapp.com/projects/41010-gminer/tickets/new")
+%br
+%br
+%h2
+  Annotation term color explanation
+#machine
+  .annotation-term.automatic-annotation.verified
+    Machine generated verified
+  .annotation-term.automatic-annotation.unverified
+    Machine generated unverified
+  .annotation-term.automatic-annotation.unaudited
+    Machine generated unaudited
+#manual
+  .annotation-term.manual-annotation.verified
+    Human generated verified

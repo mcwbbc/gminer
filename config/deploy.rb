@@ -34,6 +34,7 @@ before "deploy", "deploy:check_revision"
 
 after "deploy:update", "deploy:link_config"
 after "deploy:update", "deploy:link_datafiles"
+after "deploy:update", "deploy:link_metadata"
 after "deploy:update", "deploy:cleanup"
 
 # Customize the deployment
@@ -46,7 +47,7 @@ set :tag_on_deploy, false # turn off deployment tagging, we have our own tagging
 # directories to preserve between deployments
 # set :asset_directories, ['public/system/logos', 'public/system/uploads']
 
-# re-linking for config files on public repos  
+# re-linking for config files on public repos
 namespace :deploy do
   desc "Re-link config files"
   task :link_config, :roles => :app do
@@ -58,8 +59,13 @@ namespace :deploy do
   task :link_datafiles, :roles => :app do
     run "ln -nsf /datafiles #{current_path}/datafiles"
   end
+
+  desc "Re-link metatdata directory"
+  task :link_metadata, :roles => :app do
+    run "rm -rf #{current_path}/metadata && ln -nsf #{shared_path}/metadata #{current_path}/metadata"
+  end
 end
-  
+
 namespace :deploy do
   desc "Make sure there is something to deploy"
   task :check_revision, :roles => [:web] do
@@ -69,11 +75,11 @@ namespace :deploy do
       puts "  [1;33m* WARNING: HEAD is not the same as origin/#{branch} *[0m"
       puts "  [1;33m**************************************************[0m"
       puts ""
- 
+
       exit
     end
   end
-end    
+end
 
 #############################################################
 #	Other Tasks
@@ -91,8 +97,8 @@ namespace :deploy do
 
       template = File.read("app/views/layouts/maintenance.html.erb")
       page = ERB.new(template).result(binding)
-      
-      put page, "#{shared_path}/system/maintenance.html", 
+
+      put page, "#{shared_path}/system/maintenance.html",
                 :mode => 0644
     end
   end

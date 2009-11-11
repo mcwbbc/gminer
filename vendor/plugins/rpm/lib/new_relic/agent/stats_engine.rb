@@ -7,16 +7,16 @@ module NewRelic::Agent
     include MetricStats
     include Samplers
     include Transactions
-    
+
     def initialize
       # Makes the unit tests happy
       Thread::current[:newrelic_scope_stack] = nil
       spawn_sampler_thread
     end
-    
+
     def log
       NewRelic::Control.instance.log
     end
-    
+
   end
 end

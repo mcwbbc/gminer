@@ -40,9 +40,9 @@ class ConfigurationTest < Test::Unit::TestCase
       assert_equal 'secret',            HoptoadNotifier.proxy_pass
       assert_equal 2,                   HoptoadNotifier.http_open_timeout
       assert_equal 5,                   HoptoadNotifier.http_read_timeout
-      assert_equal HoptoadNotifier::IGNORE_USER_AGENT_DEFAULT + ['UserAgentString', /UserAgentRegexp/], 
+      assert_equal HoptoadNotifier::IGNORE_USER_AGENT_DEFAULT + ['UserAgentString', /UserAgentRegexp/],
                    HoptoadNotifier.ignore_user_agent
-      assert_equal HoptoadNotifier::IGNORE_DEFAULT + [RuntimeError], 
+      assert_equal HoptoadNotifier::IGNORE_DEFAULT + [RuntimeError],
                    HoptoadNotifier.ignore
     end
 

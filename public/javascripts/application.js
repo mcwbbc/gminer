@@ -1,25 +1,50 @@
 // Common JavaScript code across your application goes here.
 
+
+$.fn.allMatchTallestHeight = function() {
+  var max_height = 0;
+  elements = $(this);
+  elements.each( function() {
+    if ($(this).height() > max_height) {
+      max_height = $(this).height();
+    }
+  });
+
+  elements.each( function() {
+    $(this).height(max_height);
+  });
+}
+
 // set for merb/rails to get that we're using JS
 $(function() {
-  jQuery.ajaxSetup({ 
+
+  jQuery.ajaxSetup({
     'beforeSend': function(xhr) {xhr.setRequestHeader("Accept", "text/javascript")}
   })
-});
 
-$(function() {
+  $(".cloud-box-content").allMatchTallestHeight();
+
+  $("input.cancel").live("click", function(){
+    $("#new-annotation").hide();
+    return false;
+  });
+
+  $("span.view-graph").live("click", function(){
+    $(".graph").toggle();
+  });
+
   $("div.tooltip").hover( function() {
       $(this).find('.popup').show();
     },
     function() {
       $(this).find('.popup').hide();
   });
-});
 
-$(function() {
   $("a.annotation-term").mouseover( function() {
+    $(this).addClass("inset");
     $('#'+$(this).attr("field")).highlight($(this).html());
   }).mouseout( function() {
+    $(this).removeClass("inset");
     $('#'+$(this).attr("field")).removeHighlight();
   });
 
@@ -28,20 +53,16 @@ $(function() {
    }).ajaxStop(function(){
      $(this).hide();
    });
-});
 
-// updates the clicked link's curation status
-$(function() {
+  // updates the clicked link's curation status
   $("a.curate").live("click", function(){
     link = $(this);
     href = link.attr("href");
     $.post(href, {}, function(data){ updateCSS(data, link) }, "json");
     return false;
   });
-});
 
 // marks all the checked boxes as valid, and removes the checkboxes from the form
-$(function() {
   $("span.validate-all").live("click", function(){
     boxes = processChecked(true);
     $.post('/annotations/valid', boxes.serialize(), function(data){ }, "json");
@@ -117,7 +138,7 @@ function updateCSS(data, object) {
 function filter_submit() {
   var m = {};
   m._method = "get";
-  
+
   if ($("#ddown").length > 0) {
     m.ddown = $("#ddown").val();
   }
@@ -130,13 +151,20 @@ function filter_submit() {
     m.query = $("#query").val();
   }
 
+  if ($("#geotype").length > 0) {
+    m.geotype = $("#geotype").val();
+  }
+
   $("#dataTable").load(window.location.pathname, m);
+
+  return false;
 }
 
 // dynamically load the items based on query filter
 $(function() {
   $("#ddown").bind("change", filter_submit);
   $("#status").bind("change", filter_submit);
+  $("#geotype").bind("change", filter_submit);
   $("#query").bind("keyup", filter_submit);
 });
 
@@ -195,7 +223,7 @@ function attach_filter_hook () {
 
 function remove_parameter_field(term_id) {
   terms = $("#term-parameters :hidden")
-  terms.each( function() { 
+  terms.each( function() {
     if ($(this).attr("id") == term_id) {
       $(this).remove();
     }
@@ -205,7 +233,7 @@ function remove_parameter_field(term_id) {
 function update_filter_text() {
   terms = $("#term-parameters :hidden")
   var term_array = new Array();
-  terms.each( function() { 
+  terms.each( function() {
     term_name = $(this).attr("term_name");
     term_id = $(this).attr("id");
     link = "<a href='#' class='delete-result' term_id='"+term_id+"'><img src='/images/icons/error.png' border='0' class='delete-icon' /></a><span class='result-filter'>"+term_name+"</span>"
@@ -217,13 +245,13 @@ function update_filter_text() {
 }
 
 function add_parameter_field(term_id, term_name) {
-  var element = document.createElement("input");  
-  element.setAttribute("type", "hidden");  
+  var element = document.createElement("input");
+  element.setAttribute("type", "hidden");
   element.setAttribute("value", term_id);
   element.setAttribute("id", term_id);
   element.setAttribute("name", "term_array[]");
   element.setAttribute("term_name", term_name);
-  $("#term-parameters").append(element);  
+  $("#term-parameters").append(element);
 }
 
 function update_results() {

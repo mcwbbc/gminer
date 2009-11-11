@@ -3,7 +3,7 @@
     - if !audit_annotation.audited?
       = check_box_tag('selected_annotations[]', audit_annotation.id, true)
   %td{:valign => "top"}
-    = audit_annotation.geo_accession
+    = geo_link(audit_annotation.geo_accession, true)
   %td{:valign => "top"}
     = curate_link(audit_annotation)
     = ncbo_ontology_link(audit_annotation.ontology_term)

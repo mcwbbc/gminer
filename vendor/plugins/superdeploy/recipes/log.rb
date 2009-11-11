@@ -5,17 +5,17 @@
       log_file = ARGV[2] ? ARGV[2] : fetch(:rails_env, "production")
       run "tail -f #{shared_path}/log/#{log_file}.log" do |channel, stream, data|
         puts  # for an extra line break before the host name
-        puts "#{channel[:host]}: #{data}" 
+        puts "#{channel[:host]}: #{data}"
         break if stream == :err
       end
     end
-    
+
     desc 'Tail just the hits and errors; pass name of log if not #{rails_env}.log'
     task :short, :roles => :app do
       log_file = ARGV[2] ? ARGV[2] : fetch(:rails_env, "production")
       run "tail -f #{shared_path}/log/#{log_file}.log | egrep -i 'Processing|Error|:in'" do |channel, stream, data|
         puts  # for an extra line break before the host name
-        puts "#{channel[:host]}: #{data}" 
+        puts "#{channel[:host]}: #{data}"
         break if stream == :err
       end
     end
@@ -47,7 +47,7 @@
       hpmx = nil
       run "tail -f #{shared_path}/log/#{log_file}.log" do |channel, stream, data|
       # Aggregate format:
-      # [ {:controller => "User", :action => "home", 
+      # [ {:controller => "User", :action => "home",
       #     :total_time => 30, :render_time => 20, :db_time => 10, :hits => 3,
       #     :results => [{:name => "200 OK", :hits => 20}],
       #     :ips => [{:ip => "23.2.1.1", :hits => 1}, {:ip => "1.2.3.4", :hits => 2}]}, ...]
@@ -72,7 +72,7 @@
           ip = hit[2]
           found = false
           aggregate.each {|a|
-            next unless a[:controller] == controller and a[:action] == action 
+            next unless a[:controller] == controller and a[:action] == action
             found_ip = false
             a[:ips].each {|ipx|
               next unless ipx[:ip] == ip
@@ -94,7 +94,7 @@
             max_act_size = action.size if action.size > max_act_size
           end
         }
-        
+
   # get an array of arrays of the total time, render time, db time, result, & URL processed
   new_process = data.scan(/Completed in (\S*) .* Rendering: (\S*) .* DB: (\S*) .* (\S* \S*) \[(\S*)\]/).collect{|item|
           url = item[4]
@@ -113,7 +113,7 @@
           action = hit[5].downcase
           found = false
           aggregate.each_with_index {|a,i|
-            next unless a[:controller] == controller and a[:action] == action 
+            next unless a[:controller] == controller and a[:action] == action
             a[:total_time] = a[:total_time] + total
             a[:render_time] = a[:render_time] + render
             a[:db_time] = a[:db_time] + db
@@ -153,7 +153,7 @@
 #          item[1] = backtrace.scan(/.*#{deploy_to}.*:\d*:in.*/).join("\n") rescue "" # trim backtrace to get only the relevant errors
 #   item.flatten
   }
-        comm_errors = data.scan(/(COMM ERROR.*)/).collect{|item| 
+        comm_errors = data.scan(/(COMM ERROR.*)/).collect{|item|
           [item[0], ""]
   }
 
@@ -172,7 +172,7 @@
         }
 
         puts  # for an extra line break before the host name
-        puts "#{channel[:host]}:" #: #{data}" 
+        puts "#{channel[:host]}:" #: #{data}"
         puts
         puts "Count | Error         "
         puts "----------------------"
@@ -180,13 +180,13 @@
         agg_errors.each {|a|
           puts "%5d | %s\n%s" % [a[:count], a[:code], a[:backtrace]]
         }
-        
+
         puts
 
         now = Time.now
         elapsed_time = "%dh %dm %ds" % [(((now - start_time).abs)/3600), (((now - start_time).abs)/60) % 60, (((now - start_time).abs) % 60)]
         recent_time = "%.2fs" % (now - last_time)
-      
+
         puts "Controller#{' ' * (max_ctl_size - 10)} | Action#{' ' * (max_act_size - 6)} | Total (avg)#{' ' * (total_size - 11)} | Render (avg)#{' ' * (render_size - 12)
                                 } | DB (avg)#{' ' * (db_size - 8)} | Hits#{' ' * (hits_size - 4)} | UnqIP#{' ' * (uniq_ip_size - 5)} | Last #{recent_time}"
         puts "---------------------------------------------------------------------------------------#{'-' * (max_ctl_size + max_act_size + total_size + render_size + db_size + hits_size + uniq_ip_size - 56)}"
@@ -200,9 +200,9 @@
 
         aggregate.each_with_index {|a,i|
           puts "%-#{max_ctl_size}.#{max_ctl_size}s | %-#{max_act_size}.#{max_act_size}s | %#{total_size - 8}.1f (%4.3f) | %#{render_size - 8}.1f (%4.3f) | %#{db_size - 8}.1f (%4.3f) | %#{hits_size
-                 }i | %#{uniq_ip_size}i | %6.3f %-s" % [a[:controller], a[:action], 
+                 }i | %#{uniq_ip_size}i | %6.3f %-s" % [a[:controller], a[:action],
                  a[:total_time], (a[:total_time] / a[:hits] rescue 0),
-                 a[:render_time], (a[:render_time] / a[:hits] rescue 0), a[:db_time], (a[:db_time] / a[:hits] rescue 0), a[:hits], a[:ips].size, 
+                 a[:render_time], (a[:render_time] / a[:hits] rescue 0), a[:db_time], (a[:db_time] / a[:hits] rescue 0), a[:hits], a[:ips].size,
                  (recent_agg[i][:total_time] / recent_agg[i][:hits] rescue 0), "*" * (recent_agg[i][:hits] rescue 0)]
           totalx += a[:total_time]
           renderx += a[:render_time]
@@ -218,23 +218,23 @@
         db_size = ("%1.1f (%4.3f)" % [dbx, (dbx / hitsx rescue 0)]).size
         hits_size = [hitsx.to_s.size, 4].max
         uniq_ips = ips.uniq.size
-        uniq_ip_size = [uniq_ips.to_s.size, 5].max  
+        uniq_ip_size = [uniq_ips.to_s.size, 5].max
         # exponential weighted average
         hpmx ||= (hitsx / ((now - start_time) / 60.0)) # start with an approximation
         # this is almost the same as hpmx = hpmx * 59/60 + hitsx_rec * 1/60, just doesn't assume that one slice = 1s
         hpmx = (hpmx * ((60.0 - (now - last_time).abs) / 60.0)) + # ~59/60 of previous value
-               (hitsx_rec * 60.0 * ((now - last_time).abs / 60.0)) # + ~1/60 of estimated current value 
+               (hitsx_rec * 60.0 * ((now - last_time).abs / 60.0)) # + ~1/60 of estimated current value
         hpm = "%d H/m" % hpmx
 
         puts "---------------------------------------------------------------------------------------#{'-' * (max_ctl_size + max_act_size + total_size + render_size + db_size + hits_size + uniq_ip_size - 56)}"
         puts "%-#{max_ctl_size + max_act_size + 3}.#{max_ctl_size + max_act_size + 3}s | %#{total_size - 8}.1f (%4.3f) | %#{render_size - 8}.1f (%4.3f) | %#{db_size - 10}.1f (%4.3f) | %#{hits_size
-                 }i | %#{uniq_ip_size}i | %6.3f %-s" % [ elapsed_time + ', ' + hpm, totalx, 
+                 }i | %#{uniq_ip_size}i | %6.3f %-s" % [ elapsed_time + ', ' + hpm, totalx,
               (totalx / hitsx rescue 0), renderx, (renderx / hitsx rescue 0), dbx, (dbx / hitsx rescue 0),
               hitsx, uniq_ips, (totalx_rec / hitsx_rec rescue 0), ("*" * hitsx_rec) + ' ' + hitsx_rec.to_s]
 
         break if stream == :err
         last_time = Time.now
-        
+
       end # run
     end # task
 
@@ -259,7 +259,7 @@
         recent_google.each{|a|
           a[:hits] = 0
         }
-        
+
         new_google = []
   # get an array of arrays of the total time, render time, db time, result, & URL processed
   new_process = data.scan(/Completed in (\S*) .* Rendering: (\S*) .* DB: (\S*) .* (\S* \S*) \[(\S*)\]/).collect{|item|
@@ -310,7 +310,7 @@
         hpmx ||= (hitsx / ((now - start_time) / 60.0)) # start with an approximation
         # this is almost the same as hpmx = hpmx * 59/60 + hitsx_rec * 1/60, just doesn't assume that one slice = 1s
         hpmx = (hpmx * ((60.0 - (now - last_time).abs) / 60.0)) + # ~59/60 of previous value
-               (hitsx_rec * 60.0 * ((now - last_time).abs / 60.0)) # + ~1/60 of estimated current value 
+               (hitsx_rec * 60.0 * ((now - last_time).abs / 60.0)) # + ~1/60 of estimated current value
         hpm = "%d H/m" % hpmx
 
         puts
@@ -321,19 +321,19 @@
         puts "Campaign#{' ' * (size[:campaign] - 8)} | Source#{' ' * (size[:source] - 6)} | Medium#{' ' * (size[:medium] - 6)} | Content#{' ' * (size[:content] - 7)} | Hits #{recent_time}"
         puts '-' * (size[:campaign] + size[:source] + size[:medium] + size[:content] + 3 * 4 + 4)
         agg_google.each_with_index {|a,i|
-          puts  "%-#{size[:campaign]}s | %-#{size[:source]}s | %-#{size[:medium]}s | %-#{size[:content]}s | %#{size[:hits]}d %-s" % [a[:campaign], a[:source], a[:medium], a[:content], a[:hits], 
+          puts  "%-#{size[:campaign]}s | %-#{size[:source]}s | %-#{size[:medium]}s | %-#{size[:content]}s | %#{size[:hits]}d %-s" % [a[:campaign], a[:source], a[:medium], a[:content], a[:hits],
                   "*" * (recent_google[i][:hits] rescue 0)]
           hitsx += a[:hits]
           hitsx_rec += recent_google[i][:hits]
         }
         size[:hits] = [hitsx.to_s.size, 4].max
         puts '-' * (size[:campaign] + size[:source] + size[:medium] + size[:content] + 3 * 4 + 4)
-        puts "%-#{size[:campaign] + size[:source] + size[:medium] + size[:content] + 3 * 3}.#{size[:campaign] + size[:source] + size[:medium] + size[:content] + 3 * 3}s | %#{size[:hits]}d %-s" % [ 
+        puts "%-#{size[:campaign] + size[:source] + size[:medium] + size[:content] + 3 * 3}.#{size[:campaign] + size[:source] + size[:medium] + size[:content] + 3 * 3}s | %#{size[:hits]}d %-s" % [
               elapsed_time + ', ' + hpm, hitsx, ("*" * hitsx_rec) + ' ' + hitsx_rec.to_s]
 
         break if stream == :err
         last_time = Time.now
-        
+
       end # run
     end # task
 
@@ -357,7 +357,7 @@
 #        recent_google.each{|a|
  #         a[:hits] = 0
   #      }
-        
+
         new_google = []
   # get an array of arrays of the total time, render time, db time, result, & URL processed
   new_process = data.scan(/Completed in (\S*) .* Rendering: (\S*) .* DB: (\S*) .* (\S* \S*) \[(\S*)\]/).collect{|item|
@@ -381,7 +381,7 @@
               found = true
               break
             }
-          
+
             if !found
               size[foo] = hit[foo].size if hit[foo].size > size[foo]
               subtotals[foo] << {:name => hit[foo], :hits => 1}
@@ -402,7 +402,7 @@
         hpmx ||= (hitsx / ((now - start_time) / 60.0)) # start with an approximation
         # this is almost the same as hpmx = hpmx * 59/60 + hitsx_rec * 1/60, just doesn't assume that one slice = 1s
         hpmx = (hpmx * ((60.0 - (now - last_time).abs) / 60.0)) + # ~59/60 of previous value
-               (hitsx_rec * 60.0 * ((now - last_time).abs / 60.0)) # + ~1/60 of estimated current value 
+               (hitsx_rec * 60.0 * ((now - last_time).abs / 60.0)) # + ~1/60 of estimated current value
         hpm = "%d H/m" % hpmx
 
         puts
@@ -423,12 +423,12 @@
         }
   #      size[:hits] = [hitsx.to_s.size, 4].max
    #     puts '-' * (size[:campaign] + size[:source] + size[:medium] + size[:content] + 3 * 4 + 4)
-  #      puts "%-#{size[:campaign] + size[:source] + size[:medium] + size[:content] + 3 * 3}.#{size[:campaign] + size[:source] + size[:medium] + size[:content] + 3 * 3}s | %#{size[:hits]}d %-s" % [ 
+  #      puts "%-#{size[:campaign] + size[:source] + size[:medium] + size[:content] + 3 * 3}.#{size[:campaign] + size[:source] + size[:medium] + size[:content] + 3 * 3}s | %#{size[:hits]}d %-s" % [
   #            elapsed_time + ', ' + hpm, hitsx, ("*" * hitsx_rec) + ' ' + hitsx_rec.to_s]
 
         break if stream == :err
         last_time = Time.now
-        
+
       end # run
     end # task
   end # logs

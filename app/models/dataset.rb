@@ -3,7 +3,8 @@ class Dataset < ActiveRecord::Base
   extend Utilities::ClassMethods
 
   belongs_to :platform, :foreign_key => :platform_geo_accession
-  belongs_to :series_item, :foreign_key => :reference_series
+  belongs_to :series_item, :foreign_key => :reference_series, :primary_key => :geo_accession
+  has_many :annotations, :foreign_key => :geo_accession, :primary_key => :geo_accession
 
   def to_param
     self.geo_accession

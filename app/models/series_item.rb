@@ -4,6 +4,8 @@ class SeriesItem < ActiveRecord::Base
 
   belongs_to :platform
   has_many :samples
+  has_many :annotations, :foreign_key => :geo_accession, :primary_key => :geo_accession
+  has_one :dataset, :foreign_key => :reference_series, :primary_key => :geo_accession
 
   class << self
     def page(conditions, page=1, size=Constants::PER_PAGE)
@@ -32,7 +34,7 @@ class SeriesItem < ActiveRecord::Base
   end
 
   def local_series_filename
-    "#{series_path}/#{self.geo_accession}_series.soft"    
+    "#{series_path}/#{self.geo_accession}_series.soft"
   end
 
   def download
@@ -77,15 +79,15 @@ class SeriesItem < ActiveRecord::Base
   end
 
   def create_samples(array=series_hash["sample_ids"])
+    @probeset_id_hash = Probeset.all.inject({}) {|h, p| h[p.name] = p.id; h }
     array.each do |sample_id|
-      sam = Sample.first(:conditions => {:geo_accession => sample_id})
-      if !sam
+      if !sam = Sample.first(:conditions => {:geo_accession => sample_id})
         stime = Time.now
         puts "creating sample #{sample_id}"
         Sample.transaction do
           sam = Sample.new(:platform_id => self.platform_id, :series_item_id => self.id, :geo_accession => sample_id)
           sam.persist
-          sam.create_detections
+          sam.create_detections(@probeset_id_hash)
         end
         puts "Took: #{Time.now-stime}"
       end

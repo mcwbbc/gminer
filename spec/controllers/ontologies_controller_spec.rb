@@ -9,11 +9,11 @@ describe OntologiesController do
       @ontologies.stub!(:total_pages).and_return(1)
       Ontology.stub!(:page).and_return(@ontologies)
     end
-  
+
     def do_get
       get :index
     end
-  
+
     it "should be successful" do
       do_get
       response.should be_success
@@ -23,7 +23,7 @@ describe OntologiesController do
       do_get
       response.should render_template('index')
     end
-  
+
     it "should assign the found annotations for the view" do
       do_get
       assigns[:ontologies].should == @ontologies

@@ -1,0 +1,24 @@
+#new-annotation
+  - semantic_form_for(@new_annotation) do |f|
+    - f.inputs do
+      = f.input :ncbo_term_id, :input_html => { :class => "bp_form_complete-1150-uri" }
+      = f.input :ncbo_id, :as => :hidden, :wrapper_html => { :style => "display:none;" }
+      = f.input :field, :as => :hidden, :wrapper_html => { :style => "display:none;" }
+      = f.input :from, :as => :hidden, :wrapper_html => { :style => "display:none;" }
+      = f.input :to, :as => :hidden, :wrapper_html => { :style => "display:none;" }
+      = f.input :user_id, :as => :hidden, :wrapper_html => { :style => "display:none;" }
+      = f.input :verified, :as => :hidden, :wrapper_html => { :style => "display:none;" }
+      = f.input :audited, :as => :hidden, :wrapper_html => { :style => "display:none;" }
+      = f.input :geo_accession, :as => :hidden, :wrapper_html => { :style => "display:none;" }
+      = f.input :description, :as => :hidden, :wrapper_html => { :style => "display:none;" }
+    - f.buttons do
+      = f.commit_button t('label.save')
+      = f.commit_button t('label.cancel'), :button_html => { :id => "annotation_cancel",  :class => "cancel" }
+
+%ul#annotation-menu.contextMenu
+  - @ontologies.each do |ontology|
+    %li{:class => "#{ontology.ncbo_id} separator"}
+      %a{:href => "##{ontology.ncbo_id}"}
+        = ontology.name
+
+#annotation-result

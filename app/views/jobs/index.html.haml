@@ -1,0 +1,14 @@
+- title t(".title")
+= page_title(t('.title'))
+%br
+= link_to(t('.statistics_link'), statistics_jobs_url)
+%br
+= link_to(t('.new_link'), new_job_url)
+%p
+  %form{:name => "sform", :action => "", :style => "display:inline"}
+    %label
+      Filter on status:
+    = job_status_dropdown(@status)
+
+#dataTable
+  = render(:partial => "jobs_list")

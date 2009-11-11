@@ -96,7 +96,7 @@ class HoptoadTasksTest < Test::Unit::TestCase
 
     context "in a configured project with custom host" do
       setup do
-        HoptoadNotifier.configure do |config| 
+        HoptoadNotifier.configure do |config|
           config.api_key = "1234123412341234"
           config.host = "custom.host"
         end

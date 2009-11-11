@@ -91,20 +91,6 @@ describe Utilities do
     end
   end
 
-  describe "remove stopwords" do
-    it "should remove words inside the stopword array" do
-      FakeClass.remove_stopwords("a an the al. with").should == " "
-    end
-
-    it "should remove words inside the stopword array cased" do
-      FakeClass.remove_stopwords("A An THE").should == " "
-    end
-
-    it "should not remove words in the stopword array that are there as parts of other words" do
-      FakeClass.remove_stopwords("anteater theory").should == "anteater theory"
-    end
-  end
-
   describe "file hash" do
     before(:each) do
       @fake = FakeClass.new
@@ -149,58 +135,6 @@ describe Utilities do
       fake.should_receive(:system).with("gunzip --force hello.gz").and_return(true)
       $?.should_receive(:exitstatus).and_return(0)
       fake.gunzip("hello.gz").should == true
-    end
-  end
-
-  describe "create annotation" do
-    it "should call create for in the Annotation model" do
-      fake = FakeClass.new
-      fake.should_receive(:geo_accession).and_return("geo")
-      fake.should_receive(:fields).and_return("fields")
-      fake.should_receive(:descriptive_text).and_return("text")
-      fake.should_receive(:annotating_at).and_return(nil)
-      fake.should_receive(:annotated_at).and_return(nil)
-      fake.should_receive(:update_attributes).twice.and_return(true)
-      Annotation.should_receive(:create_for).with("geo", "fields", "text").and_return(["annotation"])
-      fake.create_annotations.should == ["annotation"]
-    end
-  end
-
-  describe "descriptive_text" do
-    before(:each) do
-      @fake = FakeClass.new
-      @fake.should_receive(:title).and_return("title")
-    end
-
-    it "should return a sample" do
-      series = mock(SeriesItem, :title => "seriestitle")
-      @fake.should_receive(:series_item).and_return(series)
-      @fake.should_receive(:geo_accession).and_return("GSM1234")
-      @fake.descriptive_text.should == "seriestitle - title"
-    end
-
-    it "should return a series" do
-      @fake.should_receive(:geo_accession).and_return("GSE1234")
-      @fake.descriptive_text.should == "title"
-    end
-
-    it "should return a platform" do
-      @fake.should_receive(:geo_accession).and_return("GPL1234")
-      @fake.descriptive_text.should == "title"
-    end
-
-    it "should return a dataset" do
-      @fake.should_receive(:geo_accession).and_return("GDS1234")
-      @fake.descriptive_text.should == "title"
-    end
-  end
-
-  describe "annotation" do
-    it "should call find in the Annotation model" do
-      fake = FakeClass.new
-      fake.should_receive(:geo_accession).and_return("geo")
-      Annotation.should_receive(:find_by_sql).with("SELECT a.* FROM annotations AS a, ontology_terms AS t WHERE a.geo_accession = 'geo' AND a.ontology_term_id != -1 AND a.ontology_term_id = t.id ORDER BY t.term_id").and_return(["annotation"])
-      fake.annotations.should == ["annotation"]
     end
   end
 
@@ -284,6 +218,46 @@ describe Utilities do
       s3 = Sample.spawn(:geo_accession => "GSM3")
       Sample.should_receive(:all).with(:order => [:geo_accession]).and_return([s1,s2,s3])
       sample.prev_next.should == ["GSM1", "GSM3"]
+    end
+  end
+
+  describe "count_by_ontology_array" do
+    it "should return a count of annotations for each ontology in that item" do
+      o = Ontology.spawn
+      Ontology.should_receive(:all).and_return([o])
+      a = Annotation.spawn
+      sample = Sample.spawn(:geo_accession => "GSM2")
+      sample.should_receive(:annotations).and_return([a])
+      sample.count_by_ontology_array.should == [{:amount=>1, :name=>"mouse anatomy"}, {:amount=>0, :name=>"NCI Thesaurus"}, {:amount=>0, :name=>"Basic Vertebrate Anatomy"}, {:amount=>0, :name=>"Pathway Ontology"}, {:amount=>0, :name=>"Medical Subject Headings, 2009_2008_08_06"}, {:amount=>0, :name=>"Gene Ontology"}, {:amount=>0, :name=>"Mouse adult gross anatomy"}, {:amount=>0, :name=>"Rat Strain Ontology"}, {:amount=>0, :name=>"Mammalian Phenotype"}]
+    end
+  end
+
+  describe "descriptive_text" do
+    before(:each) do
+      @fake = FakeClass.new
+      @fake.should_receive(:title).and_return("title")
+    end
+
+    it "should return a sample" do
+      series = mock(SeriesItem, :title => "seriestitle")
+      @fake.should_receive(:series_item).and_return(series)
+      @fake.should_receive(:geo_accession).and_return("GSM1234")
+      @fake.descriptive_text.should == "seriestitle - title"
+    end
+
+    it "should return a series" do
+      @fake.should_receive(:geo_accession).and_return("GSE1234")
+      @fake.descriptive_text.should == "title"
+    end
+
+    it "should return a platform" do
+      @fake.should_receive(:geo_accession).and_return("GPL1234")
+      @fake.descriptive_text.should == "title"
+    end
+
+    it "should return a dataset" do
+      @fake.should_receive(:geo_accession).and_return("GDS1234")
+      @fake.descriptive_text.should == "title"
     end
   end
 

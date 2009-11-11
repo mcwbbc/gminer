@@ -6,8 +6,9 @@ class CreateJobs < ActiveRecord::Migration
       t.string :geo_accession, :limit => 25
       t.string :field, :limit => 50
       t.datetime :created_at
-      t.datetime :started_at
-      t.datetime :finished_at
+      t.double :started_at
+      t.double :working_at
+      t.double :finished_at
     end
 
     add_index(:jobs, :worker_key)

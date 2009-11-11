@@ -6,7 +6,7 @@ class AdminData::BaseControllerTest < ActionController::TestCase
     setup do
       AdminData::BaseController.before_filter.each do |filter|
         if filter.kind_of?(ActionController::Filters::BeforeFilter) && filter.method == :ensure_is_allowed_to_view
-         @filter = filter 
+         @filter = filter
         end
       end
     end

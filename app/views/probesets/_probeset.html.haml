@@ -1,0 +1,5 @@
+%tr{:class => "#{cycle('rowWhite', 'rowBlue')}"}
+  %td{:valign => "top"}
+    = link_to(probeset.name, probeset_url(probeset))
+  %td{:valign => "top"}
+    = probeset_platform_links(@platform_hash[probeset.id])

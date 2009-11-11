@@ -72,11 +72,11 @@ AdminDataConfig.set = {
 
 class Test::Unit::TestCase
 
-  def revoke_read_only_access 
+  def revoke_read_only_access
     AdminDataConfig.set=({:view_security_check => Proc.new { |controller| false } })
   end
 
-  def grant_read_only_access 
+  def grant_read_only_access
     AdminDataConfig.set=({:view_security_check => Proc.new { |controller| true } })
   end
 
@@ -91,4 +91,4 @@ class Test::Unit::TestCase
 end
 
 # to test helper tests
-require 'action_view/test_case' 
+require 'action_view/test_case'

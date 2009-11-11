@@ -3,6 +3,6 @@
   %form{:name => "sform", :action => "", :style => "display:inline"}
     %label
       Filter on GEO accession or term name:
-    = text_field_tag(:query, params['query'], :autocomplete => 'off') 
+    = text_field_tag(:query, params['query'], :autocomplete => 'off')
 #dataTable
   = render(:partial => "results_list")

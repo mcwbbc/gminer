@@ -70,7 +70,7 @@ class AdminData::SearchControllerTest < ActionController::TestCase
       assert_equal @python_beginner_book.id, assigns(:records).first.id
     end
   end
-  
+
   context 'get advance_search with no klass param' do
     setup do
       get :advance_search
@@ -94,7 +94,7 @@ class AdminData::SearchControllerTest < ActionController::TestCase
       @python_beginner_book = Factory(:article, :title => 'python for beginners')
       @java_book = Factory(:article, :title => 'java')
       @clojure_book = Factory(:article, :title => 'clojure')
-      xml_http_request :post,:advance_search, {:klass => 'Article', 
+      xml_http_request :post,:advance_search, {:klass => 'Article',
                             :search_type => 'advance',
                             :sortby => 'article_id desc',
                             :adv_search => {'1_row' => {'col1' => 'title', :col2 => 'contains', :col3 => 'python'} }
@@ -102,8 +102,8 @@ class AdminData::SearchControllerTest < ActionController::TestCase
     end
     should_respond_with :success
     should 'contain text' do
-      assert_tag(:tag => 'div', 
-                 :attributes => {:class => 'page_info'}, 
+      assert_tag(:tag => 'div',
+                 :attributes => {:class => 'page_info'},
                  :descendant => {:tag => 'b', :child => /all 2/})
     end
   end
@@ -115,7 +115,7 @@ class AdminData::SearchControllerTest < ActionController::TestCase
       @python_beginner_book = Factory(:article, :title => 'python for beginners')
       @java_book = Factory(:article, :title => 'java')
       @clojure_book = Factory(:article, :title => 'clojure')
-      xml_http_request :post,:advance_search, {:klass => 'Article', 
+      xml_http_request :post,:advance_search, {:klass => 'Article',
                             :search_type => 'advance',
                             :sortby => 'article_id desc',
                             :adv_search => {'1_row' => {'col1' => 'title', :col2 => 'contains', :col3 => 'clojure'} }
@@ -123,8 +123,8 @@ class AdminData::SearchControllerTest < ActionController::TestCase
     end
     should_respond_with :success
     should 'contain text' do
-      assert_tag(:tag => 'div', 
-                 :attributes => {:class => 'page_info'}, 
+      assert_tag(:tag => 'div',
+                 :attributes => {:class => 'page_info'},
                  :descendant => {:tag => 'b', :child => /1/})
     end
   end
@@ -136,7 +136,7 @@ class AdminData::SearchControllerTest < ActionController::TestCase
       @python_beginner_book = Factory(:article, :title => 'python for beginners')
       @java_book = Factory(:article, :title => 'java')
       @clojure_book = Factory(:article, :title => 'clojure')
-      xml_http_request :post,:advance_search, {:klass => 'Article', 
+      xml_http_request :post,:advance_search, {:klass => 'Article',
                             :search_type => 'advance',
                             :sortby => 'article_id desc',
                             :adv_search => {'1_row' => {'col1' => 'title', :col2 => 'contains', :col3 => ''} }
@@ -144,8 +144,8 @@ class AdminData::SearchControllerTest < ActionController::TestCase
     end
     should_respond_with :success
     should 'contain text' do
-      assert_tag(:tag => 'div', 
-                 :attributes => {:class => 'page_info'}, 
+      assert_tag(:tag => 'div',
+                 :attributes => {:class => 'page_info'},
                  :descendant => {:tag => 'b', :child => /all 4/})
     end
   end
@@ -155,7 +155,7 @@ class AdminData::SearchControllerTest < ActionController::TestCase
       Article.delete_all
       @python_book = Factory(:article, :title => 'python')
       @python_beginner_book = Factory(:article, :title => 'python for beginners')
-      xml_http_request :post,:advance_search, {:klass => 'Article', 
+      xml_http_request :post,:advance_search, {:klass => 'Article',
                             :search_type => 'advance',
                             :sortby => 'article_id desc',
                             :adv_search => {'1_row' => {'col1' => 'title', :col2 => nil, :col3 => nil} }
@@ -163,8 +163,8 @@ class AdminData::SearchControllerTest < ActionController::TestCase
     end
     should_respond_with :success
     should 'contain text' do
-      assert_tag(:tag => 'div', 
-                 :attributes => {:class => 'page_info'}, 
+      assert_tag(:tag => 'div',
+                 :attributes => {:class => 'page_info'},
                  :descendant => {:tag => 'b', :child => /all 2/})
     end
   end
@@ -176,19 +176,19 @@ class AdminData::SearchControllerTest < ActionController::TestCase
       @python_beginner_book = Factory(:article, :title => 'python for beginners', :body => 'for beginners')
       @java_book = Factory(:article, :title => 'java')
       @clojure_book = Factory(:article, :title => 'clojure', :body => 'not for beginners')
-      xml_http_request :post,:advance_search, {:klass => 'Article', 
+      xml_http_request :post,:advance_search, {:klass => 'Article',
                             :search_type => 'advance',
                             :sortby => 'article_id desc',
                             :adv_search => {
                                 '1_row' => {'col1' => 'title', :col2 => 'contains', :col3 => 'python'},
-                                '2_row' => {'col1' => 'body', :col2 => 'contains', :col3 => 'beginners'} 
+                                '2_row' => {'col1' => 'body', :col2 => 'contains', :col3 => 'beginners'}
                                 }
                             }
     end
     should_respond_with :success
     should 'contain text' do
-      assert_tag(:tag => 'div', 
-                 :attributes => {:class => 'page_info'}, 
+      assert_tag(:tag => 'div',
+                 :attributes => {:class => 'page_info'},
                  :descendant => {:tag => 'b', :child => /1/})
     end
   end

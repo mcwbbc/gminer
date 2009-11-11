@@ -30,15 +30,15 @@ class AdminData::MainControllerTest < ActionController::TestCase
 
   should_route :post, '/admin_data/create',         :controller => 'admin_data/main', :action => :create
 
-  should_route :get, '/admin_data/table_structure', :controller => 'admin_data/main', 
+  should_route :get, '/admin_data/table_structure', :controller => 'admin_data/main',
                                                     :action => :table_structure
 
   context 'testing filter ensure_is_allowed_to_update' do
     setup do
       @controller.class.before_filter.each do |filter|
-        if filter.kind_of?(ActionController::Filters::BeforeFilter) && 
+        if filter.kind_of?(ActionController::Filters::BeforeFilter) &&
             filter.method == :ensure_is_allowed_to_update
-            @filter = filter 
+            @filter = filter
         end
       end
     end
@@ -121,19 +121,19 @@ class AdminData::MainControllerTest < ActionController::TestCase
       assert_equal 2, assigns(:records).size
     end
     should 'contain text' do
-      assert_tag(:tag => 'div', 
-                 :attributes => {:class => 'page_info'}, 
+      assert_tag(:tag => 'div',
+                 :attributes => {:class => 'page_info'},
                  :descendant => {:tag => 'b', :child => /all 2/})
     end
   end
 
   context 'get list car has_many association' do
     setup do
-      @door1 = Vehicle::Door.create(:color => 'black', :car_id => @car.id) 
-      @door2 = Vehicle::Door.create(:color => 'green', :car_id => @car.id) 
-      get :list, {:base => @car.class.name.underscore, 
-                  :klass => @door1.class.name.underscore, 
-                  :model_id => @car.id, 
+      @door1 = Vehicle::Door.create(:color => 'black', :car_id => @car.id)
+      @door2 = Vehicle::Door.create(:color => 'green', :car_id => @car.id)
+      get :list, {:base => @car.class.name.underscore,
+                  :klass => @door1.class.name.underscore,
+                  :model_id => @car.id,
                   :children => 'doors'}
     end
     should_respond_with :success
@@ -142,8 +142,8 @@ class AdminData::MainControllerTest < ActionController::TestCase
       assert_equal 2, assigns(:records).size
     end
     should 'contain text' do
-      assert_tag(:tag => 'div', 
-                 :attributes => {:class => 'page_info'}, 
+      assert_tag(:tag => 'div',
+                 :attributes => {:class => 'page_info'},
                  :descendant => {:tag => 'b', :child => /all 2/})
     end
   end
@@ -262,7 +262,7 @@ class AdminData::MainControllerTest < ActionController::TestCase
     end
     should_respond_with :success
   end
-  
+
   context 'get new article' do
     setup do
       get :new, {:klass => 'Article' }
@@ -294,7 +294,7 @@ class AdminData::MainControllerTest < ActionController::TestCase
       post :update, {:klass => 'vehicle/car', :model_id => @car.id, 'vehicle/car' => {:brand => 'honda'}}
     end
     should_respond_with :redirect
-    should_redirect_to('show page') { admin_data_show_path(:model_id => Vehicle::Car.last.id, 
+    should_redirect_to('show page') { admin_data_show_path(:model_id => Vehicle::Car.last.id,
                                                            :klass => @car.class.name.underscore) }
     should_set_the_flash_to /Record was updated/
       should_not_change('car count') { Vehicle::Car.count }
@@ -319,7 +319,7 @@ class AdminData::MainControllerTest < ActionController::TestCase
       post :create, {:klass => 'article', 'article' => {:title => 'hello', :body => 'hello world'}}
     end
     should_respond_with :redirect
-    should_redirect_to('show page') { admin_data_show_path(:model_id => Article.last.id, 
+    should_redirect_to('show page') { admin_data_show_path(:model_id => Article.last.id,
                                                            :klass => @article.class.name.underscore) }
     should_set_the_flash_to /Record was created/
       should_change('article count', :by => 1) { Article.count }
@@ -331,12 +331,12 @@ class AdminData::MainControllerTest < ActionController::TestCase
       post :create, {:klass => 'vehicle/car', 'vehicle/car' => {:brand => 'hello'}}
     end
     should_respond_with :redirect
-    should_redirect_to('show page') { admin_data_show_path(:model_id => Vehicle::Car.last.id, 
+    should_redirect_to('show page') { admin_data_show_path(:model_id => Vehicle::Car.last.id,
                                                            :klass => @car.class.name.underscore) }
     should_set_the_flash_to /Record was created/
     should_change('vehicle count', :by => 1) { Vehicle::Car.count }
   end
-  
+
 
   context 'create failure' do
     setup do

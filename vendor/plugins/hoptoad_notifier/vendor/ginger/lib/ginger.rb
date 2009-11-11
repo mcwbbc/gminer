@@ -7,10 +7,10 @@ module Ginger
     Major = 1
     Minor = 0
     Tiny  = 0
-    
+
     String = [Major, Minor, Tiny].join('.')
   end
-  
+
   def self.configure(&block)
     yield Ginger::Configuration.instance
   end

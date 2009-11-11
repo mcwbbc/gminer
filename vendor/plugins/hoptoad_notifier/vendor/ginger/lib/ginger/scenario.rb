@@ -3,7 +3,7 @@ module Ginger
     def add(gem, version)
       self[gem] = version
     end
-    
+
     def version(gem)
       self.keys.each do |key|
         case key
@@ -13,10 +13,10 @@ module Ginger
           return self[key] if gem =~ key
         end
       end
-      
+
       return nil
     end
-    
+
     def gems
       self.keys
     end

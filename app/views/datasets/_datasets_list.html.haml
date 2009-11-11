@@ -6,7 +6,6 @@
   %p
     = found_count("datasets", @datasets)
   %p
-  - if @datasets.total_pages > 1
     = render(:partial => "shared/pagination", :locals => {:items => @datasets})
   %br
   %table{:width => "100%", :border => "0", :cellpadding => "0", :cellspacing => "2"}

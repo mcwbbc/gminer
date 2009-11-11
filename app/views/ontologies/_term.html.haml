@@ -11,4 +11,4 @@
       = annotation_percentage(term.annotations_count, term.audited_annotation_percentage)
       - if (term.annotations_count > 0) && (term.audited_annotation_percentage < 100)
         %br
-        = link_to("Audit", audit_annotations_url(:query => term.name, :status => "Unaudited", :ddown => term.ontology.ncbo_id)) 
+        = link_to("Audit", audit_annotations_url(:query => term.name, :status => "Unaudited", :ddown => term.ontology.ncbo_id))

@@ -6,7 +6,9 @@ en:
     signup: Sign Up
     activate: Activate
     reset: Reset Password
-    
+    save: Save
+    cancel: Cancel
+
   link:
     forgot: Forgot password
     user: My Account
@@ -18,18 +20,19 @@ en:
     show: Show
     edit: Edit
     destroy: Destroy
-    
+    new_ontology: New Ontology
+
   confirm:
     signout: "Are you sure you want to signout?"
-    destroy: "Are you sure?"  
-  
+    destroy: "Are you sure?"
+
   flash:
     accounts:
       create:
         notice: 'Your account has been created. Please check your e-mail for your account activation instructions.'
       update:
         notice: "Account successfully updated."
-    
+
     users:
       create:
         notice: "User successfully created."
@@ -47,8 +50,8 @@ en:
         notice: "Sign In successful!"
       destroy:
         notice: "Sign out successful!"
-        
-    password_resets: 
+
+    password_resets:
       create:
         notice: "Instructions to reset your password have been emailed to you. Please check your email."
         error: "No user was found with that email address."
@@ -59,26 +62,26 @@ en:
     require_admin: "Sorry, you don't have access to that."
     require_user: "You must be logged in to access this page."
     require_no_user: "You must be logged out to access this page."
-    
+
     require_user_token: "We're sorry, but we could not locate your account. If you are having issues try copying and pasting the URL from your email into your browser or restarting the reset password process."
-  
+
   # Email subjects
   subject:
     activation_instructions: Activation Instructions
     password_reset_instructions: Password Reset Instructions
     welcome: Welcome to GMiner!
-  
+
   # Views
   user_sessions:
     new:
       title: Sign In
       remember_me: Remember Me
-  
+
   activations:
     new:
       title: "Activate Your Account"
       instruction: "Set your password and click Activate to log in to the site."
-  
+
   users:
     index:
       title: All Users
@@ -88,7 +91,7 @@ en:
       title: Edit My Account
     show:
       title: My Account
-  
+
   password_resets:
     instructions: "Fill out the form below and instructions to reset your password will be emailed to you."
     edit:
@@ -97,38 +100,57 @@ en:
     new:
       title: Forgot Password?
       submit: Reset my password
-  
+
   notifier:
     activation_instructions:
       text: |
         Thank you for creating an account! Click the url below to activate your account!
-        
+
         {{activation_url}}
-        
+
         If the above URL does not work try copying and pasting it into your browser. If you continue to have problem, please feel free to contact us.
-      
-    
+
+
     password_reset_instructions:
       text: |
         A request to reset your password has been made. If you did not make this request, simply ignore this email. If you did make this request just click the link below:
-        
+
         {{password_reset_url}}
-        
+
         If the above URL does not work try copying and pasting it into your browser. If you continue to have problem please feel free to contact us.
-        
+
     welcome_email:
       text: |
         Welcome to GMiner!
-        
+
         Thank you for creating an account at gminer.mcw.edu.
-        You can log in to the site at {{signin_url}} .
-        
+        You can log in to the site at {{signin_url}}
+
         If you forget your password, you can visit {{password_reset_url}} to reset it.
-  
+
+
+  ontologies:
+    new:
+      title: Create new Ontology
+    edit:
+      title: Edit Ontology
+
+  jobs:
+    index:
+      title: Jobs
+      new_link: Create Jobs
+      statistics_link: Job statistics
+    new:
+      title: Create new Jobs
+    process:
+      title: Process Jobs
+    statistics:
+      title: Statistics
+
   pages:
     home:
       welcome: Welcome to GMiner
-      
+
     upgrade:
       text: |
         <div id="ie6msg">
@@ -136,7 +158,8 @@ en:
         <p>To get the best possible experience using gminer, we recommend that you upgrade your browser to a newer version. The current version is <a href="http://www.microsoft.com/windows/downloads/ie/getitnow.mspx" target="_blank">Internet Explorer 7</a> or <a href="http://www.microsoft.com/windows/internet-explorer/default.aspx target="_blank"">Internet Explorer 8</a>. The upgrade is free. If you’re using a PC at work you should contact your IT-administrator. Either way, we'd like to encourage you to stop using IE6 and try a more secure and Web Standards-friendly browser.</p>
         <p>gminer also supports other popular browsers like <strong><a href="http://getfirefox.com" target="_blank">Firefox</a></strong> or <strong><a href="http://www.opera.com" target="_blank">Opera</a></strong>.</p>
         </div>
-    
+    help:
+      title: GMiner Help
 
   ie:
     upgrade_message: |
@@ -144,7 +167,7 @@ en:
     outdated_browser: You are using an outdated browser
     please_upgrade: "For a better experience using this site, please upgrade to a modern web browser."
     browser_obsolete: Your Browser is Obsolete
-  
+
   states:
     AL: Alabama
     AK: Alaska
@@ -197,5 +220,4 @@ en:
     WV: West Virginia
     WI: Wisconsin
     WY: Wyoming
-      
-    
+

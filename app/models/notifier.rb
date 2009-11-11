@@ -12,7 +12,7 @@ class Notifier < ActionMailer::Base
     subject I18n.t("subject.welcome")
     body :user => user
   end
-  
+
   def activation_instructions(user)
   setup(user)
   subject I18n.t("subject.activation_instructions")
@@ -27,5 +27,5 @@ private
     sent_on Time.now
     recipients user.email
   end
-  
+
 end

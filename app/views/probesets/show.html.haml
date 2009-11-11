@@ -1,0 +1,13 @@
+= page_title("Probeset: #{@probeset.name}")
+= link_to('Back', probesets_url)
+%br
+%br
+- if !@chart_image.blank?
+  %span.view-graph
+    View graph
+  .graph
+    = @chart_image
+%br
+%br
+- if @term_array.any?
+  = render(:partial => "ontology_terms_list", :locals => {:items => @term_array})

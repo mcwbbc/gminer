@@ -1,0 +1,8 @@
+= page_title("Probesets")
+%p
+  %form{:name => "sform", :action => "", :style => "display:inline"}
+    %label
+      Filter on probeset id:
+    = text_field_tag(:query, params['query'], :autocomplete => 'off')
+#dataTable
+  = render(:partial => "probesets_list")

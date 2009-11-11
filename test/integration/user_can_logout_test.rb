@@ -12,10 +12,10 @@ class UserCanLogoutTest < ActionController::IntegrationTest
       fill_in 'Password', :with => @the_user.password
       click_button 'Sign In'
     end
-    
+
     should 'be able to log out' do
       visit root_path
-      
+
       click_link "Sign out"
 
       assert_equal new_user_session_path, path

@@ -4,7 +4,7 @@ namespace :deploy do
     task :seesaw, :roles => :app do
       run "cd #{deploy_to}/current && sudo mongrel_rails seesaw::bounce"
     end
-    
+
     desc "Allow mongrel_rails to be sudo-run w/out password by deploy"
     task :setup_sudoers, :except => { :no_release => true }  do
       puts "\n/etc/sudoers before:"
@@ -26,23 +26,23 @@ namespace :deploy do
       end
     end
   end
-  
+
   namespace :passenger do
-    desc "Restart using Passenger" 
+    desc "Restart using Passenger"
     task :restart, :roles => :app do
-      run "touch #{current_path}/tmp/restart.txt" 
+      run "touch #{current_path}/tmp/restart.txt"
     end
   end
-  
+
   namespace :god do
     task :restart, :roles=>:app do
       sudo "/usr/bin/god restart #{application}"
     end
-    
+
     task :status, :roles => :app do
       sudo "/usr/bin/god status"
     end
-        
+
     namespace :starling do
       [ :stop, :start, :restart ].each do |t|
         desc "#{t.to_s.capitalize} starling using god"
@@ -51,7 +51,7 @@ namespace :deploy do
         end
       end
     end
-    
+
     namespace :workling do
       [ :stop, :start, :restart ].each do |t|
         desc "#{t.to_s.capitalize} workling using god"
@@ -68,7 +68,7 @@ namespace :deploy do
       sudo "god #{t.to_s} #{application}"
     end
   end
-  
+
   desc "like update:migrations, but will take down the app w/ a maintenance page during it"
   task :long_deploy, :roles => :app do
     transaction do
@@ -77,11 +77,11 @@ namespace :deploy do
       symlink
       migrate
     end
-  
+
     restart
     web.enable
   end
-  
+
   namespace :files do
     desc "Creates symlinked shared/files folder"
     task :symlink, :roles => :app do
@@ -94,17 +94,17 @@ namespace :deploy do
   namespace :configs do
     # Author: Sai Emrys http://saizai.com
     desc "Override config files w/ whatever's in the shared/config path (e.g. passwords, api keys)"
-    task :symlink, :roles => :app do         
+    task :symlink, :roles => :app do
       # Be extra careful about exposing these
       run "chmod -R go-rwx #{shared_path}/config"
-      
+
       # For all files in the shared config path, symlink in the shared config
   # For some reason, this Dir actually runs on the *local* system rather than the remote. Lame.
   #    Dir[File.join(shared_path, 'config', '**', '*.rb')].each do |c|
   # So here's a hack w/ find to do it the ugly way :(
       config_files = ''
       # Find all regular files (not directories) in the shared config path
-      run("find #{shared_path}/config -type f") do |channel, stream, data| 
+      run("find #{shared_path}/config -type f") do |channel, stream, data|
        config_files << data
       end
       # Extract the names of all config files
@@ -112,7 +112,7 @@ namespace :deploy do
         run "ln -sf #{shared_path}/config/#{c} #{release_path}/config/#{c}" # And symlink in the server's version, overwriting (-f) whatever was there
       end
     end
-    
+
     desc 'Create the shared configs directory on the server'
     task :setup, :roles => :app do
       run "mkdir #{shared_path}/config"

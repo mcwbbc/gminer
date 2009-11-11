@@ -7,4 +7,5 @@
 = link_to('Back', samples_url)
 %br
 %br
-= render(:partial => "shared/annotations_table", :locals => {:item => @sample})
+#annotations-table
+  = render(:partial => "shared/annotations_table", :locals => {:item => @sample})

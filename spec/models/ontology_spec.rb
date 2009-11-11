@@ -5,7 +5,7 @@ describe Ontology do
   describe "create" do
     [:name].each do |key|
       it "should not create a new instance without '#{key}'" do
-        Ontology.generate(key => nil).should_not be_valid
+        Ontology.spawn(key => nil).should_not be_valid
       end
     end
   end

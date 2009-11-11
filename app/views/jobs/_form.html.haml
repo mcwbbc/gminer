@@ -1,0 +1,4 @@
+- form.inputs do
+  = form.input :ontology_id, :as => :select, :collection => Ontology.all, :include_blank => false
+  = form.input :geo_type, :as => :select, :label => "Item type", :collection => ["Sample", "Series", "Dataset", "Platform"], :include_blank => false
+  = form.input :fields, :label => "Fields", :as => :check_boxes, :collection => ["title"]

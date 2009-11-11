@@ -14,9 +14,9 @@ module Test # :nodoc:
           Time.testing_offset = 0
         end
       end
-    
+
     private
-    
+
       def time_from(*args)
         return args[0] if 1 == args.size && args[0].is_a?(Time)
         Time.utc(*args)

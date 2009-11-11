@@ -1,7 +1,7 @@
 namespace :capistrano do
   desc <<-DESC
     Update revisions log from Capistrano 1.x.
-    
+
     Migrate from the revisions log to REVISION. Capistrano 1.x recorded each \
     deployment to a revisions.log file. Capistrano 2.x is cleaner, and just \
     puts a REVISION file in the root of the deployed revision. This task \

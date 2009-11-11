@@ -1,6 +1,6 @@
 %h3
-  == Has annotations that reference #{@annotation_hash.size} GEO accession IDs.
-- if @annotation_hash.any? 
+  = cloud_sample_count(@annotation_hash.size, @sample_count)
+- if @annotation_hash.any?
   %table.paginated{ :cellspacing => "2", :border => "0", :width => "100%", :cellpadding => "0"}
     %thead
       %tr.rowHeader
@@ -11,5 +11,7 @@
     %tbody#dataTable
       = render(:partial => "short_annotation", :collection => @annotation_hash.keys.sort)
   %br{:clear => "all"}
+- elsif (@sample_count < 0)
+  Please select a term to begin filtering.
 - else
   No Results. Please update the filters.

@@ -1,5 +1,5 @@
 # NOTE there are multiple implementations of the MemCache client in Ruby,
-# each with slightly different API's and semantics.  
+# each with slightly different API's and semantics.
 # See:
 #     http://www.deveiate.org/code/Ruby-MemCache/ (Gem: Ruby-MemCache)
 #     http://dev.robotcoop.com/Libraries/memcache-client/ (Gem: memcache-client)
@@ -12,7 +12,7 @@ MemCache.class_eval do
 end if defined? MemCache
 
 # Support for libmemcached through Evan Weaver's memcached wrapper
-# http://blog.evanweaver.com/files/doc/fauna/memcached/classes/Memcached.html    
+# http://blog.evanweaver.com/files/doc/fauna/memcached/classes/Memcached.html
 Memcached.class_eval do
   add_method_tracer :get, 'MemCache/read' if self.method_defined? :get
   %w[set add increment decrement delete replace append prepend cas].each do | method |

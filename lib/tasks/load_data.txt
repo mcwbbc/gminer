@@ -6,6 +6,8 @@ rake persist:series platform_geo_accession=GPL85 array=GSE1675,GSE1775 && rake p
 
 rake persist:series platform_geo_accession=GPL1355 array=GSE2275,GSE2547,GSE2690,GSE2870,GSE2872,GSE2875,GSE2880,GSE3512,GSE3866,GSE4028,GSE4080,GSE4081,GSE4130,GSE4514,GSE4800,GSE4990,GSE5085,GSE5131,GSE5282,GSE5509,GSE6119,GSE6299,GSE7002,GSE7041,GSE7193,GSE7253,GSE7493,GSE8077,GSE8238,GSE8700
 
-for x in `cat metadata/affymetrix_rat_platforms.txt`; do RAILS_ENV=staging rake persist:platform geo_accession=$x force=true; done && for x in `cat metadata/affymetrix_mouse_platforms.txt`; do RAILS_ENV=staging rake persist:platform geo_accession=$x force=true; done && for x in `cat metadata/affymetrix_human_platforms.txt`; do RAILS_ENV=staging rake persist:platform geo_accession=$x force=true; done
+for x in `cat metadata/affymetrix_rat_platforms.txt`; do rake RAILS_ENV=staging persist:platform geo_accession=$x force=true; done && for x in `cat metadata/affymetrix_mouse_platforms.txt`; do rake RAILS_ENV=staging persist:platform geo_accession=$x force=true; done && for x in `cat metadata/affymetrix_human_platforms.txt`; do rake RAILS_ENV=staging persist:platform geo_accession=$x force=true; done
 
-for x in `cat metadata/affymetrix_rat_platforms.txt`; do RAILS_ENV=staging rake persist:series platform_geo_accession=$x array=all; done && for x in `cat metadata/affymetrix_mouse_platforms.txt`; do RAILS_ENV=staging rake persist:series platform_geo_accession=$x array=all; done && for x in `cat metadata/affymetrix_human_platforms.txt`; do RAILS_ENV=staging rake persist:series platform_geo_accession=$x array=all; done
+for x in `cat metadata/affymetrix_rat_platforms.txt`; do rake RAILS_ENV=staging persist:series platform_geo_accession=$x array=all; done && for x in `cat metadata/affymetrix_mouse_platforms.txt`; do rake RAILS_ENV=staging persist:series platform_geo_accession=$x array=all; done && for x in `cat metadata/affymetrix_human_platforms.txt`; do rake RAILS_ENV=staging persist:series platform_geo_accession=$x array=all; done
+
+for x in `cat metadata/rat_datasets.txt`; do rake RAILS_ENV=staging persist:dataset geo_accession=$x; done

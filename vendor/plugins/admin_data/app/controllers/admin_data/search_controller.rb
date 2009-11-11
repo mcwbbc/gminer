@@ -1,4 +1,4 @@
-class AdminData::SearchController  < AdminData::BaseController 
+class AdminData::SearchController  < AdminData::BaseController
 
   unloadable
 
@@ -10,7 +10,7 @@ class AdminData::SearchController  < AdminData::BaseController
     @records = @klass.paginate(  :page => params[:page],
                                  :per_page => per_page,
                                  :order => params[:sortby],
-                                 :conditions => cond ) 
+                                 :conditions => cond )
   end
 
   def advance_search
@@ -53,7 +53,7 @@ class AdminData::SearchController  < AdminData::BaseController
 
     search_options.each do |key,value|
       col1 = value[:col1]
-      
+
       # col1 value is directly used in the sql statement. So it is important to sanitize it
       col1 = col1.gsub(/\W/,'')
 
@@ -74,7 +74,7 @@ class AdminData::SearchController  < AdminData::BaseController
 
       when 'does_not_contain':
         unless col3.blank?
-          attribute_conditions << ["#{table_name}.#{col1} NOT #{like_operator} ?","%#{col3}%"] 
+          attribute_conditions << ["#{table_name}.#{col1} NOT #{like_operator} ?","%#{col3}%"]
         end
 
       when 'is_false':

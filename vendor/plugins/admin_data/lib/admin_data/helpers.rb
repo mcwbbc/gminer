@@ -78,7 +78,7 @@ module AdminData::Helpers
       is_action_included = action_names.include?(params[:action])
       flag = params[:controller] == "admin_data/#{controller_name}" && is_action_included
       if flag
-        return 'active' 
+        return 'active'
         break
       end
     end

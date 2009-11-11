@@ -1,5 +1,5 @@
 require 'socket'
-require 'net/https' 
+require 'net/https'
 require 'net/http'
 require 'logger'
 require 'zlib'
@@ -9,16 +9,16 @@ require 'stringio'
 # in realtime as the application runs, and periodically sends that
 # data to the NewRelic server.
 module NewRelic::Agent
-  
+
   # The Agent is a singleton that is instantiated when the plugin is
   # activated.
   class Agent
-    
+
     # Specifies the version of the agent's communication protocol with
     # the NewRelic hosted site.
-    
+
     PROTOCOL_VERSION = 6
-    
+
     attr_reader :obfuscator
     attr_reader :stats_engine
     attr_reader :transaction_sampler
@@ -26,7 +26,7 @@ module NewRelic::Agent
     attr_reader :task_loop
     attr_reader :record_sql
     attr_reader :histogram
-    
+
     # Should only be called by NewRelic::Control
     def self.instance
       @instance ||= self.new
@@ -35,46 +35,46 @@ module NewRelic::Agent
     def manual_start(ignored=nil, also_ignored=nil)
       raise "This method no longer supported.  Instead use the class method NewRelic::Agent.manual_start"
     end
-    
+
     # this method makes sure that the agent is running. it's important
     # for passenger where processes are forked and the agent is
     # dormant
     #
     def ensure_worker_thread_started
       return unless control.agent_enabled? && control.monitor_mode? && !@invalid_license
-      if !running? 
+      if !running?
         launch_worker_thread
         @stats_engine.spawn_sampler_thread
       end
     end
-    
+
     # True if the worker thread has been started.  Doesn't necessarily
     # mean we are connected
     def running?
       control.agent_enabled? && control.monitor_mode? && @task_loop && @task_loop.pid == $$
     end
-    
+
     # True if we have initialized and completed 'start'
     def started?
       @started
     end
-    
-    # Attempt a graceful shutdown of the agent.  
+
+    # Attempt a graceful shutdown of the agent.
     def shutdown
       return if not started?
       if @task_loop
         @task_loop.stop
-        
+
         log.debug "Starting Agent shutdown"
-        
+
         # if litespeed, then ignore all future SIGUSR1 - it's
         # litespeed trying to shut us down
-        
+
         if control.dispatcher == :litespeed
           Signal.trap("SIGUSR1", "IGNORE")
           Signal.trap("SIGTERM", "IGNORE")
         end
-        
+
         begin
           graceful_disconnect
         rescue => e
@@ -84,32 +84,32 @@ module NewRelic::Agent
       end
       @started = nil
     end
-    
+
     def start_transaction
       Thread::current[:custom_params] = nil
       @stats_engine.start_transaction
     end
-    
+
     def end_transaction
       Thread::current[:custom_params] = nil
       @stats_engine.end_transaction
     end
-    
+
     def set_record_sql(should_record)
       prev = Thread::current[:record_sql]
       Thread::current[:record_sql] = should_record
       prev.nil? || prev
     end
-    
+
     def set_record_tt(should_record)
       prev = Thread::current[:record_tt]
       Thread::current[:record_tt] = should_record
       prev.nil? || prev
     end
     # Push flag indicating whether we should be tracing in this
-    # thread.  
+    # thread.
     def push_trace_execution_flag(should_trace=false)
-      (Thread.current[:newrelic_untraced] ||= []) << should_trace 
+      (Thread.current[:newrelic_untraced] ||= []) << should_trace
     end
 
     # Pop the current trace execution status.  Restore trace execution status
@@ -117,17 +117,17 @@ module NewRelic::Agent
     def pop_trace_execution_flag
       Thread.current[:newrelic_untraced].pop if Thread.current[:newrelic_untraced]
     end
-    
+
     def add_custom_parameters(params)
       p = Thread::current[:custom_params] || (Thread::current[:custom_params] = {})
-      
+
       p.merge!(params)
     end
-    
+
     def custom_params
       Thread::current[:custom_params] || {}
     end
-    
+
     def set_sql_obfuscator(type, &block)
       if type == :before
         @obfuscator = NewRelic::ChainedCall.new(block, @obfuscator)
@@ -142,8 +142,8 @@ module NewRelic::Agent
 
     def log
       NewRelic::Control.instance.log
-    end  
-    
+    end
+
     # Start up the agent.  This verifies that the agent_enabled? is
     # true and initializes the sampler based on the current
     # controluration settings.  Then it will fire up the background
@@ -153,23 +153,23 @@ module NewRelic::Agent
         control.log! "Agent Started Already!", :error
         return
       end
-      return if !control.agent_enabled? 
+      return if !control.agent_enabled?
 
       @local_host = determine_host
-      
+
       log.info "Web container: #{control.dispatcher.to_s}"
-      
+
       if control.dispatcher == :passenger
         log.warn "Phusion Passenger has been detected. Some RPM memory statistics may have inaccuracies due to short process lifespans."
       end
-      
+
       @started = true
-      
+
       sampler_config = control.fetch('transaction_tracer', {})
       @use_transaction_sampler = sampler_config.fetch('enabled', true)
-      
+
       @record_sql = sampler_config.fetch('record_sql', :obfuscated).to_sym
-      
+
       # use transaction_threshold: 4.0 to force the TT collection
       # threshold to 4 seconds
       # use transaction_threshold: apdex_f to use your apdex t value
@@ -181,9 +181,9 @@ module NewRelic::Agent
         @slowest_transaction_threshold = apdex_f
       end
       @slowest_transaction_threshold = @slowest_transaction_threshold.to_f
-      
+
       if @use_transaction_sampler
-        log.info "Transaction tracing threshold is #{@slowest_transaction_threshold} seconds." 
+        log.info "Transaction tracing threshold is #{@slowest_transaction_threshold} seconds."
       else
         log.info "Transaction tracing not enabled."
       end
@@ -201,7 +201,7 @@ module NewRelic::Agent
         elsif  control.license_key.length != 40
           @invalid_license = true
           control.log! "Invalid license key: #{control.license_key}", :error
-        else     
+        else
           launch_worker_thread
           # When the VM shuts down, attempt to send a message to the
           # server that this agent run is stopping, assuming it has
@@ -217,30 +217,30 @@ module NewRelic::Agent
     def collector
       @collector ||= control.server
     end
-    
+
     # Connect to the server, and run the worker loop forever.
     # Will not return.
     def run_task_loop
-      # determine the reporting period (server based)          
+      # determine the reporting period (server based)
       # note if the agent attempts to report more frequently than
       # the specified report data, then it will be ignored.
-      
-      control.log! "Reporting performance data every #{@report_period} seconds."        
-      @task_loop.add_task(@report_period) do 
+
+      control.log! "Reporting performance data every #{@report_period} seconds."
+      @task_loop.add_task(@report_period) do
         harvest_and_send_timeslice_data
       end
-      
+
       if @should_send_samples && @use_transaction_sampler
-        @task_loop.add_task(@report_period) do 
+        @task_loop.add_task(@report_period) do
           harvest_and_send_slowest_sample
         end
       elsif !control.developer_mode?
         # We still need the sampler for dev mode.
         @transaction_sampler.disable
       end
-      
+
       if @should_send_errors && @error_collector.enabled
-        @task_loop.add_task(@report_period) do 
+        @task_loop.add_task(@report_period) do
           harvest_and_send_errors
         end
       end
@@ -249,21 +249,21 @@ module NewRelic::Agent
       @connected = false
       raise
     end
-    
+
     def launch_worker_thread
       if (control.dispatcher == :passenger && $0 =~ /ApplicationSpawner/)
         log.debug "Process is passenger spawner - don't connect to RPM service"
         return
       end
-      
+
       @task_loop = WorkerLoop.new(log)
-      
+
       if control['check_bg_loading']
         log.warn "Agent background loading checking turned on"
         require 'new_relic/agent/patch_const_missing'
         ClassLoadingWatcher.enable_warning
       end
-      
+
       @worker_thread = Thread.new do
         begin
           ClassLoadingWatcher.background_thread=Thread.current if control['check_bg_loading']
@@ -290,28 +290,28 @@ module NewRelic::Agent
       end
       @worker_thread['newrelic_label'] = 'Worker Loop'
     end
-    
+
     def control
       NewRelic::Control.instance
     end
-    
+
     def initialize
       @connected = false
       @launch_time = Time.now
-      
+
       @metric_ids = {}
       @histogram = NewRelic::Histogram.new(NewRelic::Control.instance.apdex_t / 10)
       @stats_engine = NewRelic::Agent::StatsEngine.new
       @transaction_sampler = NewRelic::Agent::TransactionSampler.new(self)
       @error_collector = NewRelic::Agent::ErrorCollector.new(self)
-      
+
       @request_timeout = NewRelic::Control.instance.fetch('timeout', 2 * 60)
-      
+
       @invalid_license = false
-      
+
       @last_harvest_time = Time.now
     end
-    
+
     # Connect to the server and validate the license.  If successful,
     # @connected has true when finished.  If not successful, you can
     # keep calling this.  Return false if we could not establish a
@@ -326,45 +326,45 @@ module NewRelic::Agent
         sleep connect_retry_period.to_i
         environment = control['send_environment_info'] != false ? control.local_env.snapshot : []
         @agent_id ||= invoke_remote :start, @local_host, {
-          :pid => $$, 
-          :launch_time => @launch_time.to_f, 
-          :agent_version => NewRelic::VERSION::STRING, 
+          :pid => $$,
+          :launch_time => @launch_time.to_f,
+          :agent_version => NewRelic::VERSION::STRING,
           :environment => environment,
           :settings => control.settings }
-        
+
         host = invoke_remote(:get_redirect_host) rescue nil
-        
-        @collector = control.server_from_host(host) if host        
-            
+
+        @collector = control.server_from_host(host) if host
+
         @report_period = invoke_remote :get_data_report_period, @agent_id
- 
+
         control.log! "Connected to NewRelic Service at #{@collector}"
         log.debug "Agent ID = #{@agent_id}."
-        
+
         # Ask the server for permission to send transaction samples.
         # determined by subscription license.
         @should_send_samples = invoke_remote :should_collect_samples, @agent_id
-        
+
         if @should_send_samples
           sampling_rate = invoke_remote :sampling_rate, @agent_id if @random_sample
           @transaction_sampler.sampling_rate = sampling_rate
           log.info "Transaction sample rate: #{@transaction_sampler.sampling_rate}" if sampling_rate
         end
-        
+
         # Ask for permission to collect error data
         @should_send_errors = invoke_remote :should_collect_errors, @agent_id
-        
+
         log.info "Transaction traces will be sent to the RPM service" if @use_transaction_sampler && @should_send_samples
         log.info "Errors will be sent to the RPM service" if @error_collector.enabled && @should_send_errors
-        
+
         @connected = true
-        
+
       rescue LicenseException => e
         control.log! e.message, :error
         control.log! "Visit NewRelic.com to obtain a valid license key, or to upgrade your account."
         @invalid_license = true
         return false
-        
+
       rescue Timeout::Error, StandardError => e
         log.info "Unable to establish connection with New Relic RPM Service at #{control.server}"
         unless e.instance_of? IgnoreSilentlyException
@@ -378,70 +378,70 @@ module NewRelic::Agent
           connect_retry_period, period_msg = 60, "1 minute"
           when 3..5 then
           connect_retry_period, period_msg = 60 * 2, "2 minutes"
-        else 
+        else
           connect_retry_period, period_msg = 10*60, "10 minutes"
         end
-        log.info "Will re-attempt in #{period_msg}" 
+        log.info "Will re-attempt in #{period_msg}"
         retry
       end
     end
-      
+
     def determine_host
       Socket.gethostname
     end
-    
+
     def determine_home_directory
       control.root
     end
-    
+
     def harvest_and_send_timeslice_data
-      
+
       NewRelic::Agent::Instrumentation::DispatcherInstrumentation::BusyCalculator.harvest_busy
-      
+
       now = Time.now
-            
+
       @unsent_timeslice_data ||= {}
       @unsent_timeslice_data = @stats_engine.harvest_timeslice_data(@unsent_timeslice_data, @metric_ids)
-      
+
       begin
-        metric_ids = invoke_remote(:metric_data, @agent_id, 
-                                   @last_harvest_time.to_f, 
-                                   now.to_f, 
+        metric_ids = invoke_remote(:metric_data, @agent_id,
+                                   @last_harvest_time.to_f,
+                                   now.to_f,
                                    @unsent_timeslice_data.values)
-        
+
       rescue Timeout::Error
         # assume that the data was received. chances are that it was
         metric_ids = nil
       end
-      
+
       @metric_ids.merge! metric_ids if metric_ids
-      
+
       log.debug "#{now}: sent #{@unsent_timeslice_data.length} timeslices (#{@agent_id}) in #{Time.now - now} seconds"
-      
+
       # if we successfully invoked this web service, then clear the unsent message cache.
       @unsent_timeslice_data = {}
       @last_harvest_time = now
-      
-      # handle_messages 
-      
+
+      # handle_messages
+
       # note - exceptions are logged in invoke_remote.  If an exception is encountered here,
       # then the metric data is downsampled for another timeslices
     end
-    
+
     def harvest_and_send_slowest_sample
       @traces = @transaction_sampler.harvest(@traces, @slowest_transaction_threshold)
-      
+
       unless @traces.empty?
         now = Time.now
         log.debug "Sending (#{@traces.length}) transaction traces"
-        begin        
+        begin
           # take the traces and prepare them for sending across the
           # wire.  This includes gathering SQL explanations, stripping
           # out stack traces, and normalizing SQL.  note that we
           # explain only the sql statements whose segments' execution
           # times exceed our threshold (to avoid unnecessary overhead
           # of running explains on fast queries.)
-          traces = @traces.collect {|trace| trace.prepare_to_send(:explain_sql => @explain_threshold, :record_sql => @record_sql, :keep_backtraces => true, :explain_enabled => @explain_enabled)} 
+          traces = @traces.collect {|trace| trace.prepare_to_send(:explain_sql => @explain_threshold, :record_sql => @record_sql, :keep_backtraces => true, :explain_enabled => @explain_enabled)}
 
 
           invoke_remote :transaction_sample_data, @agent_id, traces
@@ -451,26 +451,26 @@ module NewRelic::Agent
           @traces.shift
           retry
         end
-        
+
         log.debug "#{now}: sent slowest sample (#{@agent_id}) in #{Time.now - now} seconds"
       end
-      
+
       # if we succeed sending this sample, then we don't need to keep
       # the slowest sample around - it has been sent already and we
       # can collect the next one
       @traces = nil
-      
+
       # note - exceptions are logged in invoke_remote.  If an
       # exception is encountered here, then the slowest sample of is
       # determined of the entire period since the last reported
       # sample.
     end
-    
+
     def harvest_and_send_errors
       @unsent_errors = @error_collector.harvest_errors(@unsent_errors)
       if @unsent_errors && @unsent_errors.length > 0
         log.debug "Sending #{@unsent_errors.length} errors"
-        begin        
+        begin
           invoke_remote :error_data, @agent_id, @unsent_errors
         rescue PostTooBigException
           @unsent_errors.shift
@@ -486,25 +486,25 @@ module NewRelic::Agent
 
     def compress_data(object)
       dump = Marshal.dump(object)
-      
+
       # we currently optimize for CPU here since we get roughly a 10x
       # reduction in message size with this, and CPU overhead is at a
       # premium. For extra-large posts, we use the higher compression
       # since otherwise it actually errors out.
-      
+
       dump_size = dump.size
-      
-      # small payloads don't need compression      
+
+      # small payloads don't need compression
       return [dump, 'identity'] if dump_size < 2000
-      
+
       # medium payloads get fast compression, to save CPU
       # big payloads get all the compression possible, to stay under
-      # the 2,000,000 byte post threshold      
+      # the 2,000,000 byte post threshold
       compression = dump_size < 2000000 ? Zlib::BEST_SPEED : Zlib::BEST_COMPRESSION
-      
+
       [Zlib::Deflate.deflate(dump, compression), 'deflate']
     end
-    
+
     def check_post_size(post_string)
       # TODO: define this as a config option on the server side
       return if post_string.size < 2000000
@@ -516,20 +516,20 @@ module NewRelic::Agent
       request = Net::HTTP::Post.new(opts[:uri], 'CONTENT-ENCODING' => opts[:encoding], 'ACCEPT-ENCODING' => 'gzip', 'HOST' => opts[:collector].name)
       request.content_type = "application/octet-stream"
       request.body = opts[:data]
-      
+
       log.debug "connect to #{opts[:collector]}#{opts[:uri]}"
-      
+
       response = nil
-      http = control.http_connection(collector)      
+      http = control.http_connection(collector)
       begin
-        timeout(@request_timeout) do      
+        timeout(@request_timeout) do
           response = http.request(request)
         end
       rescue Timeout::Error
         log.warn "Timed out trying to post data to RPM (timeout = #{@request_timeout} seconds)" unless @request_timeout < 30
         raise
       end
-      
+
       if response.is_a? Net::HTTPGatewayTimeOut
         log.debug("Timed out getting response: #{response.message}")
         raise Timeout::Error, response.message
@@ -556,21 +556,21 @@ module NewRelic::Agent
       raise value if value.is_a? Exception
       value
     end
-    
+
     def remote_method_uri(method)
       uri = "/agent_listener/#{PROTOCOL_VERSION}/#{control.license_key}/#{method}"
       uri << "?run_id=#{@agent_id}" if @agent_id
       uri
     end
-      
+
     # send a message via post
     def invoke_remote(method, *args)
       #determines whether to zip the data or send plain
       post_data, encoding = compress_data(args)
-      
+
       # this checks to make sure mongrel won't choke on big uploads
-      check_post_size(post_data) 
-      
+      check_post_size(post_data)
+
       response = send_request({:uri => remote_method_uri(method), :encoding => encoding, :collector => collector, :data => post_data})
 
       # raises the right exception if the remote server tells it to die
@@ -586,7 +586,7 @@ module NewRelic::Agent
       @unsent_timeslice_data = {}
       @last_harvest_time = Time.now
       log.warn "Restart not yet implemented"
-      
+
     rescue ForceDisconnectException => e
       log.error "RPM forced this agent to disconnect (#{e.message})\n" \
       "Restart this process to resume monitoring via rpm.newrelic.com."
@@ -596,29 +596,29 @@ module NewRelic::Agent
       @connected = false
       Thread.exit
     rescue SystemCallError, SocketError => e
-      # These include Errno connection errors 
+      # These include Errno connection errors
       log.debug "Recoverable error connecting to the server: #{e}"
       raise IgnoreSilentlyException
     end
-    
+
     def graceful_disconnect
       if @connected && !(control.server.name == "localhost" && control.dispatcher_instance_id == '3000')
         begin
           log.debug "Sending graceful shutdown message to #{control.server}"
-          
+
           @request_timeout = 10
-          
+
           log.debug "Sending RPM service agent run shutdown message"
           invoke_remote :shutdown, @agent_id, Time.now.to_f
-          
+
           log.debug "Graceful shutdown complete"
-          
-        rescue Timeout::Error, StandardError 
+
+        rescue Timeout::Error, StandardError
         end
       else
         log.debug "Bypassing graceful shutdown - agent not connected"
       end
     end
   end
-  
+
 end

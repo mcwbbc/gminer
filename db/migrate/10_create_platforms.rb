@@ -4,8 +4,6 @@ class CreatePlatforms < ActiveRecord::Migration
       t.string :geo_accession, :limit => 25
       t.string :title, :limit => 255
       t.string :organism, :limit => 255
-      t.datetime :annotating_at
-      t.datetime :annotated_at
     end
 
     add_index(:platforms, :geo_accession)

@@ -49,11 +49,11 @@ class AdminData::BaseController < ApplicationController
         Rails.logger.debug e.message
       end
       if klass && klass.ancestors.include?(ActiveRecord::Base)  && !@klasses.include?(klass)
-        # it is possible that a model doesn't have a corresponding table because 
+        # it is possible that a model doesn't have a corresponding table because
         # migration has not run or
         # migration has deleted the table but the model has not been deleted.
         #
-        # In order to remove such classes from the list sending count method to klass 
+        # In order to remove such classes from the list sending count method to klass
         begin
           klass.send(:count)
           @klasses << klass

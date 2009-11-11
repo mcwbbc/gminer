@@ -27,10 +27,19 @@ class DatasetsController < ApplicationController
   # GET /datasets/1
   def show
     @dataset = Dataset.first(:conditions => {:geo_accession => params[:id]})
+
     raise ActiveRecord::RecordNotFound if !@dataset
+
+    if admin_logged_in?
+      @new_annotation = Annotation.for_item(@dataset, current_user.id)
+      @ontologies = Ontology.all(:order => :name)
+    end
+
     @prev, @next = @dataset.prev_next
     respond_to do |format|
-      format.html # show.html.erb
+      format.html {
+        @annotation_count_array = @dataset.count_by_ontology_array
+      }
     end
     rescue ActiveRecord::RecordNotFound
       flash[:warning] = "That dataset does not exist."

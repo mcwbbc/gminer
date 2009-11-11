@@ -9,7 +9,7 @@ rails_root = File.dirname(__FILE__) + '/../../../'
 if File.directory?(rails_root + 'spec')
   unless File.directory?(rails_root + 'spec/exemplars')
     puts "Creating directory [#{rails_root + 'spec/exemplars'}]"
-    FileUtils.mkdir(rails_root + 'spec/exemplars') 
+    FileUtils.mkdir(rails_root + 'spec/exemplars')
   end
 else
   if File.directory?(rails_root + 'test')
@@ -18,7 +18,7 @@ else
       FileUtils.mkdir(rails_root + 'test/exemplars')
     end
   else
-    puts "Creating directory [#{rails_root + 'spec'}]"    
+    puts "Creating directory [#{rails_root + 'spec'}]"
     FileUtils.mkdir(rails_root + 'spec')
     puts "Creating directory [#{rails_root + 'spec/exemplars'}]"
     FileUtils.mkdir(rails_root + 'spec/exemplars')

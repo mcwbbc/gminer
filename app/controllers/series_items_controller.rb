@@ -27,9 +27,17 @@ class SeriesItemsController < ApplicationController
   def show
     @series_item = SeriesItem.first(:conditions => {:geo_accession => params[:id]})
     raise ActiveRecord::RecordNotFound if !@series_item
+
+    if admin_logged_in?
+      @new_annotation = Annotation.for_item(@series_item, current_user.id)
+      @ontologies = Ontology.all(:order => :name)
+    end
+
     @prev, @next = @series_item.prev_next
     respond_to do |format|
-      format.html
+      format.html {
+        @annotation_count_array = @series_item.count_by_ontology_array
+      }
     end
     rescue ActiveRecord::RecordNotFound
       flash[:warning] = "That series does not exist."

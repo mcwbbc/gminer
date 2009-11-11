@@ -1,8 +1,8 @@
-class AdminData::MainController  < AdminData::BaseController 
+class AdminData::MainController  < AdminData::BaseController
 
   unloadable
 
-  before_filter :ensure_is_allowed_to_update, 
+  before_filter :ensure_is_allowed_to_update,
                 :only => [:destroy, :delete, :edit, :update, :create]
 
   before_filter :get_class_from_params,
@@ -12,7 +12,7 @@ class AdminData::MainController  < AdminData::BaseController
   before_filter :ensure_list_children_valid, :only => [:list]
 
   before_filter :get_model_and_verify_it, :only => [:destroy, :delete, :edit, :update, :show]
-  
+
   def table_structure
     @indexes = []
     if (indexes = ActiveRecord::Base.connection.indexes(@klass.table_name)).any?
@@ -109,7 +109,7 @@ class AdminData::MainController  < AdminData::BaseController
      m = "find_by_#{primary_key}".intern
     @model = @klass.send(m, params[:model_id])
     if @model.blank?
-      render :text => "<h2>#{@klass.name} not found: #{params[:model_id]}</h2>", :status => 404 
+      render :text => "<h2>#{@klass.name} not found: #{params[:model_id]}</h2>", :status => 404
     end
   end
 

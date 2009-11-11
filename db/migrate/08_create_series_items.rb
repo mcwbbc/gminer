@@ -7,8 +7,6 @@ class CreateSeriesItems < ActiveRecord::Migration
       t.string :title, :limit => 255
       t.text :summary
       t.text :overall_design
-      t.datetime :annotating_at
-      t.datetime :annotated_at
     end
 
     add_index(:series_items, :geo_accession)

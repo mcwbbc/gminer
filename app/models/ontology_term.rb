@@ -1,5 +1,5 @@
 class OntologyTerm < ActiveRecord::Base
-  
+
   belongs_to :ontology
   has_many :annotations, :order => :geo_accession#, :dependent => :destroy
   has_many :annotation_closures, :include => :annotation, :order => "annotations.geo_accession"#, :dependent => :destroy
@@ -17,26 +17,30 @@ class OntologyTerm < ActiveRecord::Base
 
     def cloud(options = {})
       query = "SELECT ontology_terms.*"
-      query << " FROM ontology_terms, ontologies"
+      query << " FROM ontology_terms, ontologies, annotations"
       query << " WHERE ontology_terms.annotations_count > 0"
-      query << " AND ontology_terms.ncbo_id = ontologies.ncbo_id AND ontologies.name = '#{options[:ontology]}'" if options[:ontology] != nil
+      query << " AND annotations.verified = 1 AND annotations.ontology_term_id = ontology_terms.id" if !options[:invalid]
+      query << " AND ontology_terms.ncbo_id = ontologies.ncbo_id AND ontologies.ncbo_id = '#{options[:ontology_ncbo_id]}'" if options[:ontology_ncbo_id]
       query << " GROUP BY ontology_terms.name"
       query << " ORDER BY ontology_terms.annotations_count DESC, ontology_terms.name"
       query << " LIMIT #{options[:limit]}" if options[:limit] != nil
       cloud = OntologyTerm.find_by_sql(query)
     end
 
-    def persist(term_id, ncbo_id, term_name)
-      if !ot = OntologyTerm.first(:conditions => {:term_id => term_id})
-        ontology = Ontology.first(:conditions => {:ncbo_id => ncbo_id})
-        ot = ontology.ontology_terms.create(:term_id => term_id, :ncbo_id => ncbo_id, :name => term_name) if ontology
-      end
+    def count_for_probeset(term_id, probeset_id, ncbo_id)
+      count(
+        :joins => "INNER JOIN annotations ON ontology_terms.id = annotations.ontology_term_id INNER JOIN samples ON annotations.geo_accession = samples.geo_accession INNER JOIN detections ON detections.sample_id = samples.id INNER JOIN probesets ON detections.probeset_id = probesets.id AND ontology_terms.id = #{term_id} AND probesets.id = #{probeset_id} AND annotations.ncbo_id = '#{ncbo_id}' AND annotations.verified = 1"
+      )
     end
 
   end
 
   def to_param
     self.term_id
+  end
+
+  def specific_term_id
+    self.term_id.split("|").last
   end
 
   def valid_annotation_percentage
@@ -80,7 +84,7 @@ class OntologyTerm < ActiveRecord::Base
     sql << " ORDER BY ontology_terms.name"
     terms = OntologyTerm.find_by_sql(sql)
   end
-   
+
   def child_closures
     acs = AnnotationClosure.all(:conditions => {:ontology_term_id => self.id}, :order => "ontology_terms.name", :include => [:ontology_term])
     terms = acs.inject([]) do |array, ac|

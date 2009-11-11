@@ -1,9 +1,9 @@
 %tr{:class => "#{cycle('rowWhite', 'rowBlue')}"}
   %td{:valign => "top"}
+    = link_to(result.probeset.name, probeset_url(result.probeset))
+  %td{:valign => "top"}
     = geo_link(result.sample.geo_accession)
   %td{:valign => "top"}
+    = link_to(result.ontology_term.specific_term_id, ontology_term_url(result.ontology_term))
+  %td{:valign => "top"}
     = pubmed_link(result.pubmed_id)
-  %td{:valign => "top"}
-    = result.id_ref
-  %td{:valign => "top"}
-    = result.ontology_term.name

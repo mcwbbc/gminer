@@ -1,11 +1,28 @@
 = page_title("Audit Annotations")
 %p
   %form{:name => "sform", :action => "", :style => "display:inline"}
-    %label
-      Filter on term:
-    = text_field_tag(:query, params['query'], :autocomplete => 'off') 
-    = ontology_search_dropdown(@current)
-    = annotation_status_dropdown(@status)
+    %table.filter-menu
+      %tr
+        %td{:align => 'right'}
+          %label
+            Filter on term:
+        %td
+          = text_field_tag(:query, params['query'], :autocomplete => 'off')
+        %td{:align => 'right'}
+          %label
+            Ontology:
+        %td
+          = ontology_search_dropdown(@current)
+        %td{:align => 'right'}
+          %label
+            Annotation Status:
+        %td
+          = annotation_status_dropdown(@status)
+        %td{:align => 'right'}
+          %label
+          GEO item type:
+        %td
+          = annotation_geotype_dropdown(@geotype)
 
 #dataTable
   = render(:partial => "audit_list")

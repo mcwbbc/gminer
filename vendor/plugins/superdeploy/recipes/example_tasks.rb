@@ -9,12 +9,12 @@
 #    # the on_rollback handler is only executed if this task is executed within
 #    # a transaction (see below), AND it or a subsequent task fails.
 #    on_rollback { delete "/tmp/dump.sql" }
-#  
+#
 #    run "mysqldump -u theuser -p thedatabase > /tmp/dump.sql" do |ch, stream, out|
 #      ch.send_data "thepassword\n" if out =~ /^Enter password:/
 #    end
 #  end
-  
+
   # Tasks may take advantage of several different helper methods to interact
   # with the remote server(s). These are:
   #
@@ -38,14 +38,14 @@
   #   it will be treated as the contents of the template to render. Any other keys
   #   are treated as local variables, which are made available to the (ERb)
   #   template.
-  
+
 #  desc "Demonstrates the various helper methods available to recipes."
 #  task :helper_demo do
 #    # "setup" is a standard task which sets up the directory structure on the
 #    # remote servers. It is a good idea to run the "setup" task at least once
 #    # at the beginning of your app's lifetime (it is non-destructive).
 #    setup
-#  
+#
 #    buffer = render("maintenance.rhtml", :deadline => ENV['UNTIL'])
 #    put buffer, "#{shared_path}/system/maintenance.html", :mode => 0644
 #    sudo "killall -USR1 dispatch.fcgi"

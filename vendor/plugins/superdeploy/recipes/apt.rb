@@ -5,12 +5,12 @@ namespace :sys do
       logger.info "Running aptitude update"
       sudo "aptitude update"
     end
-  
+
     desc "Runs aptitude upgrade on remote server"
     task :upgrade do
       sudo_with_input "aptitude upgrade", /^Do you want to continue\?/
     end
-  
+
     desc "Search for aptitude packages on remote server"
     task :search do
       puts "Enter your search term:"
@@ -19,7 +19,7 @@ namespace :sys do
       sudo "aptitude update"
       stream "aptitude search #{deb_pkg_term}"
     end
-  
+
     desc "Installs a package using the aptitude command on the remote server."
     task :install do
       puts "What is the name of the package(s) you wish to install?"

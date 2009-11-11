@@ -5,7 +5,7 @@ class Sample < ActiveRecord::Base
   belongs_to :series_item
   belongs_to :platform
   has_many :detections
-#  has n, :results, :foreign_key => :sample_geo_accession # they exist, but don't associate in case of lazy load
+  has_many :annotations, :foreign_key => :geo_accession, :primary_key => :geo_accession
 
   class << self
     def page(conditions, page=1, size=Constants::PER_PAGE)
@@ -17,44 +17,41 @@ class Sample < ActiveRecord::Base
     end
 
     def matching(options)
-      sql = "SELECT samples.geo_accession, series_items.pubmed_id as pubmed_id, ontology_terms.term_id as ontology_term_id FROM samples, ontology_terms, series_items, annotations, ontologies "
-      sql << "WHERE ontology_terms.name = '#{options[:term]}' "
-      sql << "AND ontologies.name = '#{options[:ontology_name]}' "
+      sql = "SELECT samples.id, samples.geo_accession, series_items.pubmed_id as pubmed_id, ontology_terms.id as ontology_term_id FROM samples, ontology_terms, series_items, annotations, ontologies "
+      sql << "WHERE ontologies.ncbo_id = #{options[:ncbo_id]} "
+      sql << "AND ontology_terms.term_id = '#{options[:term_id]}' " if options[:term_id]
       sql << "AND ontology_terms.ncbo_id = ontologies.ncbo_id "
-      sql << "AND annotations.field = '#{options[:field]}' " 
-      sql << "AND series_items.pubmed_id != '' "
-      sql << "AND samples.series_geo_accession = series_items.geo_accession "
-      sql << "AND annotations.ontology_term_id = ontology_terms.term_id "
-      sql << "AND annotations.geo_accession = samples.geo_accession "
-      sql << "GROUP BY samples.geo_accession"
+      sql << "AND annotations.field = '#{options[:field]}' "
+      sql << "AND series_items.pubmed_id != '' " if options[:require_pubmed_id]
+      sql << "AND samples.series_item_id = series_items.id "
+      sql << "AND annotations.ontology_term_id = ontology_terms.id "
+      sql << "AND annotations.geo_accession = samples.geo_accession"
       samples = Sample.find_by_sql(sql)
     end
 
     def create_results(passed = {})
-      options = {:ontology_name => "Mouse adult gross anatomy", :field => "source_name"}.merge(passed)
+      options = {:ncbo_id => 1000, :field => "source_name", :require_pubmed_id => false}.merge!(passed)
       Sample.matching(options).each do |sample|
-        Result.transaction do
-          inserts = []
-          earlier = Time.new
-          sample.detections.find(:all, :conditions => {:abs_call => 'P'}).each do |detection|
-            inserts.push "('#{sample.id}', '#{detection.id_ref}', '#{sample.pubmed_id}', '#{sample.ontology_term_id}')"
-          end
+        inserts = []
+        earlier = Time.new
+        Detection.all(:conditions => {:sample_id => sample.id, :abs_call => 'P'}).each do |detection|
+          inserts.push "('#{sample.id}', '#{detection.probeset_id}', '#{sample.pubmed_id}', '#{sample.ontology_term_id}')"
+        end
 
-          if inserts.any?
-            sql = "INSERT INTO results (sample_id, id_ref, pubmed_id, ontology_term_id) VALUES #{inserts.join(", ")}"
-            begin
-              ActiveRecord::Base.connection.execute(sql)
-              puts "Sample #{sample.geo_accession} took #{Time.new-earlier}" if options[:debug]
-            rescue ActiveRecord::StatementInvalid => e
-              if e.message =~ /Mysql::Error: Duplicate entry/
-                puts "Mysql::Error: Duplicate entry #{sample.geo_accession} #{sample.ontology_term_id}"
-              else
-                raise e
-              end
+        if inserts.any?
+          sql = "INSERT INTO results (sample_id, probeset_id, pubmed_id, ontology_term_id) VALUES #{inserts.join(", ")}"
+          begin
+            ActiveRecord::Base.connection.execute(sql)
+            puts "Sample #{sample.geo_accession} took #{Time.new-earlier}" if options[:debug]
+          rescue ActiveRecord::StatementInvalid => e
+            if e.message =~ /Mysql::Error: Duplicate entry/
+              puts "Mysql::Error: Duplicate entry #{sample.geo_accession} #{sample.ontology_term_id}"
+            else
+              raise e
             end
-          else
-            puts "Sample #{sample.geo_accession} had no inserts" if options[:debug]
           end
+        else
+          puts "Sample #{sample.geo_accession} had no inserts" if options[:debug]
         end
       end
     end
@@ -69,7 +66,7 @@ class Sample < ActiveRecord::Base
   end
 
   def local_sample_filename
-    "#{series_path}/#{self.geo_accession}_sample.soft"    
+    "#{series_path}/#{self.geo_accession}_sample.soft"
   end
 
   def fields
@@ -104,7 +101,7 @@ class Sample < ActiveRecord::Base
     save!
   end
 
-  def create_detections
+  def create_detections(probeset_id_hash)
     data_regex = /^.+_at/
     abs_call_regex = /^#ABS_CALL/
     header_regex = /^ID_REF/
@@ -140,7 +137,15 @@ class Sample < ActiveRecord::Base
         if line =~ data_regex
           data = line.chomp.split("\t")
           if (data[id_ref_header_pos] && data[abs_call_header_pos])
-            inserts.push "('#{self.id}', '#{data[id_ref_header_pos].chomp}', '#{data[abs_call_header_pos].chomp}')"
+
+            id_ref = data[id_ref_header_pos].chomp
+            if !probeset_id_hash[id_ref]
+              if !p = Probeset.first(:conditions => {:name => id_ref})
+                p = Probeset.create(:name => id_ref)
+              end
+              probeset_id_hash[id_ref] = p.id
+            end
+            inserts.push "('#{self.id}', '#{probeset_id_hash[id_ref]}', '#{data[abs_call_header_pos].chomp}')"
           end
         end
       end
@@ -151,10 +156,9 @@ class Sample < ActiveRecord::Base
     end
 
     if inserts.any?
-      sql = "INSERT INTO detections (sample_id, id_ref, abs_call) VALUES #{inserts.join(", ")}"
+      sql = "INSERT INTO detections (sample_id, probeset_id, abs_call) VALUES #{inserts.join(", ")}"
       ActiveRecord::Base.connection.execute(sql)
     end
-
   end
 
 end

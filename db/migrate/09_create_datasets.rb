@@ -8,8 +8,6 @@ class CreateDatasets < ActiveRecord::Migration
       t.string :organism, :limit => 255
       t.text :title
       t.text :description
-      t.datetime :annotating_at
-      t.datetime :annotated_at
     end
 
     add_index(:datasets, :geo_accession)

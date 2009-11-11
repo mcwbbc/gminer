@@ -11,7 +11,7 @@ class Customer < ActiveRecord::Base
 end
 
 class DbPopulateTest < Test::Unit::TestCase
-  
+
   def test_creates_new_record
     User.delete_all
     User.create_or_update(:id => 1, :name => "Fred")
@@ -19,7 +19,7 @@ class DbPopulateTest < Test::Unit::TestCase
     u = User.find(:first)
     assert_equal u.name, "Fred"
   end
-  
+
   def test_updates_existing_record
     User.delete_all
     User.create_or_update(:id => 1, :name => "Fred")
@@ -28,7 +28,7 @@ class DbPopulateTest < Test::Unit::TestCase
     u = User.find(:first)
     assert_equal u.name, "George"
   end
-  
+
   def test_creates_new_record_with_nonstandard_pk
     Customer.delete_all
     Customer.create_or_update(:cust_id => 1, :name => "Fred")
@@ -36,7 +36,7 @@ class DbPopulateTest < Test::Unit::TestCase
     c = Customer.find(:first)
     assert_equal c.name, "Fred"
   end
-  
+
   def test_updates_existing_record
     Customer.delete_all
     Customer.create_or_update(:cust_id => 1, :name => "Fred")
@@ -45,6 +45,6 @@ class DbPopulateTest < Test::Unit::TestCase
     c = Customer.find(:first)
     assert_equal c.name, "George"
   end
-  
+
 end
 

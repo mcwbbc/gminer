@@ -6,8 +6,8 @@ module NewRelic
     TINY  = 1
     STRING = [MAJOR, MINOR, TINY].join('.')
   end
-  
-  # Helper class for managing version comparisons 
+
+  # Helper class for managing version comparisons
   class VersionNumber
     attr_reader :parts
     include Comparable
@@ -18,24 +18,24 @@ module NewRelic
     def major_version; @parts[0]; end
     def minor_version; @parts[1]; end
     def tiny_version; @parts[2]; end
-    
+
     def <=>(other)
       other = self.class.new(other) if other.is_a? String
       self.class.compare(self.parts, other.parts)
     end
-    
+
     def to_s
       @parts.join(".")
     end
-    
+
     def hash
       @parts.hash
     end
-    
+
     def eql? other
       (self <=> other) == 0
     end
-    
+
     private
     def self.compare(parts1, parts2)
       a, b = parts1.first, parts2.first

@@ -22,16 +22,16 @@ module TransactionSampleTestHelper
     sampler.notice_first_scope_push Time.now.to_f
     sampler.notice_transaction '/path', nil, :jim => "cool"
     sampler.notice_push_scope "a"
-    
+
     sampler.notice_transaction '/path/2', nil, :jim => "cool"
-    
+
     sql.each {|sql_statement| sampler.notice_sql(sql_statement, {:adapter => "test"}, 0 ) }
-    
+
     sleep 1.0
-    
+
     sampler.notice_pop_scope "a"
     sampler.notice_scope_empty
-    
+
     sampler.samples[0]
   end
 end

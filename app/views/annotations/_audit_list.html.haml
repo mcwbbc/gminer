@@ -6,8 +6,7 @@
   %p
     = found_count("annotations", @annotations)
   %p
-  - if @annotations.total_pages > 1
-    = render(:partial => "shared/pagination", :locals => {:items => @annotations})
+    = render(:partial => "shared/pagination_links", :locals => {:items => @annotations})
   %br
     %span.validate-all
       Validate checked

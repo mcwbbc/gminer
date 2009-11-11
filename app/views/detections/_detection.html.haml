@@ -1,0 +1,7 @@
+%tr{:class => "#{cycle('rowWhite', 'rowBlue')}"}
+  %td{:valign => "top"}
+    = link_to(detection.probeset.name, detection_url(detection))
+  %td{:valign => "top"}
+    = detection.abs_call
+  %td{:valign => "top"}
+    = geo_link(detection.sample.geo_accession)

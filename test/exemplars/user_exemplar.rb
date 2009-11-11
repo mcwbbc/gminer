@@ -8,5 +8,5 @@ class User < ActiveRecord::Base
     @base.succ!
     "#{@base}@example.com"
   end
-  
+
 end

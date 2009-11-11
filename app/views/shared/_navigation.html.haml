@@ -1,5 +1,7 @@
 #navigation
   = link_to("Home", "/")
+  %br
+  = link_to("Help", help_url)
   #user
     = signin_signout
   %h2
@@ -14,6 +16,10 @@
     %li
       = link_to("Datasets", datasets_url)
     %li
+      = link_to("Ontologies", ontologies_url)
+    %li
+      = link_to("Ontology Terms", ontology_terms_url)
+    %li
       = link_to("Annotations", annotations_url)
     - admin_only do
       %li
@@ -21,9 +27,12 @@
     %li
       = link_to("Annotation Cloud", cloud_annotations_url)
     %li
-      = link_to("Ontologies", ontologies_url)
-    %li
-      = link_to("Ontology Terms", ontology_terms_url)
-    %li
-      = link_to("Results", results_url)
+      = link_to("Probesets", probesets_url)
+    - admin_only do
+      %li
+        = link_to("Jobs", jobs_url)
+//    %li
+//      = link_to("Detections", detections_url)
+//    %li
+//      = link_to("Results", results_url)
 %div

@@ -2,7 +2,7 @@ require File.expand_path(File.join(File.dirname(__FILE__),'..', '..','..','test_
 require 'new_relic/agent/samplers/cpu_sampler'
 
 class NewRelic::Agent::StatsEngine::SamplersTest < Test::Unit::TestCase
-  
+
   def setup
     @stats_engine = NewRelic::Agent::StatsEngine.new
   end
@@ -53,8 +53,8 @@ class NewRelic::Agent::StatsEngine::SamplersTest < Test::Unit::TestCase
       NewRelic::Agent::Samplers::MemorySampler.new
     end
   end
-  def test_mongrel 
-    NewRelic::Agent::Instrumentation::DispatcherInstrumentation::BusyCalculator.stubs('is_busy?'.to_sym).returns(false)  
+  def test_mongrel
+    NewRelic::Agent::Instrumentation::DispatcherInstrumentation::BusyCalculator.stubs('is_busy?'.to_sym).returns(false)
     mongrel = mock()
     NewRelic::Control.instance.local_env.stubs(:mongrel).returns(mongrel)
     list = mock()
@@ -70,5 +70,5 @@ class NewRelic::Agent::StatsEngine::SamplersTest < Test::Unit::TestCase
     assert_equal 3, s.queue_stats.call_count
     assert_equal 3, s.queue_stats.average_call_time, "mongrel queue length"
   end
-  
+
 end

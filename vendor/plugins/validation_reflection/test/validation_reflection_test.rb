@@ -30,13 +30,13 @@ class ValidationReflectionTest < Test::Unit::TestCase
 
   class Dummy < ActiveRecord::Base
     class << self
-  
+
       def create_fake_column(name, null = true, limit = nil)
         sql_type = limit ? "varchar (#{limit})" : nil
         col = ActiveRecord::ConnectionAdapters::Column.new(name, nil, sql_type, null)
         col
       end
-  
+
       def columns
         [
          create_fake_column('col0'),
@@ -50,9 +50,9 @@ class ValidationReflectionTest < Test::Unit::TestCase
         ]
       end
     end
-    
+
     has_one :nothing
-    
+
     validates_presence_of :col1
     validates_length_of :col2, :maximum => 100
     validates_format_of :col3, :with => /^([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})$/i
@@ -87,12 +87,12 @@ class ValidationReflectionTest < Test::Unit::TestCase
     refls = Dummy.reflect_on_validations_for(:col4)
     assert refls.any? { |r| r.macro == :validates_numericality_of && r.options[:only_integer] }
   end
-  
+
   def test_numeric_is_reflected
     refls = Dummy.reflect_on_validations_for(:col5)
     assert refls.any? { |r| r.macro == :validates_numericality_of }
   end
-  
+
   def test_validation_options_are_reflected
     refls = Dummy.reflect_on_validations_for(:col5)
     refl = refls[0]

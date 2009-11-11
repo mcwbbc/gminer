@@ -1,6 +1,10 @@
 = render(:partial => "shared/show_page_title", :locals => {:title => "Series", :geo_accession => @series_item.geo_accession})
 == Platform: #{link_to(@series_item.platform.geo_accession, platform_url(@series_item.platform))}
 %br
+- if @series_item.dataset
+  == Dataset: #{link_to(@series_item.dataset.geo_accession, dataset_url(@series_item.dataset))}
+  %br
+%br
 -if !@series_item.pubmed_id.blank?
   == PubMed: #{pubmed_link(@series_item.pubmed_id)}
   %br
@@ -9,4 +13,5 @@
 %br
 %br
 = render(:partial => "shared/children", :locals => {:title => "Samples", :items => @series_item.samples})
-= render(:partial => "shared/annotations_table", :locals => {:item => @series_item})
+#annotations-table
+  = render(:partial => "shared/annotations_table", :locals => {:item => @series_item})

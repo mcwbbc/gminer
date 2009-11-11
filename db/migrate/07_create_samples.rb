@@ -18,8 +18,6 @@ class CreateSamples < ActiveRecord::Migration
       t.text :hyp_protocol
       t.text :description
       t.text :data_processing
-      t.datetime :annotating_at
-      t.datetime :annotated_at
     end
 
     add_index(:samples, :geo_accession)

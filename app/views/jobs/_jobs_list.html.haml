@@ -1,0 +1,30 @@
+%br
+- if @jobs.size == 0
+  %p
+    No jobs found...
+- else
+  %p
+    = found_count("jobs", @jobs)
+  %p
+    = render(:partial => "shared/pagination", :locals => {:items => @jobs})
+  %br
+  %table{:width => "100%", :border => "0", :cellpadding => "0", :cellspacing => "2"}
+    %thead
+      %tr.rowHeader
+        %td{:width => "10%"}
+          %b
+            GEO accession
+        %td{:width => "10%"}
+          %b
+            Field
+        %td{:width => "30%"}
+          %b
+            Ontology
+        %td{:width => "25%"}
+          %b
+            Started at
+        %td{:width => "25%"}
+          %b
+            Finished at
+    %tbody#staffTable
+      = render(:partial => "job", :collection => @jobs)

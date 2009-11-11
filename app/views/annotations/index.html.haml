@@ -1,12 +1,25 @@
 - admin_only do
-  = render(:partial => "shared/annotation_counts")
+  = render(:partial => "shared/annotation_counts", :locals => {:collection => @annotation_count_array})
 = page_title("Annotations")
 %p
   %form{:name => "sform", :action => "", :style => "display:inline"}
-    = ontology_search_dropdown(@current)
-    %label
-      Filter on term:
-    = text_field_tag(:query, params['query'], :autocomplete => 'off') 
+  %table.filter-menu
+    %tr
+      %td{:align => 'right'}
+        %label
+          Filter on term:
+      %td
+        = text_field_tag(:query, params['query'], :autocomplete => 'off')
+      %td{:align => 'right'}
+        %label
+          Ontology:
+      %td
+        = ontology_search_dropdown(@current)
+      %td{:align => 'right'}
+        %label
+        GEO item type:
+      %td
+        = annotation_geotype_dropdown(@geotype)
 
 #dataTable
   = render(:partial => "annotations_list")

@@ -1,4 +1,4 @@
-# This file is auto-generated from the current state of the database. Instead of editing this file, 
+# This file is auto-generated from the current state of the database. Instead of editing this file,
 # please use the migrations feature of Active Record to incrementally modify your database, and
 # then regenerate this schema definition.
 #
@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 14) do
+ActiveRecord::Schema.define(:version => 15) do
 
   create_table "annotation_closures", :force => true do |t|
     t.integer "annotation_id"
@@ -30,6 +30,7 @@ ActiveRecord::Schema.define(:version => 14) do
     t.integer "to"
     t.boolean "verified",                        :default => false
     t.boolean "audited",                         :default => false
+    t.integer "user_id",                         :default => 0
   end
 
   add_index "annotations", ["field"], :name => "index_annotations_on_field"
@@ -37,17 +38,16 @@ ActiveRecord::Schema.define(:version => 14) do
   add_index "annotations", ["ncbo_id"], :name => "index_annotations_on_ncbo_id"
   add_index "annotations", ["ontology_id"], :name => "index_annotations_on_ontology_id"
   add_index "annotations", ["ontology_term_id"], :name => "index_annotations_on_ontology_term_id"
+  add_index "annotations", ["user_id"], :name => "index_annotations_on_user_id"
 
   create_table "datasets", :force => true do |t|
-    t.integer  "platform_id"
-    t.string   "geo_accession",    :limit => 25
-    t.string   "reference_series", :limit => 25
-    t.string   "pubmed_id",        :limit => 25
-    t.string   "organism"
-    t.text     "title"
-    t.text     "description"
-    t.datetime "annotating_at"
-    t.datetime "annotated_at"
+    t.integer "platform_id"
+    t.string  "geo_accession",    :limit => 25
+    t.string  "reference_series", :limit => 25
+    t.string  "pubmed_id",        :limit => 25
+    t.string  "organism"
+    t.text    "title"
+    t.text    "description"
   end
 
   add_index "datasets", ["geo_accession"], :name => "index_datasets_on_geo_accession"
@@ -55,12 +55,14 @@ ActiveRecord::Schema.define(:version => 14) do
 
   create_table "detections", :force => true do |t|
     t.integer "sample_id"
-    t.string  "id_ref",    :limit => 100
-    t.string  "abs_call",  :limit => 2
+    t.string  "id_ref",      :limit => 100
+    t.string  "abs_call",    :limit => 2
+    t.integer "probeset_id"
   end
 
   add_index "detections", ["abs_call"], :name => "index_detections_on_abs_call"
   add_index "detections", ["id_ref"], :name => "index_detections_on_id_ref"
+  add_index "detections", ["probeset_id"], :name => "index_detections_on_probeset_id"
   add_index "detections", ["sample_id"], :name => "index_detections_on_sample_id"
 
   create_table "jobs", :force => true do |t|
@@ -69,8 +71,9 @@ ActiveRecord::Schema.define(:version => 14) do
     t.string   "geo_accession", :limit => 25
     t.string   "field",         :limit => 50
     t.datetime "created_at"
-    t.datetime "started_at"
-    t.datetime "finished_at"
+    t.float    "started_at"
+    t.float    "working_at"
+    t.float    "finished_at"
   end
 
   add_index "jobs", ["geo_accession"], :name => "index_jobs_on_geo_accession"
@@ -78,15 +81,17 @@ ActiveRecord::Schema.define(:version => 14) do
   add_index "jobs", ["worker_key"], :name => "index_jobs_on_worker_key"
 
   create_table "ontologies", :force => true do |t|
-    t.string "ncbo_id",         :limit => 100
-    t.string "current_ncbo_id", :limit => 100
-    t.string "name"
-    t.string "version",         :limit => 25
-    t.text   "stopwords"
+    t.string   "current_ncbo_id", :limit => 100
+    t.string   "ncbo_id",         :limit => 100
+    t.string   "name"
+    t.string   "version",         :limit => 25
+    t.text     "stopwords"
+    t.datetime "updated_at"
+    t.datetime "created_at"
   end
 
-  add_index "ontologies", ["ncbo_id"], :name => "index_ontologies_on_ncbo_id"
   add_index "ontologies", ["current_ncbo_id"], :name => "index_ontologies_on_current_ncbo_id"
+  add_index "ontologies", ["ncbo_id"], :name => "index_ontologies_on_ncbo_id"
 
   create_table "ontology_terms", :force => true do |t|
     t.integer "ontology_id"
@@ -101,46 +106,48 @@ ActiveRecord::Schema.define(:version => 14) do
   add_index "ontology_terms", ["term_id"], :name => "index_ontology_terms_on_term_id"
 
   create_table "platforms", :force => true do |t|
-    t.string   "geo_accession", :limit => 25
-    t.string   "title"
-    t.string   "organism"
-    t.datetime "annotating_at"
-    t.datetime "annotated_at"
+    t.string "geo_accession", :limit => 25
+    t.string "title"
+    t.string "organism"
   end
 
   add_index "platforms", ["geo_accession"], :name => "index_platforms_on_geo_accession"
 
+  create_table "probesets", :force => true do |t|
+    t.string "name", :limit => 100
+  end
+
+  add_index "probesets", ["name"], :name => "index_probesets_on_name", :unique => true
+
   create_table "results", :force => true do |t|
     t.integer "sample_id"
+    t.integer "probeset_id"
     t.integer "ontology_term_id"
-    t.string  "id_ref",           :limit => 100
     t.string  "pubmed_id",        :limit => 25
   end
 
-  add_index "results", ["id_ref"], :name => "index_results_on_id_ref"
   add_index "results", ["ontology_term_id"], :name => "index_results_on_ontology_term_id"
+  add_index "results", ["probeset_id"], :name => "index_results_on_probeset_id"
   add_index "results", ["sample_id"], :name => "index_results_on_sample_id"
 
   create_table "samples", :force => true do |t|
-    t.integer  "series_item_id"
-    t.integer  "platform_id"
-    t.string   "geo_accession",      :limit => 25
-    t.string   "sample_type"
-    t.string   "source_name"
-    t.string   "organism"
-    t.string   "label"
-    t.string   "molecule"
-    t.text     "title"
-    t.text     "characteristics"
-    t.text     "treatment_protocol"
-    t.text     "extract_protocol"
-    t.text     "label_protocol"
-    t.text     "scan_protocol"
-    t.text     "hyp_protocol"
-    t.text     "description"
-    t.text     "data_processing"
-    t.datetime "annotating_at"
-    t.datetime "annotated_at"
+    t.integer "series_item_id"
+    t.integer "platform_id"
+    t.string  "geo_accession",      :limit => 25
+    t.string  "sample_type"
+    t.string  "source_name"
+    t.string  "organism"
+    t.string  "label"
+    t.string  "molecule"
+    t.text    "title"
+    t.text    "characteristics"
+    t.text    "treatment_protocol"
+    t.text    "extract_protocol"
+    t.text    "label_protocol"
+    t.text    "scan_protocol"
+    t.text    "hyp_protocol"
+    t.text    "description"
+    t.text    "data_processing"
   end
 
   add_index "samples", ["geo_accession"], :name => "index_samples_on_geo_accession"
@@ -148,14 +155,12 @@ ActiveRecord::Schema.define(:version => 14) do
   add_index "samples", ["series_item_id"], :name => "index_samples_on_series_item_id"
 
   create_table "series_items", :force => true do |t|
-    t.integer  "platform_id"
-    t.string   "geo_accession",  :limit => 25
-    t.string   "pubmed_id",      :limit => 25
-    t.string   "title"
-    t.text     "summary"
-    t.text     "overall_design"
-    t.datetime "annotating_at"
-    t.datetime "annotated_at"
+    t.integer "platform_id"
+    t.string  "geo_accession",  :limit => 25
+    t.string  "pubmed_id",      :limit => 25
+    t.string  "title"
+    t.text    "summary"
+    t.text    "overall_design"
   end
 
   add_index "series_items", ["geo_accession"], :name => "index_series_items_on_geo_accession"

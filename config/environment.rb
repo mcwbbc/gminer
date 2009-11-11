@@ -8,16 +8,20 @@ require File.join(File.dirname(__FILE__), 'boot')
 
 Rails::Initializer.run do |config|
   config.gem 'jscruggs-metric_fu', :lib => 'metric_fu', :source => 'http://gems.github.com', :version => '~> 1.1'
-  config.gem 'binarylogic-searchlogic', :lib => 'searchlogic', :source => 'http://gems.github.com', :version => '~> 2.0'
-  config.gem 'justinfrench-formtastic', :lib => 'formtastic', :source => 'http://gems.github.com'
-  config.gem 'mislav-will_paginate', :lib => 'will_paginate', :source => 'http://gems.github.com', :version => '~> 2.2'
+  config.gem 'searchlogic', :source => 'http://gemcutter.org', :version => '~> 2.0'
+  config.gem 'formtastic', :source => 'http://gemcutter.org'
+  config.gem 'will_paginate', :source => 'http://gemcutter.org', :version => '~> 2.2'
   config.gem 'authlogic', :version => '~> 2.0'
   config.gem 'haml', :version => '~> 2.2'
-  config.gem 'josevalim-inherited_resources', :lib => 'inherited_resources', :source => 'http://gems.github.com', :version => '>= 0.9.0'
-  config.gem 'matthuhiggins-foreigner', :lib => 'foreigner', :source => 'http://gems.github.com'
-  config.gem 'httparty', :source => 'http://gems.github.com'
+  config.gem 'inherited_resources', :source => 'http://gemcutter.org', :version => '>= 0.9.0'
+  config.gem 'matthuhiggins-foreigner', :lib => 'foreigner', :source => 'http://gemcutter.org'
+  config.gem 'httparty', :source => 'http://gemcutter.org'
   config.gem 'uuidtools'
+  config.gem 'memcache-client', :lib => "memcache"
   config.gem 'bcrypt-ruby', :lib => 'bcrypt'
+  config.gem 'googlecharts', :lib => 'gchart'
+  config.gem 'mongo_ext', :lib => 'mongo'
+  config.gem 'mongo_mapper'
 
   # Settings in config/environments/* take precedence over those specified here.
   # Application configuration should go into files in config/initializers

@@ -1,0 +1,11 @@
+%tr
+  %td
+    = geo_item
+  %td
+    = hash[geo_item][:count]
+  %td
+    = hash[geo_item][:annotator_average_time]
+  %td
+    = hash[geo_item][:average_time]
+- if hash[geo_item][:field_names].any?
+  = render(:partial => "field_name", :collection => hash[geo_item][:field_names].keys.sort, :locals => {:geo_item => geo_item, :hash => hash})

@@ -3,3 +3,9 @@
     = link_to(highlight(ontology.name, @q), ontology_url(ontology))
   %td{:valign => "top"}
     = ontology.version
+  - admin_only do
+    %td{:valign => "top"}
+      = ontology.stopwords
+    %td{:valign => "top"}
+      = link_to(t('link.edit'), edit_ontology_path(ontology))
+

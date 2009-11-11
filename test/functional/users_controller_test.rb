@@ -1,12 +1,12 @@
 require 'test_helper'
 
 class UsersControllerTest < ActionController::TestCase
-  
+
   should_have_before_filter :require_no_user, :only => [:new, :create]
   should_have_before_filter :require_user, :only => [:show, :edit, :update]
   should_have_before_filter :admin_required, :only => [:index, :destroy]
-  
-  
+
+
   context "routing" do
     should_route :get, "/users", :action=>"index", :controller=>"users"
     should_route :post, "/users", :action=>"create", :controller=>"users"
@@ -15,12 +15,12 @@ class UsersControllerTest < ActionController::TestCase
     should_route :get, "/users/1", :action=>"show", :controller=>"users", :id => 1
     should_route :put, "/users/1", :action=>"update", :controller=>"users", :id => 1
     should_route :delete, "/users/1", :action=>"destroy", :controller=>"users", :id => 1
-    
+
     context "named routes" do
       setup do
         get :index
       end
-      
+
       should "generate users_path" do
         assert_equal "/users", users_path
       end
@@ -35,7 +35,7 @@ class UsersControllerTest < ActionController::TestCase
       end
     end
   end
-    
+
   context "on GET to :index" do
     setup do
       stub(controller).admin_required{ true }
@@ -43,13 +43,13 @@ class UsersControllerTest < ActionController::TestCase
       stub(User).all{ [@the_user] }
       get :index
     end
-    
+
     should_assign_to(:users) { [@the_user] }
     should_respond_with :success
     should_render_template :index
     should_not_set_the_flash
   end
-   
+
   context "on GET to :new" do
     setup do
       stub(controller).require_no_user{ true }
@@ -57,7 +57,7 @@ class UsersControllerTest < ActionController::TestCase
       stub(User).new{ @the_user }
       get :new
     end
-    
+
     should_assign_to(:user) { @the_user }
     should_respond_with :success
     should_render_template :new
@@ -70,7 +70,7 @@ class UsersControllerTest < ActionController::TestCase
       @the_user = User.generate!
       stub(User).new{ @the_user }
     end
-    
+
     context "with successful creation" do
       setup do
         stub(@the_user).signup!{ true }
@@ -82,24 +82,24 @@ class UsersControllerTest < ActionController::TestCase
       should_set_the_flash_to I18n.t("flash.accounts.create.notice")
       should_redirect_to("the root url") { root_url }
     end
-    
+
     context "with failed creation" do
       setup do
         stub(@the_user).signup!{ false }
         post :create, :user => { :login => "bobby", :password => "bobby", :password_confirmation => "bobby" }
       end
-      
+
       should_assign_to(:user) { @the_user }
       should_respond_with :success
       should_not_set_the_flash
       should_render_template :new
     end
   end
-  
+
   context "with a regular user" do
     # TODO: insert checks that user can only get to their own stuff, even with spoofed URLs
   end
-  
+
   context "with an admin user" do
     setup do
       @admin_user = User.generate!
@@ -113,7 +113,7 @@ class UsersControllerTest < ActionController::TestCase
       setup do
         get :show, :id => @the_user.id
       end
-    
+
       should_assign_to(:user) { @the_user }
       should_respond_with :success
       should_not_set_the_flash
@@ -124,7 +124,7 @@ class UsersControllerTest < ActionController::TestCase
       setup do
         get :edit, :id => @the_user.id
       end
-    
+
       should_assign_to(:user) { @the_user }
       should_respond_with :success
       should_not_set_the_flash

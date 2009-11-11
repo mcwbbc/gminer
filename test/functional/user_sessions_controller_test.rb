@@ -11,12 +11,12 @@ class UserSessionsControllerTest < ActionController::TestCase
     # TODO: Figure out what to do about these
     # should_route :get, "/signin", :action=>"new", :controller=>"user_sessions"
     # should_route :get, "/signout", :action=>"destroy", :controller=>"user_sessions"
-    
+
     context "named routes" do
       setup do
         get :new
       end
-      
+
       should "generate user_session_path" do
         assert_equal "/user_session", user_session_path
       end
@@ -39,7 +39,7 @@ class UserSessionsControllerTest < ActionController::TestCase
       stub(UserSession).new{ @the_user_session }
       get :new
     end
-    
+
     should_assign_to(:user_session) { @the_user_session }
     should_respond_with :success
     should_render_template :new
@@ -52,7 +52,7 @@ class UserSessionsControllerTest < ActionController::TestCase
       @the_user_session = UserSession.new
       stub(UserSession).new{ @the_user_session }
     end
-    
+
     context "with successful creation" do
       setup do
         stub(@the_user_session).save{ true }
@@ -64,20 +64,20 @@ class UserSessionsControllerTest < ActionController::TestCase
       should_set_the_flash_to I18n.t("flash.user_sessions.create.notice")
       should_redirect_to("the root url") { root_url }
     end
-    
+
     context "with failed creation" do
       setup do
         stub(@the_user_session).save{ false }
         post :create, :user_session => { :login => "bobby", :password => "bobby" }
       end
-      
+
       should_assign_to(:user_session) { @the_user_session }
       should_respond_with :success
       should_not_set_the_flash
       should_render_template :new
     end
   end
-  
+
   context "on DELETE to :destroy" do
     setup do
       @the_user = User.generate!
@@ -86,10 +86,10 @@ class UserSessionsControllerTest < ActionController::TestCase
       UserSession.create(@the_user)
       delete :destroy
     end
-    
+
     should_respond_with :redirect
     should_set_the_flash_to I18n.t("flash.user_sessions.destroy.notice")
     should_redirect_to("the login page") { new_user_session_url }
   end
-  
+
 end

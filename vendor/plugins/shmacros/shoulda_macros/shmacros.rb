@@ -2,8 +2,8 @@ module Shmacros
   module Units
     ##
     #  Adds option :strict => true for should_allow_mass_assignment_of
-    #  
-    #  When :strict is true the test explicitly verifies that 
+    #
+    #  When :strict is true the test explicitly verifies that
     #  all non-listed attributes are actually protected.
     #
     #    should_allow_mass_assignment_of :foo, :bar, :strict => true
@@ -16,12 +16,12 @@ module Shmacros
         should_not_allow_mass_assignment_of *(klass.new.attribute_names - attributes.map(&:to_s))
       end
     end
-    
+
     ##
     #  Asserts that model is valid for specific attribute values.
     #
     #    should_allow_values :country => %w(England Russia), :zipcode => "55555"
-    #    
+    #
     def should_allow_values(options)
       klass = self.name.gsub(/Test$/, '').constantize
 
@@ -29,19 +29,19 @@ module Shmacros
         options.each_pair do |attribute, values|
           [*values].each do |value|
             display_value = value.class == NilClass ? "nil" : "\"#{value}\""
-            
+
             should "allow #{attribute} to be #{display_value}" do
               instance = get_instance_of(klass)
               instance.send("#{attribute}=", value)
-              assert_nil instance.errors.on(attribute), 
-                "Expected no errors when #{attribute} is set to #{display_value}, 
+              assert_nil instance.errors.on(attribute),
+                "Expected no errors when #{attribute} is set to #{display_value},
                 instead found error \"#{instance.errors.on(attribute)}\"."
             end
           end
         end
       end
     end
-    
+
     ##
     #  Asserts that model is not valid for specific attribute values.
     #
@@ -54,24 +54,24 @@ module Shmacros
         options.each_pair do |attribute, values|
           [*values].each do |value|
             display_value = value.class == NilClass ? "nil" : "\"#{value}\""
-            
+
             should "not allow #{attribute} to be #{display_value}" do
               instance = get_instance_of(klass)
               instance.send("#{attribute}=", value)
-              assert !instance.valid?, 
+              assert !instance.valid?,
                 "Expected #{klass} to be invalid when #{attribute} is set to #{display_value}"
-              assert instance.errors.on(attribute.to_sym), 
+              assert instance.errors.on(attribute.to_sym),
                 "Expected errors on #{attribute} when set to #{display_value}"
             end
           end
         end
       end
     end
-    
+
     ##
     #  Asserts that model has accept_nested_attribtues_for defined for specific models.
     #
-    #    should_accept_nested_attributes_for :foo, :bar 
+    #    should_accept_nested_attributes_for :foo, :bar
     #
     def should_accept_nested_attributes_for(*attr_names)
       klass = self.name.gsub(/Test$/, '').constantize
@@ -86,7 +86,7 @@ module Shmacros
         end
       end
     end
-    
+
     ##
     #  Asserts that model has act_as_taggable_on defined for certain categories.
     #
@@ -104,7 +104,7 @@ module Shmacros
 
       should_have_many :taggings, category
     end
-    
+
     ##
     #  Asserts that model klass is_a?(Foo) or is_a?(Bar)
     #
@@ -122,7 +122,7 @@ module Shmacros
         end
       end
     end
-  
+
     ##
     #  Asserts that model defines callback for a certain method.
     #
@@ -133,10 +133,10 @@ module Shmacros
       if meths.size < 2
         raise(RuntimeError, "Expecting legal callback type as last argument.")
       end
-    
+
       klass = self.name.gsub(/Test$/, '').constantize
       callback_type = meths.delete(meths.last).to_s
-        
+
       meths.each do |meth|
         have_certain_callback = "call ##{meth} #{callback_type.to_s.gsub(/_/, ' ')}"
         should have_certain_callback do
@@ -146,7 +146,7 @@ module Shmacros
         end
       end
     end
-  
+
     ##
     #  Asserts that model defines delegation for certain methods.
     #
@@ -154,20 +154,20 @@ module Shmacros
     #
     def should_delegate(*methods)
       require 'mocha'
-      
+
       klass = self.name.gsub(/Test$/, '').constantize
-    
+
       options = methods.pop
       unless options.is_a?(Hash) && client = options[:to]
         raise ArgumentError, "Delegation needs a target. Supply an options hash with a :to key as the last argument (e.g. delegate :hello, :to => :greeter)."
       end
-    
+
       if options[:prefix] == true && options[:to].to_s =~ /^[^a-z_]/
         raise ArgumentError, "Can only automatically set the delegation prefix when delegating to a method."
       end
-    
+
       prefix = options[:prefix] && "#{options[:prefix] == true ? client : options[:prefix]}_"
-    
+
       context "#{klass}" do
         methods.each do |method|
           should "delegate #{method} to #{client}" do
@@ -177,7 +177,7 @@ module Shmacros
             obj.stubs(client).returns(mock) if obj.send(client).nil?
             obj.send(client).expects(method_name).once
             obj.send(method)
-            
+
             obj.stubs(client).returns(nil)
             if options[:allow_nil]
               assert_nothing_raised("Delegation must allow nil as recipient, but doesn't.") do

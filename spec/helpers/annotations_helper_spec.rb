@@ -22,4 +22,24 @@ describe AnnotationsHelper do
     end
   end
 
+  describe "annotation_geotype_dropdown" do
+    it "should return a select tag" do
+      helper.annotation_geotype_dropdown("").should == "<select id=\"geotype\" name=\"geotype\"><option value=\"All\">All</option>\n<option value=\"Platform\">Platform</option>\n<option value=\"Dataset\">Dataset</option>\n<option value=\"Series\">Series</option>\n<option value=\"Sample\">Sample</option></select>"
+    end
+  end
+
+  describe "cloud_sample_count" do
+    it "should return a '' string if count < 0" do
+      helper.cloud_sample_count(50, -1).should == nil
+    end
+
+    it "should return a string with the count" do
+      helper.cloud_sample_count(50, 50).should == "Has annotations that reference 50 GEO accession IDs."
+    end
+
+    it "should add that it only returned the first 100 rows" do
+      helper.cloud_sample_count(100, 200).should == "Has annotations that reference 200 GEO accession IDs. Limited to the first 100 records."
+    end
+  end
+
 end

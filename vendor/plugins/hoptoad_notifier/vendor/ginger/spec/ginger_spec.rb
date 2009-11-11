@@ -5,10 +5,10 @@ describe "Ginger" do
     Ginger.configure do |config|
       scenario = Ginger::Scenario.new
       scenario["riddle"] = "0.9.8"
-      
+
       config.scenarios << scenario
     end
-    
+
     Ginger::Configuration.instance.scenarios.length.should == 1
   end
 end

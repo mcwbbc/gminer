@@ -2,6 +2,14 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe Annotation do
 
+  describe "for_item" do
+    it "should create a new annotation" do
+      dataset = Dataset.spawn
+      annotation = Annotation.new(:user_id => "12", :field => nil, :from => nil, :to => nil, :audited => true, :verified => true, :description => "rat strain dataset", :geo_accession => "GDS8700")
+      Annotation.for_item(dataset, "12").should be_instance_of(Annotation)
+    end
+  end
+
   describe "build cloud" do
     before(:each) do
       @at1 = mock(OntologyTerm, :name => "at1", :term_id => "at1_id")
@@ -15,21 +23,23 @@ describe Annotation do
       @anatomy_terms = [@at1, @at2]
       @rat_strain_terms = [@rs1, @rs2]
       @annotations = [@a1, @a2]
-      OntologyTerm.should_receive(:cloud).with(:ontology => "Mouse adult gross anatomy").and_return(@anatomy_terms)
-      OntologyTerm.should_receive(:cloud).with(:ontology => "Rat Strain Ontology").and_return(@rat_strain_terms)
-      Annotation.should_receive(:find_by_sql).with("SELECT * FROM annotations GROUP BY geo_accession ORDER BY geo_accession").and_return(@annotations)
+      OntologyTerm.should_receive(:cloud).with(:ontology_ncbo_id => "1000", :invalid => false).and_return(@anatomy_terms)
+      OntologyTerm.should_receive(:cloud).with(:ontology_ncbo_id => "1150", :invalid => false).and_return(@rat_strain_terms)
     end
 
     describe "with no parameters" do
       it "should return the annotation hash, anatomy terms and rat strain terms" do
-        @annotation_hash = {"GSM1"=>"a1_desc", "GSM2"=>"a2_desc"}
-        Annotation.build_cloud(nil).should == [@annotation_hash, @anatomy_terms, @rat_strain_terms]
+        @annotation_hash = {}
+        Annotation.build_cloud(nil, false).should == [@annotation_hash, @anatomy_terms, @rat_strain_terms, -1]
       end
     end
 
     describe "with parameters" do
       it "should return the filtered annotation hash, anatomy terms and rat strain terms" do
-        Annotation.should_receive(:find_by_sql).with("SELECT annotations.* FROM annotations, ontology_terms WHERE ontology_terms.term_id = 'term_id' AND ontology_terms.id = annotations.ontology_term_id GROUP BY geo_accession ORDER BY geo_accession").and_return([@a2])
+        Annotation.should_receive(:find_by_sql).with("SELECT * FROM annotations WHERE annotations.verified = 1 GROUP BY geo_accession ORDER BY geo_accession").and_return(@annotations)
+        Annotation.should_receive(:count_by_sql).with("SELECT count(DISTINCT geo_accession) FROM annotations WHERE annotations.verified = 1").and_return(50)
+        Annotation.should_receive(:find_by_sql).with("SELECT annotations.* FROM annotations, ontology_terms WHERE ontology_terms.term_id = 'term_id' AND ontology_terms.id = annotations.ontology_term_id AND annotations.verified = 1 GROUP BY geo_accession ORDER BY geo_accession").and_return([@a2])
+        Annotation.should_receive(:count_by_sql).with("SELECT count(DISTINCT geo_accession) FROM annotations, ontology_terms WHERE ontology_terms.term_id = 'term_id' AND ontology_terms.id = annotations.ontology_term_id AND annotations.verified = 1").and_return(5)
         ontology_term = mock(OntologyTerm, :term_id => "rs2_id")
         a1 = mock(Annotation, :ontology_term => ontology_term)
         annotations = [a1]
@@ -38,41 +48,7 @@ describe Annotation do
         @annotation_hash = {"GSM2"=>"a2_desc"}
         @anatomy_terms = []
         @rat_strain_terms = [@rs2]
-        Annotation.build_cloud(["term_id"]).should == [@annotation_hash, @anatomy_terms, @rat_strain_terms]
-      end
-    end
-  end
-
-  describe "persist" do
-    describe "without valid ontology term" do
-      it "should not create a new annotation" do
-        OntologyTerm.should_receive(:first).with(:conditions => {:term_id => "term"}).and_return(nil)
-        Annotation.persist("GPL1234", "title", "ncbo_id", "term", "0", "10", "description").should == nil
-      end
-    end
-
-    describe "with valid ontology term" do
-      before(:each) do
-        @ontology = Ontology.generate
-        @ontology_term = OntologyTerm.generate(:ontology_id => @ontology.id)
-        OntologyTerm.should_receive(:first).with(:conditions => {:term_id => "term"}).and_return(@ontology_term)
-      end
-
-      describe "with existing annotation" do
-        it "should not create a new annotation" do
-          annotation = Annotation.generate
-          Annotation.should_receive(:first).with(:conditions => {:geo_accession => "GPL1234", :field => "title", :ontology_term_id => @ontology_term.id}).and_return(annotation)
-          Annotation.persist("GPL1234", "title", "ncbo_id", "term", "0", "10", "description").should == nil
-        end
-      end
-
-      describe "without existing annotation" do
-        it "should create a new annotation" do
-          annotation = Annotation.generate
-          Annotation.should_receive(:first).with(:conditions => {:geo_accession => "GPL1234", :field => "title", :ontology_term_id =>  @ontology_term.id}).and_return(nil)
-          Annotation.should_receive(:create).with(:geo_accession => "GPL1234", :field => "title", :ncbo_id => "ncbo_id", :ontology_id => @ontology_term.ontology.id, :ontology_term_id =>  @ontology_term.id, :from => "0", :to => "10", :description => "description").and_return(annotation)
-          Annotation.persist("GPL1234", "title", "ncbo_id", "term", "0", "10", "description").should == annotation
-        end
+        Annotation.build_cloud(["term_id"], false).should == [@annotation_hash, @anatomy_terms, @rat_strain_terms, 5]
       end
     end
   end

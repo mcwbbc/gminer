@@ -30,7 +30,7 @@ require 'ostruct'
 module ActiveRecordExtensions # :nodoc:
   module ValidationReflection # :nodoc:
     CONFIG_PATH = File.join(RAILS_ROOT, 'config', 'plugins', 'validation_reflection.rb')
-    
+
     mattr_accessor :reflected_validations
     ActiveRecordExtensions::ValidationReflection.reflected_validations = %w(
        validates_acceptance_of
@@ -47,7 +47,7 @@ module ActiveRecordExtensions # :nodoc:
 
     mattr_accessor :in_ignored_subvalidation
     ActiveRecordExtensions::ValidationReflection.in_ignored_subvalidation = false
-    
+
     def self.included(base)
       return if base.kind_of?(ActiveRecordExtensions::ValidationReflection::ClassMethods)
       base.extend(ClassMethods)
@@ -103,7 +103,7 @@ module ActiveRecordExtensions # :nodoc:
       end
 
       private
-      
+
       def remember_validation_metadata(validation_type, *attr_names)
         configuration = attr_names.last.is_a?(Hash) ? attr_names.pop : {}
         attr_names.each do |attr_name|
@@ -111,7 +111,7 @@ module ActiveRecordExtensions # :nodoc:
             [ ActiveRecord::Reflection::MacroReflection.new(validation_type, attr_name.to_sym, configuration, self) ]
         end
       end
-      
+
       def ignoring_subvalidations(ignore)
         save_ignore = ActiveRecordExtensions::ValidationReflection.in_ignored_subvalidation
         unless ActiveRecordExtensions::ValidationReflection.in_ignored_subvalidation

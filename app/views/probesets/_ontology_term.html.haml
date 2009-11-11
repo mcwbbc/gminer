@@ -1,0 +1,16 @@
+%tr{:class => "#{cycle('rowWhite', 'rowBlue')}"}
+  %td{:valign => "top"}
+    = link_to(ontology_term[:term].name, ontology_term_url(ontology_term[:term]))
+  %td{:valign => "top"}
+    = link_to(ontology_term[:term].term_id.split("|").last, ontology_term_url(ontology_term[:term]))
+    = ncbo_ontology_link(ontology_term[:term])
+  %td{:valign => "top"}
+    = ontology_term[:present_count]
+  %td{:valign => "top"}
+    = ontology_term[:absent_count]
+  %td{:valign => "top"}
+    = ontology_term[:marginal_count]
+  %td{:valign => "top"}
+    = ontology_term[:total_count]
+  %td{:valign => "top"}
+    = formatted_percent(ontology_term[:present_count], ontology_term[:total_count])

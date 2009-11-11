@@ -26,7 +26,9 @@ class PlatformsController < ApplicationController
     raise ActiveRecord::RecordNotFound if !@platform
     @prev, @next = @platform.prev_next
     respond_to do |format|
-      format.html
+      format.html {
+        @annotation_count_array = @platform.count_by_ontology_array
+      }
     end
     rescue ActiveRecord::RecordNotFound
       flash[:warning] = "That platform does not exist."

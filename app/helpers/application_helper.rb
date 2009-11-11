@@ -5,7 +5,7 @@ module ApplicationHelper
 
   def flash_messages
     return unless messages = flash.keys.select{|k| FLASH_NOTICE_KEYS.include?(k)}
-    formatted_messages = messages.map do |type|      
+    formatted_messages = messages.map do |type|
       content_tag :div, :class => type.to_s do
         message_for_item(flash[type], flash["#{type}_item".to_sym])
       end
@@ -19,7 +19,7 @@ module ApplicationHelper
       render(:partial => 'shared/form_errors', :locals => { :record => item }) if item
     else
       render(:partial => 'shared/form_error_header', :locals => { :record => item }) if item
-    end    
+    end
   end
 
   def message_for_item(message, item = nil)
@@ -39,12 +39,12 @@ module ApplicationHelper
     concat(render(:partial => partial_name, :locals => options))
   end
 
-  # Create as many of these as you like, each should call a different partial 
+  # Create as many of these as you like, each should call a different partial
     # 1. Render 'shared/rounded_box' partial with the given options and block content
   def rounded_box(css_class, options = {}, &block)
     block_to_partial('shared/rounded_box', options.merge(:css_class => css_class), &block)
   end
-  
+
   def term_cloud(terms, classes)
     if terms && terms.any?
       max, min = 0, terms[0].annotations_count.to_i
@@ -77,6 +77,11 @@ module ApplicationHelper
     count > 0 ? count : "is closure"
   end
 
+  def formatted_percent(count, total)
+    percent = (count.to_f/total.to_f)*100
+    "#{'%.2f' % percent}%"
+  end
+
   def annotation_percentage(count, percent)
     count > 0 ? "#{'%.2f' % percent}%" : "is closure"
   end
@@ -98,7 +103,21 @@ module ApplicationHelper
   end
 
   def term_link(annotation)
-    link_to(annotation.ontology_term.name, ontology_term_url(annotation.ontology_term), :field => annotation.field, :class => "annotation-term")
+    if !annotation.audited?
+      css = "unaudited"
+    elsif annotation.verified?
+      css = "verified"
+    else
+      css = "unverified"
+    end
+
+    if annotation.user_id == 0
+      css << " automatic-annotation"
+    else
+      css << " manual-annotation"
+    end
+
+    link_to(annotation.ontology_term.name, ontology_term_url(annotation.ontology_term), :field => annotation.field, :class => css)
   end
 
   def ontology_link(annotation)
@@ -108,21 +127,21 @@ module ApplicationHelper
   def ncbo_ontology_link(ontology_term)
     ncbo_id, term_id = ontology_term.term_id.split("|")
     alt = "Visualize #{term_id} at NCBO Bioportal"
-    link_to(image_tag("icons/ncbo_bioportal.png", :alt => alt), "http://bioportal.bioontology.org/visualize/#{ontology_term.ontology.current_ncbo_id}/#{term_id}", :target => "_blank", :title => alt)
+    link_to(image_tag("icons/ncbo_bioportal.png", :alt => alt), "http://bioportal.bioontology.org/virtual/#{ontology_term.ontology.ncbo_id}/#{term_id}", :target => "_blank", :title => alt)
   end
 
-  def geo_link(geo)
+  def geo_link(geo, new_window=false)
     case geo
-    when /^GSM/
-      link_to(geo, sample_url(geo))
-    when /^GSE/
-      link_to(geo, series_item_url(geo))
-    when /^GPL/
-      link_to(geo, platform_url(geo))
-    when /^GDS/
-      link_to(geo, dataset_url(geo))
-    else
-      geo
+      when /^GSM/
+        link_to(geo, sample_url(geo), :target => new_window ? "_blank" : "" )
+      when /^GSE/
+        link_to(geo, series_item_url(geo), :target => new_window ? "_blank" : "" )
+      when /^GPL/
+        link_to(geo, platform_url(geo), :target => new_window ? "_blank" : "" )
+      when /^GDS/
+        link_to(geo, dataset_url(geo), :target => new_window ? "_blank" : "" )
+      else
+        geo
     end
   end
 
@@ -140,6 +159,12 @@ module ApplicationHelper
     parameters = {:ontology_term_id => annotation.ontology_term_id, :geo_accession => annotation.geo_accession, :field => annotation.field}
     css = "annotation-term curate"
 
+    if annotation.user_id == 0
+      css << " automatic-annotation"
+    else
+      css << " manual-annotation"
+    end
+
     if !annotation.audited?
       css << " unaudited"
     elsif annotation.verified?
@@ -154,19 +179,17 @@ module ApplicationHelper
   def annotation_hash(item, field)
     hash = item.annotations_for(field).inject({}) do |h, a|
       if h.has_key?(a.ontology_term.ontology.name)
-        if a.verified?
-          if h[a.ontology_term.ontology.name][:terms]
-            h[a.ontology_term.ontology.name][:terms] << term_link(a)
-          else
-            h[a.ontology_term.ontology.name][:terms] = [term_link(a)]
-          end
+        if h[a.ontology_term.ontology.name][:terms]
+          h[a.ontology_term.ontology.name][:terms] << term_link(a)
+        else
+          h[a.ontology_term.ontology.name][:terms] = [term_link(a)]
         end
         h[a.ontology_term.ontology.name][:curate_links] << curate_link(a)
         h[a.ontology_term.ontology.name][:ncbo_ontology_links] << ncbo_ontology_link(a.ontology_term)
       else
         h[a.ontology_term.ontology.name] = {}
         h[a.ontology_term.ontology.name][:link] = ontology_link(a)
-        h[a.ontology_term.ontology.name][:terms] = [term_link(a)] if a.verified?
+        h[a.ontology_term.ontology.name][:terms] = [term_link(a)]
         h[a.ontology_term.ontology.name][:curate_links] = [curate_link(a)]
         h[a.ontology_term.ontology.name][:ncbo_ontology_links] = [ncbo_ontology_link(a.ontology_term)]
       end
@@ -176,7 +199,7 @@ module ApplicationHelper
 
   def ontology_array(item, field)
     hash = annotation_hash(item, field)
-    ontologies = hash.keys.sort.inject([]) {|a, key| a << {:name => hash[key][:link], :terms => hash[key][:terms] ? hash[key][:terms].join(", ") : "", :curate_links => hash[key][:curate_links].join(" "), :ncbo_ontology_links => hash[key][:ncbo_ontology_links].join(" ")}}
+    ontologies = hash.keys.sort.inject([]) {|a, key| a << {:name => hash[key][:link], :terms => hash[key][:terms] ? hash[key][:terms].join("") : "", :curate_links => hash[key][:curate_links].join(""), :ncbo_ontology_links => hash[key][:ncbo_ontology_links].join("")}}
   end
 
   def annotations_for(item, field)
@@ -202,7 +225,7 @@ module ApplicationHelper
       block.call
     end
   end
-  
+
   # Block method that creates an area of the view that
   # only renders if the request is coming from an
   # authenticated user.
@@ -211,7 +234,7 @@ module ApplicationHelper
       block.call
     end
   end
-  
+
   # Block method that creates an area of the view that
   # only renders if the request is coming from an
   # administrative user.
@@ -245,6 +268,6 @@ private
       block.call
     end
   end
-  
+
 end
 

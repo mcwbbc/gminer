@@ -4,7 +4,7 @@ describe Dataset do
 
   describe "download file" do
     it "should download the file via ftp" do
-      ds = Dataset.generate
+      ds = Dataset.spawn
       ds.should_receive(:dataset_path).and_return("path")
       ds.should_receive(:make_directory).with("path").and_return(true)
       ds.should_receive(:dataset_filename).and_return("filename")
@@ -22,7 +22,7 @@ describe Dataset do
 
   describe "persist" do
     it "should set the fields and save to the database" do
-      ds = Dataset.generate
+      ds = Dataset.spawn
       ds.stub!(:dataset_hash).and_return({"organism" => "rat","title" => "rat","description" => "rat","reference_series" => "rat","platform_geo_accession" => "GPL1355", "pubmed_id" => "1234"})
       ds.should_receive(:download).and_return(true)
       ds.should_receive(:organism=).with("rat").and_return(true)
@@ -30,7 +30,7 @@ describe Dataset do
       ds.should_receive(:description=).with("rat").and_return(true)
       ds.should_receive(:pubmed_id=).with("1234").and_return(true)
       ds.should_receive(:reference_series=).with("rat").and_return(true)
-      platform = Platform.generate
+      platform = Platform.spawn
       Platform.should_receive(:first).with(:conditions => {:geo_accession => 'GPL1355'}).and_return(platform)
       ds.should_receive(:platform_id=).with(platform.id).and_return(true)
       ds.should_receive(:save!).and_return(true)
@@ -40,7 +40,7 @@ describe Dataset do
 
   describe "dataset hash" do
     it "should return the hash for the dataset by parsing the file" do
-      ds = Dataset.generate
+      ds = Dataset.spawn
       ds.should_receive(:fields).and_return(["fields"])
       ds.should_receive(:local_dataset_filename).and_return("file.soft")
       ds.should_receive(:file_hash).with(["fields"], "file.soft").and_return(true)
@@ -50,37 +50,37 @@ describe Dataset do
 
   describe "fields" do
     it "should return an array of hashes with field information" do
-      ds = Dataset.generate
+      ds = Dataset.spawn
       ds.fields.should == [{:value=>"rat", :regex=>/^!dataset_platform_organism = (.+?)$/, :name=>"organism"}, {:value=>"rat strain dataset", :regex=>/^!dataset_title = (.+?)$/, :name=>"title"}, {:value=>"rat strain description", :regex=>/^!dataset_description = (.+?)$/, :name=>"description"}, {:value=>"1234", :regex=>/^!dataset_pubmed_id = (\d+)$/, :name=>"pubmed_id"}, {:value=>"", :regex=>/^!dataset_reference_series = (GSE\d+)$/, :name=>"reference_series"}, {:value=>"", :regex=>/^!dataset_platform = (GPL\d+)$/, :name=>"platform_geo_accession"}]
     end
   end
 
   describe "download" do
     it "should download the file if it doesn't exist" do
-      ds = Dataset.generate
+      ds = Dataset.spawn
       File.should_receive(:exists?).with(/datafiles\/GDS8700\/GDS8700\.soft$/).and_return(false)
       ds.should_receive(:download_file).and_return(true)
       ds.download
     end
   end
-  
+
   describe "dataset path" do
     it "should return the path for the datasets" do
-      ds = Dataset.generate
+      ds = Dataset.spawn
       ds.dataset_path.should match(/datafiles\/GDS8700$/)
     end
   end
-  
+
   describe "dataset filename" do
     it "should return the path for the datasets" do
-      ds = Dataset.generate
+      ds = Dataset.spawn
       ds.dataset_filename.should == "GDS8700.soft"
     end
   end
-  
+
   describe "local dataset filename" do
     it "should return the path for the datasets" do
-      ds = Dataset.generate
+      ds = Dataset.spawn
       ds.local_dataset_filename.should match(/datafiles\/GDS8700\/GDS8700.soft$/)
     end
   end
@@ -94,7 +94,7 @@ describe Dataset do
 
   describe "to_param" do
     it "should return the geo_accession as the param" do
-      ds = Dataset.generate
+      ds = Dataset.spawn
       ds.to_param.should == "GDS8700"
     end
   end

@@ -1,4 +1,8 @@
-.digg_pagination
-  .page_info
-    = page_entries_info(items)
-  = will_paginate(items)
+- if items.total_pages == 1
+  .digg_pagination
+- elsif (items.total_pages < 10 && items.total_pages > 1)
+  = render(:partial => "shared/pagination_links", :locals => {:items => items})
+- else
+  .digg_pagination
+    .page_info
+      Please filter your results to return fewer pages.

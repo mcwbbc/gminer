@@ -84,12 +84,12 @@ def should_notify_normally
     environment_hash = {:def => 456}
     backtrace_data = :backtrace_data
 
-    raw_notice = {:request => {:params => params_hash}, 
+    raw_notice = {:request => {:params => params_hash},
                   :environment => environment_hash,
                   :backtrace => backtrace_data}
 
-    processed_notice = {:backtrace => :backtrace_data, 
-                        :request => {:params => :params_data}, 
+    processed_notice = {:backtrace => :backtrace_data,
+                        :request => {:params => :params_data},
                         :environment => :environment_data}
 
     @controller.expects(:clean_hoptoad_backtrace).with(backtrace_data).returns(:backtrace_data)

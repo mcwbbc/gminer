@@ -5,31 +5,31 @@ class ApplicationController < ActionController::Base
   # Provide access to overrides for restful methods (ie #create! #edit!)
   # See inherited_resources docs for more info.
   include InheritedResources::DSL
-  
+
   helper :all # include all helpers, all the time
-  
+
   # make methods available to views
   helper_method :logged_in?, :admin_logged_in?, :current_user_session, :current_user
-  
+
   # See ActionController::RequestForgeryProtection for details
   protect_from_forgery
-  
-  # See ActionController::Base for details 
+
+  # See ActionController::Base for details
   # Uncomment this to filter the contents of submitted sensitive data parameters
-  # from your application log (in this case, all fields with names like "password"). 
+  # from your application log (in this case, all fields with names like "password").
   filter_parameter_logging :password, :confirm_password, :password_confirmation, :creditcard
-  
+
   def logged_in?
     !current_user_session.nil?
   end
-  
+
   def admin_required
     unless current_user && current_user.admin?
       flash[:warning] = t("flash.require_admin")
       redirect_to root_url and return false
     end
   end
-  
+
   def admin_logged_in?
     logged_in? && current_user.admin?
   end
@@ -62,11 +62,11 @@ private
       return false
     end
   end
-  
+
   def store_location
     session[:return_to] = request.request_uri
   end
-  
+
   def redirect_back_or_default(default)
     redirect_to(session[:return_to] || default)
     session[:return_to] = nil

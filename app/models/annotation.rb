@@ -2,20 +2,20 @@ class Annotation < ActiveRecord::Base
   include Utilities
   extend Utilities::ClassMethods
 
+  attr_accessor :ncbo_term_id, :ncbo_term_name
+
   validates_uniqueness_of :ncbo_id, :scope => [:ontology_term_id, :geo_accession, :field]
 
   belongs_to :ontology_term, :counter_cache => true
   belongs_to :ontology
-
   has_many :annotation_closures #, :include => :ontology_term, :order => "ontology_terms.name"
+
+  named_scope :mouse_anatomy, :conditions => { :ncbo_id => "1000"}
 
   class << self
 
-    def persist(geo_accession, field_name, ncbo_id, ontology_term_string, text_start, text_end, description)
-      ontology_term = OntologyTerm.first(:conditions => {:term_id => ontology_term_string})
-      if ontology_term && !annotation = Annotation.first(:conditions => {:geo_accession => geo_accession, :field => field_name, :ontology_term_id => ontology_term.id})
-        Annotation.create(:geo_accession => geo_accession, :field => field_name, :ncbo_id => ncbo_id, :ontology_term_id => ontology_term.id, :ontology_id => ontology_term.ontology_id, :from => text_start, :to => text_end, :description => description)
-      end
+    def for_item(item, user_id)
+      Annotation.new(:user_id => user_id, :audited => true, :verified => true, :description => item.descriptive_text, :geo_accession => item.geo_accession)
     end
 
     def count_by_ontology_array
@@ -36,14 +36,19 @@ class Annotation < ActiveRecord::Base
                )
     end
 
-    def build_cloud(term_array)
-      anatomy_terms = OntologyTerm.cloud(:ontology => "Mouse adult gross anatomy").sort_by { |term| term.name.downcase }
-      rat_strain_terms = OntologyTerm.cloud(:ontology => "Rat Strain Ontology").sort_by { |term| term.name.downcase }
-      @annotation_hash = Annotation.find_by_sql("SELECT * FROM annotations GROUP BY geo_accession ORDER BY geo_accession").inject({}) { |h, a| h[a.geo_accession] = a.description; h }
+    def build_cloud(term_array, include_invalid)
+      anatomy_terms = OntologyTerm.cloud(:ontology_ncbo_id => "1000", :invalid => include_invalid).sort_by { |term| term.name.downcase }
+      rat_strain_terms = OntologyTerm.cloud(:ontology_ncbo_id => "1150", :invalid => include_invalid).sort_by { |term| term.name.downcase }
+      @annotation_hash = {}
+      sample_count = -1
 
       if !term_array.blank?
+        @annotation_hash = Annotation.find_by_sql("SELECT * FROM annotations WHERE annotations.verified = 1 GROUP BY geo_accession ORDER BY geo_accession").inject({}) { |h, a| h[a.geo_accession] = a.description; h }
+        sample_count = Annotation.count_by_sql("SELECT count(DISTINCT geo_accession) FROM annotations WHERE annotations.verified = 1")
         term_array.each do |term|
-          annotations = Annotation.find_by_sql("SELECT annotations.* FROM annotations, ontology_terms WHERE ontology_terms.term_id = '#{term}' AND ontology_terms.id = annotations.ontology_term_id GROUP BY geo_accession ORDER BY geo_accession")
+          annotations = Annotation.find_by_sql("SELECT annotations.* FROM annotations, ontology_terms WHERE ontology_terms.term_id = '#{term}' AND ontology_terms.id = annotations.ontology_term_id AND annotations.verified = 1 GROUP BY geo_accession ORDER BY geo_accession")
+          term_count = Annotation.count_by_sql("SELECT count(DISTINCT geo_accession) FROM annotations, ontology_terms WHERE ontology_terms.term_id = '#{term}' AND ontology_terms.id = annotations.ontology_term_id AND annotations.verified = 1")
+          sample_count = (sample_count > term_count) ? term_count : sample_count
           hash = annotations.inject({}) { |h, a| h[a.geo_accession] = a.description; h }
           intersection = @annotation_hash.keys & hash.keys
           combine = @annotation_hash.dup.update(hash)
@@ -62,8 +67,8 @@ class Annotation < ActiveRecord::Base
         end
 
         term_ids.uniq!
-        at = anatomy_term_ids & term_ids
-        rs = rat_strain_term_ids & term_ids
+        at = (anatomy_term_ids & term_ids)
+        rs = (rat_strain_term_ids & term_ids)
         @anatomy_terms = anatomy_terms.inject([]) { |a, term| a << term if at.include?(term.term_id); a }
         @rat_strain_terms = rat_strain_terms.inject([]) { |a, term| a << term if rs.include?(term.term_id); a }
       else
@@ -71,7 +76,7 @@ class Annotation < ActiveRecord::Base
         @rat_strain_terms = rat_strain_terms
       end
 
-      [@annotation_hash, @anatomy_terms.uniq, @rat_strain_terms.uniq]
+      [@annotation_hash, @anatomy_terms.uniq, @rat_strain_terms.uniq, sample_count]
     end
   end
 
@@ -81,7 +86,7 @@ class Annotation < ActiveRecord::Base
     if self.from != 1
       term = text[0..(self.from-2)] << term
     end
-    
+
     if self.to != text.size
       term = term << text[self.to..text.size]
     end

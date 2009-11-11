@@ -20,7 +20,7 @@ class ActionController::TestCase
       }.size
     end
   end
-  
+
   def self.should_protect_from_forgery(options = {})
     klass = described_type
     should "protect_from_forgery" do

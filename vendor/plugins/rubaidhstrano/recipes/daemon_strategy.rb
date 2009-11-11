@@ -1,4 +1,4 @@
-# Hook into +load+ so that all configuration is loaded before we do anything. 
+# Hook into +load+ so that all configuration is loaded before we do anything.
 # That way, we know what deployment strategy the main deployment recipe has
 # chosen.
 on :load do

@@ -8,10 +8,10 @@ class UserCanLoginTest < ActionController::IntegrationTest
 @the_user.activate!
 
     end
-    
+
     should 'be able to login with valid id and password' do
       visit signin_path
-      
+
       fill_in 'Sign In', :with => @the_user.login
       fill_in 'Password', :with => @the_user.password
 

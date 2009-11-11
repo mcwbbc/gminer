@@ -4,4 +4,5 @@
 %br
 = render(:partial => "shared/children", :locals => {:title => "Platform", :items => [@dataset.platform]}) if @dataset.platform
 = render(:partial => "shared/children", :locals => {:title => "Series", :items => [@dataset.series_item]}) if @dataset.series_item
-= render(:partial => "shared/annotations_table", :locals => {:item => @dataset})
+#annotations-table
+  = render(:partial => "shared/annotations_table", :locals => {:item => @dataset})

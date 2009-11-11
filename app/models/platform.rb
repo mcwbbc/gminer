@@ -1,5 +1,4 @@
 class Platform < ActiveRecord::Base
-  
   include Utilities
   extend Utilities::ClassMethods
 
@@ -8,6 +7,7 @@ class Platform < ActiveRecord::Base
 
   has_many :series_items
   has_many :samples, :through => :series_items
+  has_many :annotations, :foreign_key => :geo_accession, :primary_key => :geo_accession
 
   class << self
     def page(conditions, page=1, size=Constants::PER_PAGE)
@@ -17,6 +17,17 @@ class Platform < ActiveRecord::Base
                :per_page => size
                )
     end
+
+    def for_probeset(probeset_name)
+      find(
+        :all,
+        :select => "platforms.*",
+        :joins => "INNER JOIN samples ON platforms.id = samples.platform_id INNER JOIN detections ON samples.id = detections.sample_id INNER JOIN probesets ON probesets.id = detections.probeset_id AND probesets.name = '#{probeset_name}'",
+        :group  => "platforms.geo_accession",
+        :order  => "platforms.geo_accession"
+      )
+    end
+
   end
 
   def to_param

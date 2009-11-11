@@ -1,4 +1,4 @@
-class AdminData::DiagnosticController  < AdminData::BaseController 
+class AdminData::DiagnosticController  < AdminData::BaseController
 
    unloadable
 

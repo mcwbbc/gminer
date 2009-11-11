@@ -1,5 +1,7 @@
-= page_title("Ontology term: #{@ontology_term.name}")
+= page_title("Ontology term: #{@ontology_term.name} (#{@ontology_term.specific_term_id})")
 %br
+%p
+  == Ontology: #{link_to(@ontology_term.ontology.name, ontology_url(@ontology_term.ontology))}
 = link_to('Back', ontology_terms_url)
 %br
 %br

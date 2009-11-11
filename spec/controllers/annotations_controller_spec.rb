@@ -12,12 +12,13 @@ describe AnnotationsController do
       @annotations.stub!(:total_pages).and_return(1)
       Annotation.stub!(:page).and_return(@annotations)
       controller.stub!(:admin_required).and_return(true)
+      controller.stub!(:set_ontology_dropdown).and_return("1000")
     end
-  
+
     def do_get
       get :audit
     end
-  
+
     it "should be successful" do
       do_get
       response.should be_success
@@ -27,25 +28,32 @@ describe AnnotationsController do
       do_get
       response.should render_template('audit')
     end
-  
+
     it "should assign the found annotations for the view" do
       do_get
       assigns[:annotations].should == @annotations
     end
 
+    ["All", "Valid", "Invalid", "Unaudited"].each do |status|
+      it "should do filter results based on #{status}" do
+        get :audit, :status => status
+        response.should be_success
+      end
+    end
   end
 
   describe "handling GET /annotations" do
     before(:each) do
-      @annotations = [mock_annotation]
+      @annotations = [@mock_annotation]
       @annotations.stub!(:total_pages).and_return(1)
       Annotation.stub!(:page).and_return(@annotations)
+      controller.stub!(:set_ontology_dropdown).and_return("1000")
     end
-  
+
     def do_get
       get :index
     end
-  
+
     it "should be successful" do
       do_get
       response.should be_success
@@ -55,7 +63,7 @@ describe AnnotationsController do
       do_get
       response.should render_template('index')
     end
-  
+
     it "should assign the found annotations for the view" do
       do_get
       assigns[:annotations].should == @annotations
@@ -126,11 +134,10 @@ describe AnnotationsController do
       @annotation_hash = {}
       @anatomy_terms = {}
       @rat_strain_terms = {}
-      Annotation.should_receive(:build_cloud).with("1111|abcd").and_return([@annotation_hash, @anatomy_terms, @rat_strain_terms])
+      Annotation.should_receive(:build_cloud).with("1111|abcd", false).and_return([@annotation_hash, @anatomy_terms, @rat_strain_terms, 50])
     end
 
     it "should render the html" do
-      Annotation.should_receive(:count_by_ontology_array).and_return(1)
       get :cloud, :term_array => "1111|abcd", :format => "html"
     end
 

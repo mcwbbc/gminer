@@ -2,59 +2,36 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe OntologyTerm do
 
-  describe "persist" do
-    describe "with existing" do
-      it "should not create" do
-        ot = OntologyTerm.generate
-        OntologyTerm.should_receive(:first).with(:conditions => {:term_id => "term_id"}).and_return(ot)
-        OntologyTerm.persist("term_id", "ncbo_id", "term_name").should == nil
-      end
-    end
-
-    describe "without existing" do
-      before(:each) do
-        @ot = OntologyTerm.generate
-        OntologyTerm.should_receive(:first).with(:conditions => {:term_id => "term_id"}).and_return(nil)
-      end
-
-      describe "with matching ontology" do
-        it "should create a new ontology_term" do
-          ontology = Ontology.generate
-          Ontology.should_receive(:first).with(:conditions => {:ncbo_id => "ncbo_id"}).and_return(ontology)
-          ontology_terms = mock("ontology_terms")
-          ontology.should_receive(:ontology_terms).and_return(ontology_terms)
-          ontology_terms.should_receive(:create).with(:term_id => "term_id", :ncbo_id => "ncbo_id", :name => "term_name").and_return(@ot)
-          OntologyTerm.persist("term_id", "ncbo_id", "term_name").should == @ot
-        end
-      end
-
-      describe "without matching ontology" do
-        it "should not save anyting" do
-          Ontology.should_receive(:first).with(:conditions => {:ncbo_id => "ncbo_id"}).and_return(nil)
-          OntologyTerm.persist("term_id", "ncbo_id", "term_name").should be_nil
-        end
-      end
-
+  describe "count_for_probeset" do
+    it "should return the count for the selected parameters" do
+      OntologyTerm.should_receive(:count).with(:joins => "INNER JOIN annotations ON ontology_terms.id = annotations.ontology_term_id INNER JOIN samples ON annotations.geo_accession = samples.geo_accession INNER JOIN detections ON detections.sample_id = samples.id INNER JOIN probesets ON detections.probeset_id = probesets.id AND ontology_terms.id = 1 AND probesets.id = 2 AND annotations.ncbo_id = '1000' AND annotations.verified = 1").and_return(5)
+      OntologyTerm.count_for_probeset(1, 2, '1000').should == 5
     end
   end
 
   describe "cloud" do
     it "should return ontology terms with empty options" do
       term = mock(OntologyTerm)
-      OntologyTerm.should_receive(:find_by_sql).with("SELECT ontology_terms.* FROM ontology_terms, ontologies WHERE ontology_terms.annotations_count > 0 GROUP BY ontology_terms.name ORDER BY ontology_terms.annotations_count DESC, ontology_terms.name").and_return([term])
+      OntologyTerm.should_receive(:find_by_sql).with("SELECT ontology_terms.* FROM ontology_terms, ontologies, annotations WHERE ontology_terms.annotations_count > 0 AND annotations.verified = 1 AND annotations.ontology_term_id = ontology_terms.id GROUP BY ontology_terms.name ORDER BY ontology_terms.annotations_count DESC, ontology_terms.name").and_return([term])
       OntologyTerm.cloud.should == [term]
     end
 
     it "should return ontology terms with an ontology" do
       term = mock(OntologyTerm)
-      OntologyTerm.should_receive(:find_by_sql).with("SELECT ontology_terms.* FROM ontology_terms, ontologies WHERE ontology_terms.annotations_count > 0 AND ontology_terms.ncbo_id = ontologies.ncbo_id AND ontologies.name = 'Rat Strain Ontology' GROUP BY ontology_terms.name ORDER BY ontology_terms.annotations_count DESC, ontology_terms.name").and_return([term])
-      OntologyTerm.cloud(:ontology => "Rat Strain Ontology").should == [term]
+      OntologyTerm.should_receive(:find_by_sql).with("SELECT ontology_terms.* FROM ontology_terms, ontologies, annotations WHERE ontology_terms.annotations_count > 0 AND annotations.verified = 1 AND annotations.ontology_term_id = ontology_terms.id AND ontology_terms.ncbo_id = ontologies.ncbo_id AND ontologies.ncbo_id = '1150' GROUP BY ontology_terms.name ORDER BY ontology_terms.annotations_count DESC, ontology_terms.name").and_return([term])
+      OntologyTerm.cloud(:ontology_ncbo_id => "1150").should == [term]
     end
 
     it "should return ontology terms with an ontology and limit" do
       term = mock(OntologyTerm)
-      OntologyTerm.should_receive(:find_by_sql).with("SELECT ontology_terms.* FROM ontology_terms, ontologies WHERE ontology_terms.annotations_count > 0 AND ontology_terms.ncbo_id = ontologies.ncbo_id AND ontologies.name = 'Rat Strain Ontology' GROUP BY ontology_terms.name ORDER BY ontology_terms.annotations_count DESC, ontology_terms.name LIMIT 5").and_return([term])
-      OntologyTerm.cloud(:ontology => "Rat Strain Ontology", :limit => 5).should == [term]
+      OntologyTerm.should_receive(:find_by_sql).with("SELECT ontology_terms.* FROM ontology_terms, ontologies, annotations WHERE ontology_terms.annotations_count > 0 AND annotations.verified = 1 AND annotations.ontology_term_id = ontology_terms.id AND ontology_terms.ncbo_id = ontologies.ncbo_id AND ontologies.ncbo_id = '1150' GROUP BY ontology_terms.name ORDER BY ontology_terms.annotations_count DESC, ontology_terms.name LIMIT 5").and_return([term])
+      OntologyTerm.cloud(:ontology_ncbo_id => "1150", :limit => 5).should == [term]
+    end
+
+    it "should return ontology terms with an ontology and limit returning everything" do
+      term = mock(OntologyTerm)
+      OntologyTerm.should_receive(:find_by_sql).with("SELECT ontology_terms.* FROM ontology_terms, ontologies, annotations WHERE ontology_terms.annotations_count > 0 AND ontology_terms.ncbo_id = ontologies.ncbo_id AND ontologies.ncbo_id = '1150' GROUP BY ontology_terms.name ORDER BY ontology_terms.annotations_count DESC, ontology_terms.name LIMIT 5").and_return([term])
+      OntologyTerm.cloud(:ontology_ncbo_id => "1150", :limit => 5, :invalid => true).should == [term]
     end
   end
 
@@ -67,7 +44,7 @@ describe OntologyTerm do
 
   describe "child closures" do
     before(:each) do
-      @ot = OntologyTerm.generate
+      @ot = OntologyTerm.spawn
     end
 
     it "should return and empty array for no closures" do
@@ -80,7 +57,7 @@ describe OntologyTerm do
 
       a = mock(Annotation)
       a.should_receive(:ontology_term).and_return(term)
-      
+
       ac = mock(AnnotationClosure)
       ac.should_receive(:annotation).and_return(a)
       AnnotationClosure.should_receive(:all).with(:conditions => {:ontology_term_id => @ot.id}, :order => "ontology_terms.name", :include => [:ontology_term]).and_return([ac])
@@ -107,7 +84,7 @@ describe OntologyTerm do
 
   describe "closure geo references" do
     before(:each) do
-      @ot = OntologyTerm.generate
+      @ot = OntologyTerm.spawn
     end
 
     it "should return an empty array with no annotations" do
@@ -129,7 +106,7 @@ describe OntologyTerm do
 
   describe "direct geo references" do
     before(:each) do
-      @ot = OntologyTerm.generate
+      @ot = OntologyTerm.spawn
     end
 
     it "should return an empty array with no annotations" do
@@ -148,7 +125,7 @@ describe OntologyTerm do
 
   describe "link item" do
     before(:each) do
-      @ot = OntologyTerm.generate
+      @ot = OntologyTerm.spawn
       @item = mock("geo_item")
     end
 
@@ -171,14 +148,21 @@ describe OntologyTerm do
 
   describe "to_param" do
     it "should return the term_id as the param" do
-      ot = OntologyTerm.generate
-      ot.to_param.should == "13578|Cheese"
+      ot = OntologyTerm.spawn
+      ot.to_param.should == "#{ot.ncbo_id}|#{ot.name}"
+    end
+  end
+
+  describe "specific_term_id" do
+    it "should return the term_id without the ncbo ontology id" do
+      ot = OntologyTerm.spawn
+      ot.specific_term_id.should == ot.name
     end
   end
 
   describe "valid annotation count" do
     it "should return a number of the valid annotations" do
-      ot = OntologyTerm.generate
+      ot = OntologyTerm.spawn
       Annotation.should_receive(:count).with(:conditions => {:ontology_term_id => ot.id, :verified => true} ).and_return(1)
       ot.valid_annotation_count.should == 1
     end
@@ -186,7 +170,7 @@ describe OntologyTerm do
 
   describe "audited annotation count" do
     it "should return a number of the audited annotations" do
-      ot = OntologyTerm.generate
+      ot = OntologyTerm.spawn
       Annotation.should_receive(:count).with(:conditions => {:ontology_term_id => ot.id, :audited => true} ).and_return(1)
       ot.audited_annotation_count.should == 1
     end
@@ -194,26 +178,26 @@ describe OntologyTerm do
 
   describe "valid_annotation_percentage" do
     it "should return a percentage of the valid annotations" do
-      @ot = OntologyTerm.generate(:annotations_count => 2)
+      @ot = OntologyTerm.spawn(:annotations_count => 2)
       @ot.should_receive(:valid_annotation_count).and_return(1)
       @ot.valid_annotation_percentage.should == 50.0
     end
 
     it "should return 0 if there are no valid" do
-      @ot = OntologyTerm.generate(:annotations_count => 0)
+      @ot = OntologyTerm.spawn(:annotations_count => 0)
       @ot.valid_annotation_percentage.should == 0
     end
   end
 
   describe "audited_annotation_percentage" do
     it "should return a percentage of the audited annotations" do
-      @ot = OntologyTerm.generate(:annotations_count => 2)
+      @ot = OntologyTerm.spawn(:annotations_count => 2)
       @ot.should_receive(:audited_annotation_count).and_return(1)
       @ot.audited_annotation_percentage.should == 50.0
     end
 
     it "should return 0 if there are no valid" do
-      @ot = OntologyTerm.generate(:annotations_count => 0)
+      @ot = OntologyTerm.spawn(:annotations_count => 0)
       @ot.audited_annotation_percentage.should == 0
     end
   end
