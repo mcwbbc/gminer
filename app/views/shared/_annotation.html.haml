@@ -1,9 +1,8 @@
-%tr{ :class => cycle('rowWhite', 'rowBlue') }
+%tr{ :class => cycle('row-odd', 'row-even') }
   %td{ :valign => "top", :width => "40%" }
     = ontology_name
   %td{ :valign => "top" }
-    - if admin_user?
-      = curate_link_list
-      = ncbo_ontology_link_list
+    - if admin?
+      = curate_link_list.html_safe
     - else
-      = term_list
+      = term_list.html_safe

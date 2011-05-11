@@ -1,8 +1,6 @@
 = page_title(t('.welcome'))
 /[if lt IE 7]
-  <p class="flash_error">
-  = t('ie.upgrade_message', :upgrade_page_url => link_to(t('link.upgrade'), pages_path(:action => 'upgrade'), :target => :blank))
-  </p>
+  %meta(http-equiv="REFRESH" content="0;url=/pages/upgrade")
 %br
 - @terms.each do |term|
   .home-cloud-box

@@ -16,7 +16,7 @@ class SamplesController < ApplicationController
           @annotation_count_array = Sample.annotation_count_array
         }
       format.js  {
-          render(:partial => "samples_list")
+          render(:partial => "samples_list.html.haml")
         }
     end
   end
@@ -25,12 +25,14 @@ class SamplesController < ApplicationController
     @sample = Sample.first(:conditions => {:geo_accession => params[:id]})
     raise ActiveRecord::RecordNotFound if !@sample
 
-    if admin_logged_in?
+    if admin?
       @new_annotation = Annotation.for_item(@sample, current_user.id)
       @ontologies = Ontology.all(:order => :name)
+      @top_tags = Tag.top_tags(@sample.tag_list)
+      @all_tags = Tag.all_tags(@sample.tag_list).map(&:name)
+      @prev, @next = @sample.prev_next
     end
 
-    @prev, @next = @sample.prev_next
     respond_to do |format|
       format.html {
         @annotation_count_array = @sample.count_by_ontology_array

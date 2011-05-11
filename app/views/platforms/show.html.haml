@@ -1,7 +1,8 @@
+= render(:partial => "shared/admin_box.html.haml", :locals => {:annotation_count_array => @annotation_count_array, :geo_item => @platform , :top_tags => @top_tags, :all_tags => @all_tags})
 = render(:partial => "shared/show_page_title", :locals => {:title => "Platform", :geo_accession => @platform.geo_accession})
 = link_to('Back', platforms_url)
 %br
 %br
 = render(:partial => "shared/children", :locals => {:title => "Series", :items => @platform.series_items})
-= render(:partial => "shared/children", :locals => {:title => "Samples", :items => @platform.samples})
+= render(:partial => "shared/cytoscape.html.haml", :locals => {:item => @platform}) if current_user && current_user.show_cytoscape?
 = render(:partial => "shared/annotations_table", :locals => {:item => @platform})

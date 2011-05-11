@@ -1,19 +1,45 @@
 class Sample < ActiveRecord::Base
+  include Abstract::Sample
   include Utilities
   extend Utilities::ClassMethods
 
+  acts_as_taggable_on :tags
+
   belongs_to :series_item
-  belongs_to :platform
-  has_many :detections
-  has_many :annotations, :foreign_key => :geo_accession, :primary_key => :geo_accession
+  belongs_to :platform, :class_name => "Gminer::Platform"
+  has_many :detections, :dependent => :delete_all
+  has_many :annotations, :dependent => :delete_all, :foreign_key => :geo_accession, :primary_key => :geo_accession
 
   class << self
-    def page(conditions, page=1, size=Constants::PER_PAGE)
-      paginate(:order => [:geo_accession],
-               :conditions => conditions,
-               :page => page,
-               :per_page => size
-               )
+
+    def load_sample
+      @sample ||= begin
+        if RedisConnection.db.exists('sample-geo-accessions')
+          RedisConnection.db.smembers('sample-geo-accessions').sort
+        else
+          Sample.all.map { |item| item.geo_accession }.each do |id|
+            RedisConnection.db.sadd('sample-geo-accessions', id)
+          end
+        end
+      end
+    end
+
+    def for_probeset(ontology_term_id, probeset_id, status)
+      joins = "INNER JOIN annotations ON samples.geo_accession = annotations.geo_accession INNER JOIN ontology_terms ON ontology_terms.id = annotations.ontology_term_id INNER JOIN detections ON detections.sample_id = samples.id INNER JOIN probesets ON detections.probeset_id = probesets.id"
+      find(:all,
+        :select => 'samples.geo_accession',
+        :joins => joins,
+        :conditions => ["probesets.name = ? AND detections.abs_call = ? AND ontology_terms.term_id = ? AND annotations.verified = 1", probeset_id, status, ontology_term_id],
+        :group => "samples.geo_accession"
+      )
+    end
+
+    def count_for_probeset(probeset_id, ontology_term_id)
+      count('samples.id',
+        :distinct => true,
+        :joins => "INNER JOIN annotations ON samples.geo_accession = annotations.geo_accession INNER JOIN ontology_terms ON ontology_terms.id = annotations.ontology_term_id INNER JOIN detections ON detections.sample_id = samples.id INNER JOIN probesets ON detections.probeset_id = probesets.id",
+        :conditions => ["probesets.id = ? AND ontology_terms.id = ? AND annotations.verified = 1", probeset_id, ontology_term_id]
+      )
     end
 
     def matching(options)
@@ -21,7 +47,7 @@ class Sample < ActiveRecord::Base
       sql << "WHERE ontologies.ncbo_id = #{options[:ncbo_id]} "
       sql << "AND ontology_terms.term_id = '#{options[:term_id]}' " if options[:term_id]
       sql << "AND ontology_terms.ncbo_id = ontologies.ncbo_id "
-      sql << "AND annotations.field = '#{options[:field]}' "
+      sql << "AND annotations.field_name = '#{options[:field_name]}' "
       sql << "AND series_items.pubmed_id != '' " if options[:require_pubmed_id]
       sql << "AND samples.series_item_id = series_items.id "
       sql << "AND annotations.ontology_term_id = ontology_terms.id "
@@ -30,7 +56,7 @@ class Sample < ActiveRecord::Base
     end
 
     def create_results(passed = {})
-      options = {:ncbo_id => 1000, :field => "source_name", :require_pubmed_id => false}.merge!(passed)
+      options = {:ncbo_id => 1000, :field_name => "source_name", :require_pubmed_id => false}.merge!(passed)
       Sample.matching(options).each do |sample|
         inserts = []
         earlier = Time.new
@@ -57,50 +83,6 @@ class Sample < ActiveRecord::Base
     end
   end
 
-  def to_param
-    self.geo_accession
-  end
-
-  def series_path
-    "#{Rails.root}/datafiles/#{self.platform.geo_accession}/#{self.series_item.geo_accession}"
-  end
-
-  def local_sample_filename
-    "#{series_path}/#{self.geo_accession}_sample.soft"
-  end
-
-  def fields
-    fields = [
-      {:name => "title", :value => title, :regex => /^!Sample_title = (.+)$/},
-      {:name => "sample_type", :value => sample_type, :regex => /^!Sample_type = (.+?)$/},
-      {:name => "source_name", :value => source_name, :regex => /^!Sample_source_name_ch1 = (.+?)$/},
-      {:name => "organism", :value => organism, :regex => /^!Sample_organism_ch1 = (.+?)$/},
-      {:name => "characteristics", :value => characteristics, :regex => /^!Sample_characteristics_ch1 = (.+?)$/},
-      {:name => "treatment_protocol", :value => treatment_protocol, :regex => /^!Sample_treatment_protocol_ch1 = (.+?)$/},
-      {:name => "extract_protocol", :value => extract_protocol, :regex => /^!Sample_extract_protocol_ch1 = (.+?)$/},
-      {:name => "label", :value => label, :regex => /^!Sample_label_ch1 = (.+?)$/},
-      {:name => "label_protocol", :value => label_protocol, :regex => /^!Sample_label_protocol_ch1 = (.+?)$/},
-      {:name => "scan_protocol", :value => scan_protocol, :regex => /^!Sample_scan_protocol = (.+?)$/},
-      {:name => "hyp_protocol", :value => hyp_protocol, :regex => /^!Sample_hyb_protocol = (.+?)$/},
-      {:name => "description", :value => description, :regex => /^!Sample_description = (.+?)$/},
-      {:name => "data_processing", :value => data_processing, :regex => /^!Sample_data_processing = (.+?)$/},
-      {:name => "molecule", :value => molecule, :regex => /^!Sample_molecule_ch1 = (.+?)$/},
-    ]
-  end
-
-  def sample_hash
-    hash = file_hash(fields, local_sample_filename)
-    hash.keys.each do |key|
-      hash[key] = join_item(hash[key])
-    end
-    hash
-  end
-
-  def persist
-    self.attributes = sample_hash
-    save!
-  end
-
   def create_detections(probeset_id_hash)
     data_regex = /^.+_at/
     abs_call_regex = /^#ABS_CALL/
@@ -116,25 +98,25 @@ class Sample < ActiveRecord::Base
     mass_header_pos = nil
     significance_header_pos = nil
 
-    File.open(local_sample_filename, "r").each do |line|
+    File.open(local_sample_filename, "rb", :encoding => 'ISO-8859-1').each do |line|
       if !abs_call_flag
-        abs_call_flag = line =~ abs_call_regex
+        abs_call_flag = line.match(abs_call_regex)
         next
       end
 
-      if line =~ header_regex
+      if line.match(header_regex)
         headers = line.chomp.split("\t")
         id_ref_header_pos = headers.index("ID_REF")
         abs_call_header_pos = headers.index("ABS_CALL")
         abs_call_flag = (headers.include?("ID_REF") && headers.include?("ABS_CALL"))
       end
 
-      if line =~ end_table_regex
+      if line.match(end_table_regex)
         intable_flag = false
       end
 
       if intable_flag
-        if line =~ data_regex
+        if line.match(data_regex)
           data = line.chomp.split("\t")
           if (data[id_ref_header_pos] && data[abs_call_header_pos])
 
@@ -150,7 +132,7 @@ class Sample < ActiveRecord::Base
         end
       end
 
-      if line =~ start_table_regex
+      if line.match(start_table_regex)
         intable_flag = true
       end
     end

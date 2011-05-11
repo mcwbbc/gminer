@@ -1,12 +1,15 @@
-%h3
-  == Has #{annotation_count} #{annotation_type} annotations on #{items.size} GEO accession IDs.
 - if items.any?
-  %table.paginated{ :cellspacing => "2", :border => "0", :width => "100%", :cellpadding => "0" }
+  %h3
+    == Appears as a #{annotation_type} annotation in #{pluralize(items.total_entries, "GEO accession ID")}.
+  %p
+    = render(:partial => "shared/pagination", :locals => {:items => items, :limit => false})
+  %br
+  %table{ :cellspacing => "2", :border => "0", :width => "100%", :cellpadding => "0" }
     %thead
-      %tr.rowHeader
+      %tr.row-header
         %td{ :width => "20%" }
           GEO accession
         %td{ :width => "80%" }
           Description
-    %tbody#dataTable
-      = render(:partial => "annotation", :collection => items)
+    %tbody
+      = render(:partial => "annotation.html.haml", :collection => items)

@@ -1,10 +1,10 @@
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+require 'spec_helper'
 
 describe OntologiesController do
 
   describe "handling GET /ontologies" do
     before(:each) do
-      ontology = Ontology.spawn
+      ontology = Factory.build(:ontology)
       @ontologies = [ontology]
       @ontologies.stub!(:total_pages).and_return(1)
       Ontology.stub!(:page).and_return(@ontologies)
@@ -33,7 +33,7 @@ describe OntologiesController do
 
   describe "GET show" do
     it "assigns the requested ontology as @ontology" do
-      ontology = Ontology.spawn
+      ontology = Factory.build(:ontology)
       Ontology.stub!(:find).with("1").and_return(ontology)
       get :show, :id => "1"
       assigns[:ontology].should equal(ontology)

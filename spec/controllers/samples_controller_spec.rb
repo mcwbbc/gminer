@@ -1,10 +1,10 @@
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+require 'spec_helper'
 
 describe SamplesController do
 
   describe "handling GET /samples" do
     before(:each) do
-      sample = Sample.spawn
+      sample = Factory.build(:sample)
       @samples = [sample]
       @samples.stub!(:total_pages).and_return(1)
       Sample.stub!(:page).and_return(@samples)
@@ -33,12 +33,12 @@ describe SamplesController do
 
   describe "GET show" do
     it "assigns the requested sample as @sample" do
-      user = User.spawn(:id => "1")
-      controller.should_receive(:admin_logged_in?).and_return(true)
+      user = Factory.build(:user, :id => "1")
+      controller.should_receive(:admin?).and_return(true)
       controller.should_receive(:current_user).and_return(user)
 
-      series_item = SeriesItem.spawn
-      sample = Sample.spawn(:series_item => series_item)
+      series_item = Factory.build(:series_item)
+      sample = Factory.build(:sample, :series_item => series_item)
       Sample.stub!(:first).with(:conditions => {:geo_accession => "GDS1234"}).and_return(sample)
       sample.should_receive(:prev_next).and_return(["GDS1", "GDS3"])
       sample.should_receive(:count_by_ontology_array).and_return({})

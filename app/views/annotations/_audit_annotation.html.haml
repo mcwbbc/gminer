@@ -1,12 +1,13 @@
-%tr{:class => "#{cycle('rowWhite', 'rowBlue')}"}
+%tr{:class => "#{cycle('row-odd', 'row-even')}", :tags => "#{audit_annotation.tags_for}"}
   %td{:valign => "top", :align => 'center'}
     - if !audit_annotation.audited?
       = check_box_tag('selected_annotations[]', audit_annotation.id, true)
   %td{:valign => "top"}
     = geo_link(audit_annotation.geo_accession, true)
+    %br
+    = audit_annotation.field_name
   %td{:valign => "top"}
     = curate_link(audit_annotation)
-    = ncbo_ontology_link(audit_annotation.ontology_term)
   %td{:valign => "top"}
     .context
       = audit_annotation.in_context

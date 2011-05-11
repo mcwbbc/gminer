@@ -1,4 +1,4 @@
-%tr{:class => "#{cycle('rowWhite', 'rowBlue')}"}
+%tr{:class => "#{cycle('row-odd', 'row-even')}"}
   %td{:valign => "top"}
     = link_to(highlight(sample.geo_accession, @q), sample_url(sample))
   %td{:valign => "top"}

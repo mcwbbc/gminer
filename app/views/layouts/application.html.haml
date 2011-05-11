@@ -1,47 +1,37 @@
 !!!
-%html{:xmlns => "http://www.w3.org/1999/xhtml", "xml:lang" => "en", :lang => "en"}
+%html.no-js{:xmlns => "http://www.w3.org/1999/xhtml", "xml:lang" => "en", :lang => "en"}
   %head
+    = csrf_meta_tag
     %meta{ :content => "text/html; charset=iso-8859-1", "http-equiv" => "Content-Type" }
     %title
       = h(yield(:title) || "GMiner")
-    %script{ :src => "/javascripts/jquery.js", :type => "text/javascript" }
-    %script{ :src => "/javascripts/jquery.highlight-3.js", :type => "text/javascript" }
-    %script{ :src => "/javascripts/jquery.pagination.js", :type => "text/javascript" }
-    %script{ :src => "/javascripts/application.js", :type => "text/javascript" }
-    - admin_only do
-      %script{ :src => "/javascripts/ncbo-selection.js", :type => "text/javascript" }
-      %script{ :src => "/javascripts/ncbo-form-complete.js", :type => "text/javascript" }
-      %script{ :src => "/javascripts/jquery.contextMenu.js", :type => "text/javascript" }
-    %link{ :href => "/stylesheets/reset-fonts-grids.css", :rel => "stylesheet", :type => "text/css", :media => "screen", :charset => "utf-8" }
-    %link{ :href => "/stylesheets/base.css", :rel => "stylesheet", :type => "text/css", :media => "screen", :charset => "utf-8" }
-    %link{ :href => "/stylesheets/main.css", :rel => "stylesheet", :type => "text/css", :media => "screen", :charset => "utf-8" }
-    %link{ :href => "/stylesheets/boxes.css", :rel => "stylesheet", :type => "text/css", :media => "screen", :charset => "utf-8" }
-    %link{ :href => "/stylesheets/formtastic.css", :rel => "stylesheet", :type => "text/css", :media => "screen", :charset => "utf-8" }
-    %link{ :href => "/stylesheets/formtastic_changes.css", :rel => "stylesheet", :type => "text/css", :media => "screen", :charset => "utf-8" }
-    - admin_only do
-      %link{ :href => "/stylesheets/jquery.contextMenu.css", :rel => "stylesheet", :type => "text/css", :media => "screen", :charset => "utf-8" }
-    = yield :head
+    = yield(:head)
+    = render(:partial => "shared/tracking.html.haml") if Rails.env.production?
+    = render(:partial => "layouts/javascripts.html.haml")
+    = render(:partial => "layouts/css.html.haml")
   %body
-    - admin_only do
-      = render(:partial => "shared/annotation_counts", :locals => {:collection => @annotation_count_array}) if @annotation_count_array
-      = render(:partial => "shared/create_popup") if @new_annotation
-    = image_tag('layout/loading.gif', :id => "loading", :alt => "loading")
-    #doc3.yui-t3
-      #hd
-        - rounded_box('whitebox') do
-          = render(:partial => "shared/header")
-      #bd
-        #yui-main
-          .yui-b
-            - rounded_box('whitebox') do
-              #main
-                = flash_messages
-                = yield
-        .yui-b
-          - rounded_box('bluebox') do
-            = render(:partial => "shared/navigation")
-      #ft
-        = render(:partial => "shared/footer")
+    - if admin?
+      - if current_user.show_scoreboard?
+        #top-curators
+      = render(:partial => "shared/create_popup.html.haml") if @new_annotation
+      = render(:partial => "shared/right_click_menus.html.haml")
+    #header
+      = render(:partial => "shared/header.html.haml")
+    #content
+      .grid-container.main.rounded
+        #loading
+          = image_tag('layout/loading.gif', :alt => "Loading...")
+        .grid-container
+          .grid_4.alpha
+            #nav
+              = render(:partial => "shared/navigation.html.haml")
+          .grid_20.omega
+            #flash-messages
+              = raw(flash_messages)
+            = yield
+        .clear
+      .clear
+    #footer
+      = render(:partial => "shared/footer.html.haml")
     %iframe{ :src => "about:blank", :style => "height:0px;width:0px;visibility:hidden" }
       this frame prevents back forward cache
-    = render(:partial => "shared/tracking") if Rails.env.production?

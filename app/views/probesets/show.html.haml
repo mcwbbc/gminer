@@ -1,12 +1,13 @@
 = page_title("Probeset: #{@probeset.name}")
+= render(:partial => "probeset_information.html.haml", :locals => {:probeset => @probeset})
 = link_to('Back', probesets_url)
 %br
 %br
 - if !@chart_image.blank?
   %span.view-graph
-    View graph
-  .graph
-    = @chart_image
+    Toggle graph
+  = high_graph("probe_chart", @chart_image)
+  #probe_chart.bar-graph
 %br
 %br
 - if @term_array.any?

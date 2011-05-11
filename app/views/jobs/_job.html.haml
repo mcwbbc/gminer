@@ -1,8 +1,8 @@
-%tr{:class => "#{cycle('rowWhite', 'rowBlue')}"}
+%tr{:class => "#{cycle('row-odd', 'row-even')}"}
   %td{:valign => "top"}
     = geo_link(job.geo_accession)
   %td{:valign => "top"}
-    = job.field
+    = job.field_name
   %td{:valign => "top"}
     = job.ontology.name
   %td{:valign => "top"}

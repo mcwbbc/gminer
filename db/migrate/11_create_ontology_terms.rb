@@ -6,15 +6,12 @@ class CreateOntologyTerms < ActiveRecord::Migration
       t.string :ncbo_id, :limit => 100
       t.string :name, :limit => 255
       t.integer :annotations_count, :default => 0
+      t.timestamps
     end
 
     add_index(:ontology_terms, :term_id)
     add_index(:ontology_terms, :ncbo_id)
     add_index(:ontology_terms, :ontology_id)
-
-    add_foreign_key(:annotations, :ontology_terms, :dependent => :delete)
-    add_foreign_key(:annotation_closures, :ontology_terms, :dependent => :delete)
-    add_foreign_key(:results, :ontology_terms, :dependent => :delete)
 
   end
 
@@ -22,10 +19,6 @@ class CreateOntologyTerms < ActiveRecord::Migration
     remove_index(:ontology_terms, :term_id)
     remove_index(:ontology_terms, :ncbo_id)
     remove_index(:ontology_terms, :ontology_id)
-
-    remove_foreign_key(:ontology_terms, :results)
-    remove_foreign_key(:ontology_terms, :annotation_closures)
-    remove_foreign_key(:ontology_terms, :annotations)
 
     drop_table :ontology_terms
   end

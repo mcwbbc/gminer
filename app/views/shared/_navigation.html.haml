@@ -1,38 +1,49 @@
-#navigation
-  = link_to("Home", "/")
-  %br
-  = link_to("Help", help_url)
-  #user
-    = signin_signout
+%h2
+  GEO Records
+%ul.nav
+  %li
+    = link_to("Platforms", platforms_url)
+  %li
+    = link_to("Samples", samples_url)
+  %li
+    = link_to("Series", series_items_url)
+  %li
+    = link_to("Datasets", datasets_url)
+%h2
+  View Data
+%ul.nav
+  %li
+    = link_to("Ontologies", ontologies_url)
+  %li
+    = link_to("Ontology Terms", ontology_terms_url)
+  %li
+    = link_to("Annotations", annotations_url)
+  %li
+    = link_to("Annotation Cloud", cloud_annotations_url)
+  %li
+    = link_to("Probesets", probesets_url)
+%h2
+  Downloads
+%ul.nav
+  %li
+    = link_to("RDF", rdf_url)
+- if admin?
   %h2
-    Views
-  %ul
+    Administration
+  %ul.nav
     %li
-      = link_to("Platforms", platforms_url)
+      = link_to("Annotations - Audit", audit_annotations_url)
     %li
-      = link_to("Samples", samples_url)
+      = link_to("Annotations - Audit GEO", item_audit_annotations_url)
     %li
-      = link_to("Series", series_items_url)
+      = link_to("Resource Index Annotations", resource_index_annotations_url)
     %li
-      = link_to("Datasets", datasets_url)
+      = link_to("Jobs", jobs_url)
     %li
-      = link_to("Ontologies", ontologies_url)
+      = link_to("Reports", reports_url)
     %li
-      = link_to("Ontology Terms", ontology_terms_url)
-    %li
-      = link_to("Annotations", annotations_url)
-    - admin_only do
-      %li
-        = link_to("Annotations - Audit", audit_annotations_url)
-    %li
-      = link_to("Annotation Cloud", cloud_annotations_url)
-    %li
-      = link_to("Probesets", probesets_url)
-    - admin_only do
-      %li
-        = link_to("Jobs", jobs_url)
+      = link_to("Tags", tags_url)
 //    %li
 //      = link_to("Detections", detections_url)
 //    %li
 //      = link_to("Results", results_url)
-%div

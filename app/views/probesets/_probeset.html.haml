@@ -1,5 +1,9 @@
-%tr{:class => "#{cycle('rowWhite', 'rowBlue')}"}
+%tr{:class => "#{cycle('row-odd', 'row-even')}"}
   %td{:valign => "top"}
     = link_to(probeset.name, probeset_url(probeset))
+  %td{:valign => "top"}
+    = probeset_rgd_gene_link(probeset.rgd_gene)
+  %td{:valign => "top"}
+    = probeset_symbol(probeset.symbol)
   %td{:valign => "top"}
     = probeset_platform_links(@platform_hash[probeset.id])

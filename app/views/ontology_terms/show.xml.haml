@@ -6,7 +6,5 @@
   %ncbo_term_id= @ontology_term.term_id
   %ontology_term_id= @ontology_term.term_id.split("|").last
   %annotations
-    - @direct_geo.keys.each do |accession|
-      %annotation
-        %geo_accession= accession
-        %description= @direct_geo[accession]
+    = render(:partial => "ontology_terms/annotation.xml.haml", :collection => @direct_geo, :locals => {:source => 'direct'})
+    = render(:partial => "ontology_terms/annotation.xml.haml", :collection => @closure_geo, :locals => {:source => 'closure'})

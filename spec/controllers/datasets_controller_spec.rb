@@ -1,10 +1,10 @@
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+require 'spec_helper'
 
 describe DatasetsController do
 
   describe "handling GET /datasets" do
     before(:each) do
-      dataset = Dataset.spawn
+      dataset = Factory.build(:dataset)
       @datasets = [dataset]
       @datasets.stub!(:total_pages).and_return(1)
       Dataset.stub!(:page).and_return(@datasets)
@@ -33,10 +33,10 @@ describe DatasetsController do
 
   describe "GET show" do
     it "assigns the requested dataset as @dataset" do
-      user = User.spawn(:id => "1")
-      controller.should_receive(:admin_logged_in?).and_return(true)
+      user = Factory.build(:user, {:id => 1})
+      controller.should_receive(:admin?).and_return(true)
       controller.should_receive(:current_user).and_return(user)
-      dataset = Dataset.spawn
+      dataset = Factory.build(:dataset)
       Dataset.stub!(:first).with(:conditions => {:geo_accession => "GDS1234"}).and_return(dataset)
       Annotation.should_receive(:for_item).with(dataset, user.id)
       dataset.should_receive(:prev_next).and_return(["GDS1", "GDS3"])

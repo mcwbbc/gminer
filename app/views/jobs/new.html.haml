@@ -1,9 +1,8 @@
 - title t('.title')
 = page_title(t('.title'))
 %br
-- semantic_form_for(@job) do |f|
-  = f.error_messages
-  = render(:partial => "jobs/form", :object => f)
-  - f.buttons do
-    = f.commit_button t('label.save')
-    = f.commit_button t('label.cancel')
+= simple_form_for(@job) do |f|
+  = error_messages_for(@job)
+  = render(:partial => "jobs/form.html.haml", :object => f)
+  = f.submit(t('label.save'))
+  = f.submit(t('label.cancel'))

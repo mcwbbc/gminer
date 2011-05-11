@@ -1,5 +1,7 @@
 class ResultsController < ApplicationController
 
+  before_filter :admin_required
+
   def index
     @q = params[:query]
     page = (params[:page].to_i > 0) ? params[:page] : 1

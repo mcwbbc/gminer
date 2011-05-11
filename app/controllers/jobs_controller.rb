@@ -1,7 +1,7 @@
 class JobsController < ApplicationController
 
   before_filter :check_cancel, :only => [:create, :update]
-  before_filter :admin_required
+  before_filter :admin_required, :except => [:status]
 
   def index
     create_status_dropdown
@@ -29,20 +29,47 @@ class JobsController < ApplicationController
     end
   end
 
-  def statistics
-    @results_hash = Job.get_statistics
-  end
-
   def new
-    @job = Job.new
+    ontology = Ontology.first
+    geo_type = Constants::GEO_TYPES.first
+    @job = Job.new(:geo_type => geo_type, :ontology => ontology)
+    @fields = @job.get_fields
   end
 
   def create
+    job = Job.new(params[:job])
+    fields = params[:fields] || []
+
+    fields.each do |field_name|
+      job.geo_item_model.find_in_batches(:select => "id, geo_accession") do |group|
+        group.each do |geo_item|
+          Job.create_for(geo_item.geo_accession, job.ontology_id, field_name)
+        end
+      end
+    end
+
     flash[:notice] = "Jobs have been created."
     redirect_to(jobs_url)
   end
 
+  def update_job_form
+    job = Job.new(params[:job])
+    @fields = job.get_fields
+    render(:partial => "jobs/geo_type.html.haml")
+  end
+
+  def dashboard
+  end
+
+  def graph_status
+    pending_count = Job.pending_count
+    active_count = Job.active_count
+    worker_count = Worker.count
+    render(:json => {'pending' => pending_count, 'active' => active_count, 'workers' => worker_count}.to_json)
+  end
+
   protected
+
     def find_jobs(conditions, page)
       @jobs = Job.page(conditions, page, Constants::PER_PAGE)
     end

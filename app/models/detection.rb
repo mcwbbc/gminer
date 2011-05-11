@@ -7,9 +7,9 @@ class Detection < ActiveRecord::Base
   belongs_to :sample
   belongs_to :probeset
 
-  named_scope :present, :conditions => {:abs_call => 'P'}
-  named_scope :absent, :conditions => {:abs_call => 'A'}
-  named_scope :marginal, :conditions => {:abs_call => 'M'}
+  scope :present, :conditions => {:abs_call => 'P'}
+  scope :absent, :conditions => {:abs_call => 'A'}
+  scope :marginal, :conditions => {:abs_call => 'M'}
 
   class << self
     def page(conditions, page=1, size=Constants::PER_PAGE)
@@ -20,6 +20,10 @@ class Detection < ActiveRecord::Base
                :per_page => size
                )
     end
+  end
+
+  def to_param
+    "#{sample_id}-#{probeset_id}"
   end
 
 

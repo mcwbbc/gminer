@@ -12,8 +12,8 @@ describe ProbesetsHelper do
 
   describe "probeset_platform_links" do
     it "should return a string of links concatinated by <br /> tags" do
-      p1 = Platform.spawn
-      p2 = Platform.spawn(:geo_accession => "GPL1", :title => "title")
+      p1 = Factory.build(:platform)
+      p2 = Factory.build(:platform, :geo_accession => "GPL1", :title => "title")
       helper.probeset_platform_links([p1, p2]).should == "<a href=\"http://test.host/platforms/GPL1355\" target=\"\">GPL1355</a> - Platform Title<br /><a href=\"http://test.host/platforms/GPL1\" target=\"\">GPL1</a> - title"
     end
   end

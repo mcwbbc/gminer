@@ -1,10 +1,13 @@
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+require 'spec_helper'
 
 describe ResultsController do
+  before(:each) do
+    controller.stub!(:admin_required).and_return(true)
+  end
 
   describe "handling GET /results" do
     before(:each) do
-      result = Result.spawn
+      result = Factory.build(:result)
       @results = [result]
       @results.stub!(:total_pages).and_return(1)
       Result.stub!(:page).and_return(@results)
@@ -33,7 +36,7 @@ describe ResultsController do
 
   describe "GET show" do
     it "assigns the requested result as @result" do
-      result = Result.spawn
+      result = Factory.build(:result)
       Result.stub!(:find).with("1").and_return(result)
       get :show, :id => "1"
       assigns[:result].should equal(result)

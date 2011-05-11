@@ -1,4 +1,4 @@
-%tr{:class => "#{cycle('rowWhite', 'rowBlue')}"}
+%tr{:class => "#{cycle('row-odd', 'row-even')}"}
   %td{:valign => "top"}
     = link_to(ontology_term[:term].name, ontology_term_url(ontology_term[:term]))
   %td{:valign => "top"}
@@ -14,3 +14,5 @@
     = ontology_term[:total_count]
   %td{:valign => "top"}
     = formatted_percent(ontology_term[:present_count], ontology_term[:total_count])
+  %td{:valign => "top"}
+    = link_to("Compare", compare_probeset_url(@probeset.name, :ontology_term_id => ontology_term[:term]))

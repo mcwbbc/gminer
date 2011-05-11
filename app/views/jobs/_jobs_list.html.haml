@@ -10,21 +10,16 @@
   %br
   %table{:width => "100%", :border => "0", :cellpadding => "0", :cellspacing => "2"}
     %thead
-      %tr.rowHeader
+      %tr.row-header
         %td{:width => "10%"}
-          %b
-            GEO accession
+          GEO accession
         %td{:width => "10%"}
-          %b
-            Field
+          Field
         %td{:width => "30%"}
-          %b
-            Ontology
+          Ontology
         %td{:width => "25%"}
-          %b
-            Started at
+          Started at
         %td{:width => "25%"}
-          %b
-            Finished at
+          Finished at
     %tbody#staffTable
       = render(:partial => "job", :collection => @jobs)

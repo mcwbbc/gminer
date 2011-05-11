@@ -1,8 +1,7 @@
 - title t('.title')
 = page_title(t('.title'))
-- semantic_form_for(@ontology) do |f|
-  = f.error_messages
+= simple_form_for(@ontology) do |f|
+  = error_messages_for(@ontology)
   = render(:partial => "ontologies/form", :object => f)
-  - f.buttons do
-    = f.commit_button t('label.update')
-    = f.commit_button t('label.cancel')
+  = f.submit(t('label.update'))
+  = f.submit(t('label.cancel'))

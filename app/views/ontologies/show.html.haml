@@ -1,26 +1,10 @@
 = page_title("Ontology: #{@ontology.name}")
 %br
 = link_to('Back', ontologies_url)
-%br
-%br
-== Has #{@ontology.ontology_terms.size} ontology terms.
-%br
-%br
-%table.paginated{:width => "100%", :border => "0", :cellpadding => "0", :cellspacing => "2"}
-  %thead
-    %tr.rowHeader
-      %td{:width => "40%"}
-        %b
-          Ontology term
-      %td{:width => "20%"}
-        %b
-          Annotation count
-      - admin_only do
-        %td{:width => "20%"}
-          %b
-            Valid
-        %td{:width => "20%"}
-          %b
-            Audited
-  %tbody#dataTable
-    = render(:partial => "term", :collection => @ontology.ontology_terms)
+%p
+  %form{:name => "sform", :action => "", :style => "display:inline"}
+    %label
+      Filter on name:
+    = text_field_tag(:query, params['query'], :autocomplete => 'off')
+.dataTable
+  = render(:partial => "ontology_term_list.html.haml")

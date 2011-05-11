@@ -1,8 +1,12 @@
+= render(:partial => "shared/admin_box.html.haml", :locals => {:annotation_count_array => @annotation_count_array, :geo_item => @dataset, :top_tags => @top_tags, :all_tags => @all_tags})
 = render(:partial => "shared/show_page_title", :locals => {:title => "Dataset", :geo_accession => @dataset.geo_accession})
 = link_to('Back', datasets_url)
 %br
 %br
 = render(:partial => "shared/children", :locals => {:title => "Platform", :items => [@dataset.platform]}) if @dataset.platform
 = render(:partial => "shared/children", :locals => {:title => "Series", :items => [@dataset.series_item]}) if @dataset.series_item
+= render(:partial => "shared/cytoscape.html.haml", :locals => {:item => @dataset}) if current_user && current_user.show_cytoscape?
 #annotations-table
   = render(:partial => "shared/annotations_table", :locals => {:item => @dataset})
+- if admin?
+  = render(:partial => "resource_index_annotations/show.html.haml")

@@ -2,7 +2,7 @@ class CreateClosureAnnotationsJob < Struct.new(:annotation_id)
 
   def perform
     annotation = Annotation.find(annotation_id)
-    create_for(annotation, annotation.ontology_term.name, annotation.ncbo_id, [Constants::STOPWORDS, annotation.ontology_term.ontology.stopwords].join(","), annotation.ontology_term.ontology.expand_ontologies, "jfgeiger@mcw.edu")
+    create_for(annotation, annotation.ontology_term.name, annotation.ncbo_id, [Constants::STOPWORDS, annotation.ontology_term.ontology.stopwords].join(","), annotation.ontology_term.ontology.expand_ontologies, "email@mcw.edu")
   end
 
   def create_for(annotation, field_value, ncbo_id, stopwords, expand_ontologies, email)

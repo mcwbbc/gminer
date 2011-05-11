@@ -61,8 +61,23 @@ class OntologiesController < ApplicationController
   def show
     @ontology = Ontology.find(params[:id])
 
+    page = (params[:page].to_i > 0) ? params[:page].to_i : 1
+
+    @q = params[:query]
+    q_front = "#{@q}%"
+
+    cstring = "ontology_id = ? AND name LIKE ?"
+    conditions = [cstring, @ontology.id, q_front]
+
+    find_ontology_terms(conditions, page)
+    #if we have a page > the last one, redo the query turning the page into the last one
+    find_ontology_terms(conditions, @ontology_terms.total_pages) if params[:page].to_i > @ontology_terms.total_pages
+
     respond_to do |format|
-      format.html
+      format.html {}
+      format.js  {
+          render(:partial => "ontology_term_list.html.haml")
+        }
     end
 
     rescue ActiveRecord::RecordNotFound
@@ -73,6 +88,10 @@ class OntologiesController < ApplicationController
   protected
     def find_ontologies(conditions, page)
       @ontologies = Ontology.page(conditions, page, Constants::PER_PAGE)
+    end
+
+    def find_ontology_terms(conditions, page)
+      @ontology_terms = OntologyTerm.page_for_ontology(conditions, page, Constants::PER_PAGE)
     end
 
     def check_cancel

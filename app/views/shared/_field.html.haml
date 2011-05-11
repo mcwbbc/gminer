@@ -5,8 +5,5 @@
     %td
       %span{ :id => field[:name] }
         = field[:value]
-- if item.annotations_for(field[:name]).any?
-  %tr
-    %td
-    %td
-      = annotations_for(item, field[:name])
+      .annotation-table(id="table-#{field[:name]}")
+        = annotations_for(item, field[:name])

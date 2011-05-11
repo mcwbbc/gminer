@@ -1,5 +1,5 @@
 // views/annotations/cloud.js.haml
-== $("#annotations").html("#{escape_javascript(render(:partial => 'annotations'))}");
-== $("#terms").html("#{escape_javascript(render(:partial => "cloud", :locals => {:title => "Anatomy terms", :terms => @anatomy_terms}))}");
-== $("#strains").html("#{escape_javascript(render(:partial => "cloud", :locals => {:title => "Rat Strains", :terms => @rat_strain_terms}))}");
+== $("#annotations").html("#{escape_javascript(render(:partial => 'annotations.html.haml'))}");
+== $("#terms").html("#{escape_javascript(render(:partial => "cloud.html.haml", :locals => {:title => "Anatomy terms", :terms => @anatomy_terms}))}");
+== $("#strains").html("#{escape_javascript(render(:partial => "cloud.html.haml", :locals => {:title => "Rat Strains", :terms => @rat_strain_terms}))}");
 == $(".cloud-box-content").allMatchTallestHeight();

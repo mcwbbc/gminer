@@ -1,5 +1,7 @@
 class DetectionsController < ApplicationController
 
+  before_filter :admin_required
+
   def index
     @q = params[:query]
     page = (params[:page].to_i > 0) ? params[:page] : 1
@@ -20,7 +22,8 @@ class DetectionsController < ApplicationController
   end
 
   def show
-    @detection = Detection.find(params[:id])
+    sid, psid = params[:id].split("-")
+    @detection = Detection.first(:conditions => {:probeset_id => psid, :sample_id => sid})
 
     respond_to do |format|
       format.html

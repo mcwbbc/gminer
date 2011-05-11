@@ -1,6 +1,12 @@
-%tr{:class => "#{cycle('rowWhite', 'rowBlue')}"}
+%tr{:class => "#{cycle('row-odd', 'row-even')}"}
   %td{:valign => "top"}
     = link_to(highlight(platform.geo_accession, @q), platform_url(platform))
+    - if admin?
+      .box{:geo_accession => platform.geo_accession}
+        .skip-annotations.annotation-status{:status => 'skip'}
+          Skip
+        .include-annotations.annotation-status{:status => 'unaudited'}
+          Include
   %td{:valign => "top"}
     = highlight(platform.organism, @q)
   %td{:valign => "top"}

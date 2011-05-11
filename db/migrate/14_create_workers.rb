@@ -4,6 +4,7 @@ class CreateWorkers < ActiveRecord::Migration
       t.string :worker_key, :limit => 50
       t.boolean :ready, :default => false
       t.boolean :working, :default => false
+      t.datetime :updated_at
     end
 
     add_index(:workers, :worker_key)

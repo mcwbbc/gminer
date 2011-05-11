@@ -1,32 +1,15 @@
 namespace :distribute do
 
-  desc "Run the scheduler"
-  task(:scheduler, :workers, :needs => :environment) do |t, args| 
-    workers = args[:workers] ? args[:workers] : 5
-    scheduler = Scheduler.new
-    scheduler.run(workers)
-  end
-
-  desc "Run the processor"
-  task(:processor, :needs => :environment) do |t, args|  
-    processor = Processor.new
-    processor.run
-  end
-
-  desc "Run the databaser"
-  task(:databaser, :needs => :environment) do |t, args|  
-    databaser = Databaser.new
-    databaser.run
-  end
-
   desc "Setup rabbitmq vhost/users"
-  task(:config, :needs => :environment) do |t, args|  
-    puts `sudo rabbitmqctl add_vhost /gminer`
+  task(:config => :environment) do
+    environment = ENV['RAILS_ENV'] || 'development'
+    puts "environment: #{environment}"
+    puts `rabbitmqctl add_vhost /gminer-#{environment}`
     # create 'gminer' user, give them each the password 'gminer'
     %w[gminer].each do |agent|
-      puts `sudo rabbitmqctl add_user #{agent} gminer`
+      puts `rabbitmqctl add_user #{agent} gminer`
     end
-    puts `sudo rabbitmqctl set_permissions -p /gminer gminer ".*" ".*" ".*"`
+    puts `rabbitmqctl set_permissions -p /gminer-#{environment} gminer ".*" ".*" ".*"`
   end
 
 end

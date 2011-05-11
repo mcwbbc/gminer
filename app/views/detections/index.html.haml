@@ -4,5 +4,5 @@
     %label
       Filter on probeset id:
     = text_field_tag(:query, params['query'], :autocomplete => 'off')
-#dataTable
+.dataTable
   = render(:partial => "detections_list")

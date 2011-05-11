@@ -13,6 +13,7 @@
             Ontology:
         %td
           = ontology_search_dropdown(@current)
+      %tr
         %td{:align => 'right'}
           %label
             Annotation Status:
@@ -23,6 +24,16 @@
           GEO item type:
         %td
           = annotation_geotype_dropdown(@geotype)
+      %tr
+        %td{:align => 'right'}
+          %label
+            Has predicate:
+        %td
+          = has_predicate_dropdown(@has_predicate)
+        %td
+        %td
+          %button#refresh
+            Refresh
 
-#dataTable
-  = render(:partial => "audit_list")
+.dataTable
+  = render(:partial => "audit_list.html.haml")

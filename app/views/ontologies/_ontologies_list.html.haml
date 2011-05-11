@@ -6,23 +6,19 @@
   %p
     = found_count("ontologies", @ontologies)
   %p
-    = render(:partial => "shared/pagination", :locals => {:items => @ontologies})
+    = render(:partial => "shared/pagination.html.haml", :locals => {:items => @ontologies})
   %br
   %table{:width => "100%", :border => "0", :cellpadding => "0", :cellspacing => "2"}
     %thead
-      %tr.rowHeader
-        %td{:width => "40%"}
-          %b
-            Name
+      %tr.row-header
+        %td{:width => "30%"}
+          Name
         %td{:width => "10%"}
-          %b
-            Version
-        - admin_only do
-          %td{:width => "40%"}
-            %b
-              Stopwords
+          Version
+        - if admin?
+          %td{:width => "50%"}
+            Stopwords
           %td{:width => "10%"}
-            %b
-              Action
+            Action
     %tbody#staffTable
-      = render(:partial => "ontology", :collection => @ontologies)
+      = render(:partial => "ontology.html.haml", :collection => @ontologies)

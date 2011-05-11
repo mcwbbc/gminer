@@ -4,9 +4,9 @@ describe Probeset do
 
   describe "generate_platform_hash" do
     it "should return a hash of platforms based on the supplied probesets" do
-      p = Probeset.spawn
-      p1 = Platform.spawn
-      Platform.should_receive(:for_probeset).with(p.name).and_return([p1])
+      p = Factory.build(:probeset)
+      p1 = Factory.build(:platform)
+      Gminer::Platform.should_receive(:for_probeset).with(p.name).and_return([p1])
       Probeset.generate_platform_hash([p]).should == {p.id => [p1]}
     end
   end
@@ -21,7 +21,7 @@ describe Probeset do
   describe "to_param" do
     {"1234_at" => "1234_at", "AFFX-18SRNAMur/X00686_3_at" => "AFFX-18SRNAMur%5CX00686_3_at", "name space" => "name+space"}.each do |name, encoded|
       it "should return the url encoded name as the param for #{name}" do
-        p = Probeset.spawn(:name => name)
+        p = Factory.build(:probeset, :name => name)
         p.to_param.should == encoded
       end
     end
@@ -29,31 +29,40 @@ describe Probeset do
 
   describe "ontology_term_hash" do
     it "should return a hash with terms and counts" do
-      p = Probeset.spawn
-      ot = OntologyTerm.spawn(:annotations_count => 5)
+      p = Factory.build(:probeset)
+      ot = Factory.build(:ontology_term, :annotations_count => 5)
       ot.should_receive(:found_count).and_return(5)
-      OntologyTerm.should_receive(:find).with(:all, :select => "ontology_terms.*, count(ontology_terms.id) AS found_count", :joins => "INNER JOIN annotations ON ontology_terms.id = annotations.ontology_term_id INNER JOIN samples ON annotations.geo_accession = samples.geo_accession INNER JOIN detections ON detections.sample_id = samples.id INNER JOIN probesets ON detections.probeset_id = probesets.id AND probesets.id = #{p.id} AND detections.abs_call = 'P' AND annotations.ncbo_id = '1000' AND annotations.verified = 1", :group  => "ontology_terms.id", :order  => "ontology_terms.name").and_return([ot])
-      OntologyTerm.should_receive(:count_for_probeset).with(ot.id, p.id, '1000').and_return(5)
+      OntologyTerm.should_receive(:find).with(:all, :select => "ontology_terms.*, count(DISTINCT(samples.id)) AS found_count", :joins => "INNER JOIN annotations ON ontology_terms.id = annotations.ontology_term_id INNER JOIN samples ON annotations.geo_accession = samples.geo_accession INNER JOIN detections ON detections.sample_id = samples.id INNER JOIN probesets ON detections.probeset_id = probesets.id AND probesets.id = #{p.id} AND detections.abs_call = 'P' AND annotations.ncbo_id = '1000' AND annotations.verified = 1", :group  => "ontology_terms.id", :order  => "ontology_terms.name").and_return([ot])
+      Sample.should_receive(:count_for_probeset).with(ot.id, p.id).and_return(5)
       p.ontology_term_hash('1000', 'P').should == {ot.term_id => {:term => ot, :found_count => 5, :total_count => 5}}
     end
   end
 
-  describe "generate_gooogle_chart" do
+  describe "generate_google_chart" do
     it "should call the Graph and generate" do
-      p = Probeset.spawn
+      p = Factory.build(:probeset)
       graph = Graph.new([])
       Graph.should_receive(:new).with(["array"]).and_return(graph)
       graph.should_receive(:generate).and_return("image")
-      p.generate_gooogle_chart(["array"]).should == "image"
+      p.generate_google_chart(["array"]).should == "image"
+    end
+  end
+
+  describe "generate_high_chart" do
+    it "should call the Chart and generate" do
+      p = Factory.build(:probeset)
+      graph = Graph.new([])
+      Graph.should_receive(:new).and_return(graph)
+      p.generate_high_chart(["array"]).should == graph
     end
   end
 
   describe "generate_term_array" do
     before(:each) do
-      @p = Probeset.spawn
-      @term1 = OntologyTerm.spawn
-      @term2 = OntologyTerm.spawn
-      @term3 = OntologyTerm.spawn
+      @p = Factory.build(:probeset)
+      @term1 = Factory.build(:ontology_term)
+      @term2 = Factory.build(:ontology_term)
+      @term3 = Factory.build(:ontology_term)
     end
 
     it "should return a hash with the terms, counts, and totals seperated" do

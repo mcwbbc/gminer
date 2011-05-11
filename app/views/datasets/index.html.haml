@@ -1,10 +1,9 @@
-- admin_only do
-  = render(:partial => "shared/annotation_counts", :locals => {:collection => @annotation_count_array})
+= render(:partial => "shared/admin_box.html.haml", :locals => {:annotation_count_array => @annotation_count_array})
 = page_title("Datasets")
 %p
   %form{:name => "sform", :action => "", :style => "display:inline"}
     %label
       Filter on GEO accession or title:
     = text_field_tag(:query, params['query'], :autocomplete => 'off')
-#dataTable
+.dataTable
   = render(:partial => "datasets_list")

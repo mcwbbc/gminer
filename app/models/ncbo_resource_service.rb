@@ -32,7 +32,7 @@ class NcboResourceService
     def get_data(term_ids)
       retried = false
       parameters = {
-        "email" => 'jfgeiger@mcw.edu',
+        "email" => 'email@mcw.edu',
         "applicationid" => 'GMiner',
         "conceptids" => term_ids,
         "isVirtualOntologyId" => "true",

@@ -1,17 +1,18 @@
 %h3
-  = cloud_sample_count(@annotation_hash.size, @sample_count)
-- if @annotation_hash.any?
-  %table.paginated{ :cellspacing => "2", :border => "0", :width => "100%", :cellpadding => "0"}
+  = cloud_sample_count(@total_count)
+%br
+- if @annotations.any?
+  = render(:partial => "shared/pagination", :locals => {:items => @annotations, :klass => 'cloud_pagination', :limit => false})
+  %br
+  %table{ :cellspacing => "2", :border => "0", :width => "100%", :cellpadding => "0"}
     %thead
-      %tr.rowHeader
+      %tr.row-header
         %td{ :width => "20%" }
           GEO accession
         %td{ :width => "80%" }
           Description
-    %tbody#dataTable
-      = render(:partial => "short_annotation", :collection => @annotation_hash.keys.sort)
+    %tbody.dataTable
+      = render(:partial => "short_annotation.html.haml", :collection => @annotations)
   %br{:clear => "all"}
-- elsif (@sample_count < 0)
-  Please select a term to begin filtering.
 - else
-  No Results. Please update the filters.
+  Please select a term to begin filtering.

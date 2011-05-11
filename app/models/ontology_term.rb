@@ -1,39 +1,54 @@
 class OntologyTerm < ActiveRecord::Base
 
   belongs_to :ontology
-  has_many :annotations, :order => :geo_accession#, :dependent => :destroy
-  has_many :annotation_closures, :include => :annotation, :order => "annotations.geo_accession"#, :dependent => :destroy
+  has_many :annotations, :dependent => :delete_all, :order => :geo_accession#, :dependent => :destroy
+  has_many :annotation_closures, :dependent => :delete_all, :include => :annotation, :order => "annotations.geo_accession"#, :dependent => :destroy
+
+  has_many :valid_annotations, :class_name => "Annotation", :conditions => {:verified => true}, :order => :geo_accession#, :dependent => :destroy
+  has_many :valid_annotation_closures, :class_name => "AnnotationClosure", :conditions => ['annotations.verified = ?', true], :include => :annotation, :order => "annotations.geo_accession"#, :dependent => :destroy
 
 #  has n, :results, :foreign_key => :ontology_term_id#, :order => :sample_geo_accession, :dependent => :destroy # they exist, but don't associate in case of lazy load
 
   class << self
+
+    def for_samples(sample_array)
+      joins = "INNER JOIN annotations ON ontology_terms.id = annotations.ontology_term_id"
+      find(:all,
+        :select => 'ontology_terms.name, ontology_terms.term_id, count(distinct(annotations.geo_accession)) as term_count',
+        :joins => joins,
+        :conditions => ["annotations.geo_accession IN (?) AND annotations.verified = 1", sample_array],
+        :group => "ontology_terms.term_id",
+        :order => 'term_count DESC, ontology_terms.name'
+      )
+    end
+
     def page(conditions, page=1, size=Constants::PER_PAGE)
-      paginate(:order => [:name],
+      join = "INNER JOIN annotations ON ontology_terms.id = annotations.ontology_term_id AND annotations.verified = 1"
+      paginate(:order => 'name',
+               :conditions => conditions,
+               :joins => join,
+               :group => 'annotations.term_id',
+               :page => page,
+               :per_page => size
+               )
+    end
+
+    def page_for_ontology(conditions, page=1, size=Constants::PER_PAGE)
+      paginate(:order => "annotations_count DESC, name",
                :conditions => conditions,
                :page => page,
                :per_page => size
                )
     end
 
-    def cloud(options = {})
-      query = "SELECT ontology_terms.*"
-      query << " FROM ontology_terms, ontologies, annotations"
-      query << " WHERE ontology_terms.annotations_count > 0"
-      query << " AND annotations.verified = 1 AND annotations.ontology_term_id = ontology_terms.id" if !options[:invalid]
-      query << " AND ontology_terms.ncbo_id = ontologies.ncbo_id AND ontologies.ncbo_id = '#{options[:ontology_ncbo_id]}'" if options[:ontology_ncbo_id]
-      query << " GROUP BY ontology_terms.name"
-      query << " ORDER BY ontology_terms.annotations_count DESC, ontology_terms.name"
-      query << " LIMIT #{options[:limit]}" if options[:limit] != nil
-      cloud = OntologyTerm.find_by_sql(query)
+    def cloud_term_ids(options = {})
+      order = options[:limit] ? 'annotations_count DESC' : 'name'
+      join = "INNER JOIN annotations ON ontology_terms.id = annotations.ontology_term_id AND annotations.verified = 1"
+      join << " AND ontology_terms.ncbo_id = '#{options[:ontology_ncbo_id]}'" if options[:ontology_ncbo_id]
+      join << " AND annotations.geo_accession IN (#{options[:geo_term_array].to_in_query_string})" if options[:geo_term_array]
+      find(:all, :select => 'ontology_terms.term_id, ontology_terms.name, count(DISTINCT geo_accession) AS annotations_count', :joins => join, :order => order, :group => 'ontology_terms.term_id', :limit => options[:limit])
     end
-
-    def count_for_probeset(term_id, probeset_id, ncbo_id)
-      count(
-        :joins => "INNER JOIN annotations ON ontology_terms.id = annotations.ontology_term_id INNER JOIN samples ON annotations.geo_accession = samples.geo_accession INNER JOIN detections ON detections.sample_id = samples.id INNER JOIN probesets ON detections.probeset_id = probesets.id AND ontology_terms.id = #{term_id} AND probesets.id = #{probeset_id} AND annotations.ncbo_id = '#{ncbo_id}' AND annotations.verified = 1"
-      )
-    end
-
-  end
+  end # of self
 
   def to_param
     self.term_id
@@ -64,15 +79,15 @@ class OntologyTerm < ActiveRecord::Base
   end
 
   def audited_annotation_count
-    Annotation.count(:conditions => {:ontology_term_id => self.id, :audited => true})
+    Annotation.count(:conditions => {:ontology_term_id => self.id, :status => 'audited'})
   end
 
   def direct_geo_references
-    annotations.inject([]) { |array, a| array << {:geo_accession => a.geo_accession, :description => a.description}; array }
+    valid_annotations.inject([]) { |array, a| array << {:geo_accession => a.geo_accession, :description => a.description}; array }.uniq
   end
 
   def closure_geo_references
-    annotation_closures.inject([]) { |array, ac| array << {:geo_accession => ac.annotation.geo_accession, :description => ac.annotation.description}; array }
+    valid_annotation_closures.inject([]) { |array, ac| array << {:geo_accession => ac.annotation.geo_accession, :description => ac.annotation.description}; array }.uniq
   end
 
   def parent_closures
@@ -94,6 +109,14 @@ class OntologyTerm < ActiveRecord::Base
     terms.uniq
   end
 
+  def geo_counts
+    [["GPL", "Platform"], ["GDS", "Dataset"], ["GSE", "Series"], ["GSM", "Sample"]].inject([]) do |array, geo|
+      count = annotations.count('geo_accession', :distinct => true, :conditions => ['geo_accession LIKE ? AND verified = ?', "#{geo[0]}%", true])
+      array << [geo[1], count] if count > 0
+      array
+    end
+  end
+
   def link_item(key)
     case key
       when /^GSM/
@@ -105,7 +128,7 @@ class OntologyTerm < ActiveRecord::Base
       when /^GDS/
         m = "datasets"
     end
-    "<a href='/#{m}/#{key}'>#{key}</a>"
+    "<a href='/#{m}/#{key}'>#{key}</a>".html_safe
   end
 
 end

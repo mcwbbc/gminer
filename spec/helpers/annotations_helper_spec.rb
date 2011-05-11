@@ -1,4 +1,4 @@
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+require 'spec_helper'
 
 describe AnnotationsHelper do
 
@@ -10,7 +10,7 @@ describe AnnotationsHelper do
 
   describe "ontology_search_dropdown" do
     it "should return a select tag" do
-      ontology = Ontology.spawn
+      ontology = Factory.build(:ontology)
       Ontology.should_receive(:which_have_annotations).and_return([ontology])
       helper.ontology_search_dropdown("").should == "<select id=\"ddown\" name=\"ddown\"><option value=\"1000\">mouse anatomy</option></select>"
     end
@@ -23,22 +23,32 @@ describe AnnotationsHelper do
   end
 
   describe "annotation_geotype_dropdown" do
-    it "should return a select tag" do
-      helper.annotation_geotype_dropdown("").should == "<select id=\"geotype\" name=\"geotype\"><option value=\"All\">All</option>\n<option value=\"Platform\">Platform</option>\n<option value=\"Dataset\">Dataset</option>\n<option value=\"Series\">Series</option>\n<option value=\"Sample\">Sample</option></select>"
+    describe "with ignore all" do
+      it "should return a select tag" do
+        helper.annotation_geotype_dropdown("", true).should == "<select id=\"geotype\" name=\"geotype\"><option value=\"Platform\">Platform</option>\n<option value=\"Dataset\">Dataset</option>\n<option value=\"Series\">Series</option>\n<option value=\"Sample\">Sample</option></select>"
+      end
+    end
+
+    describe "without ignore all" do
+      it "should return a select tag" do
+        helper.annotation_geotype_dropdown("").should == "<select id=\"geotype\" name=\"geotype\"><option value=\"All\">All</option>\n<option value=\"Platform\">Platform</option>\n<option value=\"Dataset\">Dataset</option>\n<option value=\"Series\">Series</option>\n<option value=\"Sample\">Sample</option></select>"
+      end
     end
   end
 
   describe "cloud_sample_count" do
-    it "should return a '' string if count < 0" do
-      helper.cloud_sample_count(50, -1).should == nil
-    end
+    describe "with 1 term" do
+      it "should return a '' string if count == 0" do
+        helper.cloud_sample_count(0).should == nil
+      end
 
-    it "should return a string with the count" do
-      helper.cloud_sample_count(50, 50).should == "Has annotations that reference 50 GEO accession IDs."
-    end
+      it "should return a string with the count" do
+        helper.cloud_sample_count(50).should == "annotations reference 50 GEO records."
+      end
 
-    it "should add that it only returned the first 100 rows" do
-      helper.cloud_sample_count(100, 200).should == "Has annotations that reference 200 GEO accession IDs. Limited to the first 100 records."
+      it "should return a string with the count of one" do
+        helper.cloud_sample_count(1).should == "annotations reference 1 GEO record."
+      end
     end
   end
 

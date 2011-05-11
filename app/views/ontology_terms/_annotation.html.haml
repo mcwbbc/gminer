@@ -1,5 +1,5 @@
-%tr{:class => "#{cycle('rowWhite', 'rowBlue')}"}
+%tr{:class => "#{cycle('row-odd', 'row-even')}"}
   %td{:valign => "top"}
-    = geo_link(annotation[:geo_accession])
+    = geo_link(defined?(annotation.annotation) ? annotation.annotation.geo_accession : annotation.geo_accession)
   %td{:valign => "top"}
-    = annotation[:description]
+    = defined?(annotation.annotation) ? annotation.annotation.description : annotation.description

@@ -1,40 +1,38 @@
 - title t('.title')
 = page_title(t('.title'))
-= link_to t('link.edit'), edit_account_path
-%p
-%p
-  %b
-    = User.human_attribute_name('email')
-    \:
-  = h @user.email
-- admin_only do
-  %p
-    %b
-      = User.human_attribute_name('login_count')
-      \:
-    = h @user.login_count
-  %p
-    %b
-      = User.human_attribute_name('last_request_at')
-      \:
-    = h @user.last_request_at
-  %p
-    %b
-      = User.human_attribute_name('last_login_at')
-      \:
-    = h @user.last_login_at
-  %p
-    %b
-      = User.human_attribute_name('current_login_at')
-      \:
-    = h @user.current_login_at
-  %p
-    %b
-      = User.human_attribute_name('last_login_ip')
-      \:
-    = h @user.last_login_ip
-  %p
-    %b
-      = User.human_attribute_name('current_login_ip')
-      \:
-    = h @user.current_login_ip
+.form-box
+  - if me?(@user)
+    %br
+    == Email: #{@user.email}
+    %br
+    = link_to("edit", edit_user_registration_url)
+%h2
+  Annotations curated
+%table{ :cellspacing => "2", :border => "0", :width => "100%", :cellpadding => "0"}
+  %thead
+    %tr.row-header
+      %td{ :width => "50%" }
+        Last 24 Hours
+      %td{ :width => "50%" }
+        All time
+  %tbody.dataTable
+    %tr
+      %td{ :width => "50%" }
+        = @user.curated_annotations.daily.audited.size
+      %td{ :width => "50%" }
+        = @user.curated_annotations.audited.size
+%h2
+  Annotations created
+%table{ :cellspacing => "2", :border => "0", :width => "100%", :cellpadding => "0"}
+  %thead
+    %tr.row-header
+      %td{ :width => "50%" }
+        Last 24 Hours
+      %td{ :width => "50%" }
+        All time
+  %tbody.dataTable
+    %tr
+      %td{ :width => "50%" }
+        = @user.created_annotations.daily.audited.size
+      %td{ :width => "50%" }
+        = @user.created_annotations.audited.size

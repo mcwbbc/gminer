@@ -1,26 +1,26 @@
 %table{:width => "100%", :border => "0", :cellpadding => "0", :cellspacing => "2"}
   %thead
-    %tr.rowHeader
+    %tr.row-header
+      %td(colspan='2')
+      %td(colspan='3' align='center')
+        Samples where
+      %td(colspan='3')
+    %tr.row-header
       %td{:width => "30%"}
-        %b
-          Name
-      %td{:width => "20%"}
-        %b
-          Term ID
+        Name
       %td{:width => "10%"}
-        %b
-          Present
+        Term ID
       %td{:width => "10%"}
-        %b
-          Absent
+        Present
       %td{:width => "10%"}
-        %b
-          Marginal
+        Absent
       %td{:width => "10%"}
-        %b
-          Total
+        Marginal
       %td{:width => "10%"}
-        %b
-          Present Percentage
+        Total
+      %td{:width => "10%"}
+        Present %
+      %td{:width => "10%"}
+        Action
   %tbody#staffTable
-    = render(:partial => "ontology_term", :collection => items)
+    = render(:partial => "ontology_term.html.haml", :collection => items)

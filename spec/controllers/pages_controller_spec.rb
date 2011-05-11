@@ -23,18 +23,7 @@ describe PagesController do
 
     it "should assign the found annotations for the view" do
       do_get
-      assigns[:terms].should == [{:title=>"All Terms", :values=>[]}, {:title=>"Rat Strain Ontology", :values=>[]}, {:title=>"Mouse adult gross anatomy", :values=>[]}]
-    end
-
-  end
-
-  describe "handling GET /pages/kaboom" do
-    it "should be successful" do
-      u = User.spawn
-      User.should_receive(:first).and_return(u)
-      u.should_receive(:kaboom!)
-      get :kaboom
-      response.should be_success
+      assigns[:terms].should == [{'title'=>"All Terms", 'values'=>[]}, {'title'=>"Rat Strain Ontology", 'values'=>[]}, {'title'=>"Mouse adult gross anatomy", 'values'=>[]}]
     end
   end
 

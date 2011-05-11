@@ -2,15 +2,15 @@ class Ontology < ActiveRecord::Base
   include Utilities
   extend Utilities::ClassMethods
 
-  has_many :ontology_terms, :order => "annotations_count DESC, name"
-  has_many :annotations
+  has_many :ontology_terms, :dependent => :delete_all, :order => "annotations_count DESC, name"
+  has_many :annotations, :dependent => :delete_all
 
   validates_presence_of :name
   validates_uniqueness_of :name
 
   class << self
     def page(conditions, page=1, size=Constants::PER_PAGE)
-      paginate(:order => [:name],
+      paginate(:order => :name,
                :conditions => conditions,
                :page => page,
                :per_page => size
@@ -18,7 +18,7 @@ class Ontology < ActiveRecord::Base
     end
 
     def which_have_annotations
-      Ontology.all(:order => [:name]).select { |ontology| ontology if ontology.annotations.size > 0 }
+      Ontology.all(:order => :name).select { |ontology| ontology if ontology.annotations.size > 0 }
     end
 
     def insert_terms(file, ncbo_id)
@@ -31,7 +31,7 @@ class Ontology < ActiveRecord::Base
       in_term_flag = false
       obsolete_flag = false
 
-      File.open(file, "r").each do |line|
+      File.open(file, "rb", :encoding => 'ISO-8859-1').each do |line|
 
         # check if we've got a term header, and set true if we do
         if result = term_regex.match(line)
@@ -86,7 +86,7 @@ class Ontology < ActiveRecord::Base
   end # of self
 
   def update_data
-    self.current_ncbo_id, self.name, self.version = NCBOService.current_ncbo_id(self.ncbo_id)
+    self.current_ncbo_id, self.name, self.version = NCBOAnnotatorService.current_ncbo_id(self.ncbo_id)
     save!
   end
 

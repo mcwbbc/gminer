@@ -23,26 +23,48 @@ class Probeset < ActiveRecord::Base
 
     def generate_platform_hash(probesets)
       platform_hash = probesets.inject({}) do |h, probeset|
-        h[probeset.id] = Platform.for_probeset(probeset.name)
+        h[probeset.id] = Gminer::Platform.for_probeset(probeset.name)
         h
       end
+    end
+
+    def insert_rgd_genes(file)
+      File.open(file, "rb", :encoding => 'ISO-8859-1').each do |line|
+        name, rgd_gene = line.split("\t")
+        if !probeset = Probeset.first(:conditions => {:name => name})
+          probeset = Probeset.create(:name => name, :rgd_gene => rgd_gene)
+          puts "New: #{name}"
+        else
+          probeset.rgd_gene = rgd_gene
+          probeset.save!
+          puts "Update: #{name} -> #{rgd_gene}"
+        end
+      end
+    end
+  end # of self
+
+  def associated_probesets
+    if rgd_gene.blank?
+      []
+    else
+      Probeset.all(:conditions => ["rgd_gene = #{rgd_gene} AND id != #{id}"])
     end
   end
 
   def ontology_term_hash(ncbo_id, status='P')
     ontology_terms = OntologyTerm.find(
       :all,
-      :select => "ontology_terms.*, count(ontology_terms.id) AS found_count",
+      :select => "ontology_terms.*, count(DISTINCT(samples.id)) AS found_count",
       :joins => "INNER JOIN annotations ON ontology_terms.id = annotations.ontology_term_id INNER JOIN samples ON annotations.geo_accession = samples.geo_accession INNER JOIN detections ON detections.sample_id = samples.id INNER JOIN probesets ON detections.probeset_id = probesets.id AND probesets.id = #{self.id} AND detections.abs_call = '#{status}' AND annotations.ncbo_id = '#{ncbo_id}' AND annotations.verified = 1",
       :group  => "ontology_terms.id",
       :order  => "ontology_terms.name"
     )
 
     ontology_terms.inject({}) do |h, term|
-      h[term.term_id] = {:term => term, :found_count => term.found_count, :total_count => OntologyTerm.count_for_probeset(term.id, self.id, ncbo_id)}
+      h[term.term_id] = {:term => term, :found_count => term.found_count, :total_count => Sample.count_for_probeset(self.id, term.id)}
       h
     end
-  end
+  end #end of self
 
   def generate_term_array
     present_term_hash = ontology_term_hash("1000", 'P')
@@ -72,9 +94,13 @@ class Probeset < ActiveRecord::Base
     term_hash.values.sort_by {|k| k[:total_count]}
   end
 
-  def generate_gooogle_chart(a)
+  def generate_google_chart(a)
    g = Graph.new(a)
    g.generate
+  end
+
+  def generate_high_chart(a)
+   g = Graph.new(a)
   end
 
   # we need to convert the forward slashes to back slashes and then encode them

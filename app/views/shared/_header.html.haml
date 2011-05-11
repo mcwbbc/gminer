@@ -1,4 +1,9 @@
-#header
-  = link_to(image_tag('layout/mcw_logo.gif', :class => "mcw-logo", :alt => "Medical College of Wisconsin"), "http://mcw.edu/", :target => "_blank")
-  = image_tag('layout/logo.png', :class => "gminer-logo")
-  = link_to(image_tag('layout/ncbo_logo.gif', :class => "ncbo-logo", :alt => "National Center for Biomedical Ontology"), "http://bioontology.org/", :target => "_blank")
+.grid-container.header.rounded
+  .grid_24
+    = link_to(image_tag('layout/logo.png', :class => "gminer-logo", :alt => "GMiner"), root_url)
+    = link_to(image_tag('layout/mcw_logo.gif', :class => "mcw-logo", :alt => "Medical College of Wisconsin"), "http://mcw.edu/", :target => "_blank")
+    = link_to(image_tag('layout/ncbo_logo.gif', :class => "ncbo-logo", :alt => "National Center for Biomedical Ontology"), "http://bioontology.org/", :target => "_blank")
+    = render(:partial => "shared/user.html.haml")
+    #help
+      = link_to('Help', help_url)
+.clear

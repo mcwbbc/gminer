@@ -1,6 +1,7 @@
 = page_title("Annotations via Cloud")
 #term-parameters
 //  == #{check_box_tag(:invalid, @invalid)} Include invalid
+%br
 #terms
   = render(:partial => "cloud", :locals => {:title => "Anatomy terms", :terms => @anatomy_terms})
 #strains
@@ -8,4 +9,4 @@
 %br{:clear => "all"}
 #filters
 #annotations
-  = render(:partial => "annotations")
+  = render(:partial => "annotations.html.haml")

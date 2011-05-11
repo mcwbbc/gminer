@@ -1,6 +1,18 @@
 class Notifier < ActionMailer::Base
-  default_url_options[:host] = "gminer.mcw.edu"
-  
+
+  case Rails.env
+    when "development"
+      host = "development"
+    when "production"
+      host = "production"
+    when "processing"
+      host = "processing"
+    when "staging"
+      host = "staging"
+  end
+
+  default_url_options[:host] = host
+
   def password_reset_instructions(user)
     setup(user)
     subject I18n.t("subject.password_reset_instructions")
@@ -23,7 +35,7 @@ end
 private
 
   def setup(user)
-    from "gminer-admin@mcw.edu"
+    from "email@mcw.edu"
     sent_on Time.now
     recipients user.email
   end

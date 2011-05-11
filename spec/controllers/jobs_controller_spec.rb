@@ -7,7 +7,7 @@ describe JobsController do
 
   describe "handling GET /jobs" do
     before(:each) do
-      job = Job.spawn
+      job = Factory.build(:job)
       @jobs = [job]
       @jobs.stub!(:total_pages).and_return(1)
       Job.stub!(:page).and_return(@jobs)
@@ -34,20 +34,5 @@ describe JobsController do
 
   end
 
-  describe "GET statistics" do
-    before(:each) do
-      Job.should_receive(:get_statistics).and_return({})
-    end
-
-    def do_statistics
-      get :statistics
-    end
-
-    it "should be successful" do
-      do_statistics
-      response.should be_success
-    end
-
-  end
 end
 

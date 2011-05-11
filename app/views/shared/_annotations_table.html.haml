@@ -1,13 +1,13 @@
-- admin_only do
-  = render(:partial => "shared/admin_nav")
+- if admin?
+  = render(:partial => "shared/admin_nav.html.haml")
 %table{:width => "100%", :border => "0", :cellpadding => "0", :cellspacing => "2"}
   %thead
-    %tr.rowHeader
+    %tr.row-header
       %td{:width => "20%"}
         %b
           Name
       %td{:width => "80%"}
         %b
           Value
-  %tbody#dataTable
-    = render(:partial => "shared/field", :collection => item.fields, :locals => {:item => item})
+  %tbody.dataTable
+    = render(:partial => "shared/field.html.haml", :collection => item.field_array, :locals => {:item => item})

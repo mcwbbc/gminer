@@ -1,32 +1,83 @@
-ActionController::Routing::Routes.draw do |map|
+Gminer::Application.routes.draw do
 
-  map.resources :platforms, :datasets, :samples, :series_items, :ontologies, :ontology_terms, :results, :detections, :probesets
+  devise_for :users
 
-  map.resources :jobs,
-                :collection => {
-                                :process => :post,
-                                :statistics => :get
-                              }
+  resources :users, :only => [:show]
 
-  map.resources :annotations,
-            :collection => { :cloud => :get,
-                             :audit => :get,
-                             :valid => :post,
-                             :invalid => :post
-                           },
-            :member => { :curate => :post }
+  resources :datasets, :samples, :series_items, :ontologies, :ontology_terms, :results, :detections, :resource_index_annotations
 
-  map.resource :account, :except => :destroy
-  map.resources :password_resets, :only => [:new, :create, :edit, :update]
-  map.resources :users
-  map.resource :user_session, :only => [:new, :create, :destroy]
-  map.signin 'signin', :controller => "user_sessions", :action => "new"
-  map.signout 'signout', :controller => "user_sessions", :action => "destroy"
-  map.activate '/activate/:activation_code', :controller => 'activations', :action => 'new'
-  map.finish_activate '/finish_activate/:id', :controller => 'activations', :action => 'create'
-  map.help '/help', :controller => 'pages', :action => 'help'
+  resources :platforms do
+    collection do
+      post :skip_annotations
+    end
+  end
 
-  map.signup 'signup', :controller => "accounts", :action => "new"
-  map.root :controller => "pages", :action => "home"
-  map.pages 'pages/:action', :controller => "pages"
+  resources :cytoscapes do
+    collection do
+      post :resource_count
+      post :resource_count_hash
+    end
+
+    member do
+      get :resource_term_ids
+      get :item_json
+    end
+  end
+
+  resources :probesets do
+    member do
+      get :compare
+    end
+  end
+
+  resources :tags do
+    collection do
+      post :create_for
+      post :delete_for
+    end
+
+    member do
+      post :delete_for
+    end
+  end
+
+  resources :reports do
+    collection do
+      get :progress
+      get :job_statistics
+      get :annotation
+      get :manual_annotation_terms
+      get :comparison
+    end
+  end
+
+  resources :jobs do
+    collection do
+      get :graph_status
+      get :dashboard
+      post :process
+      post :update_job_form
+    end
+  end
+
+  resources :annotations do
+    collection do
+      get :top_curators
+      get :cloud
+      get :audit
+      get :item_audit
+      post :mass_curate
+    end
+
+    member do
+      post :predicate
+      post :curate
+      get :geo_item
+    end
+  end
+
+  match '/help', :to => 'pages#help', :as => 'help'
+  match '/rdf', :to => 'pages#rdf', :as => 'rdf'
+  root :to => 'pages#home'
+
 end

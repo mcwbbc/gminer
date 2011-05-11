@@ -1,8 +1,8 @@
-%tr{:class => "#{cycle('rowWhite', 'rowBlue')}"}
+%tr{:class => "#{cycle('row-odd', 'row-even')}"}
   %td{:valign => "top"}
     = link_to(highlight(ontology_term.name, @q), ontology_term_url(ontology_term))
     = ncbo_ontology_link(ontology_term)
   %td{:valign => "top"}
-    = is_closure(ontology_term.annotations_count)
+    = has_annotations(ontology_term.annotations_count)
   %td{:valign => "top"}
     = link_to(ontology_term.ontology.name, ontology_url(ontology_term.ontology))

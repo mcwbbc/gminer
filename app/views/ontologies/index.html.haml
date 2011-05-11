@@ -1,5 +1,5 @@
 = page_title("Ontologies")
-- admin_only do
+- if admin?
   %br
   = link_to("Create ontology", new_ontology_path)
   %br
@@ -8,5 +8,5 @@
     %label
       Filter on name:
     = text_field_tag(:query, params['query'], :autocomplete => 'off')
-#dataTable
-  = render(:partial => "ontologies_list")
+.dataTable
+  = render(:partial => "ontologies_list.html.haml")

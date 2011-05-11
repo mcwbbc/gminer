@@ -1,10 +1,10 @@
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+require 'spec_helper'
 
 describe SeriesItemsController do
 
   describe "handling GET /series_items" do
     before(:each) do
-      series_item = SeriesItem.spawn
+      series_item = Factory.build(:series_item)
       @series_items = [series_item]
       @series_items.stub!(:total_pages).and_return(1)
       SeriesItem.stub!(:page).and_return(@series_items)
@@ -33,11 +33,11 @@ describe SeriesItemsController do
 
   describe "GET show" do
     it "assigns the requested series_item as @series_item" do
-      user = User.spawn(:id => "1")
-      controller.should_receive(:admin_logged_in?).and_return(true)
+      user = Factory.build(:user, :id => "1")
+      controller.should_receive(:admin?).and_return(true)
       controller.should_receive(:current_user).and_return(user)
 
-      series_item = SeriesItem.spawn
+      series_item = Factory.build(:series_item)
       SeriesItem.stub!(:first).with(:conditions => {:geo_accession => "GDS1234"}).and_return(series_item)
       series_item.should_receive(:prev_next).and_return(["GDS1", "GDS3"])
       series_item.should_receive(:count_by_ontology_array).and_return({})

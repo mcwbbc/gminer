@@ -28,12 +28,14 @@ class SeriesItemsController < ApplicationController
     @series_item = SeriesItem.first(:conditions => {:geo_accession => params[:id]})
     raise ActiveRecord::RecordNotFound if !@series_item
 
-    if admin_logged_in?
+    if admin?
       @new_annotation = Annotation.for_item(@series_item, current_user.id)
       @ontologies = Ontology.all(:order => :name)
+      @top_tags = Tag.top_tags(@series_item.tag_list)
+      @all_tags = Tag.all_tags(@series_item.tag_list).map(&:name)
+      @prev, @next = @series_item.prev_next
     end
 
-    @prev, @next = @series_item.prev_next
     respond_to do |format|
       format.html {
         @annotation_count_array = @series_item.count_by_ontology_array

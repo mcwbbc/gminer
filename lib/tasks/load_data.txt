@@ -11,3 +11,9 @@ for x in `cat metadata/affymetrix_rat_platforms.txt`; do rake RAILS_ENV=staging 
 for x in `cat metadata/affymetrix_rat_platforms.txt`; do rake RAILS_ENV=staging persist:series platform_geo_accession=$x array=all; done && for x in `cat metadata/affymetrix_mouse_platforms.txt`; do rake RAILS_ENV=staging persist:series platform_geo_accession=$x array=all; done && for x in `cat metadata/affymetrix_human_platforms.txt`; do rake RAILS_ENV=staging persist:series platform_geo_accession=$x array=all; done
 
 for x in `cat metadata/rat_datasets.txt`; do rake RAILS_ENV=staging persist:dataset geo_accession=$x; done
+
+for x in `cat metadata/affymetrix_rat_platforms.txt`; do bundle exec rake RAILS_ENV=processing persist:platform geo_accession=$x full=true force=true; done
+
+
+for x in `cat metadata/full_rat_platforms.txt`; do bundle exec rake RAILS_ENV=processing persist:platform geo_accession=$x full=true force=true --trace >> log/platform_loading.log; done
+for x in `cat metadata/full_rat_datasets.txt`; do bundle exec rake RAILS_ENV=processing persist:dataset geo_accession=$x --trace >> log/dataset_loading.log; done

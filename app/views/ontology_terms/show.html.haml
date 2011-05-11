@@ -5,7 +5,10 @@
 = link_to('Back', ontology_terms_url)
 %br
 %br
-= render(:partial => "references", :locals => {:title => "Parent closures", :terms => @parent_closures}) if @parent_closures.any?
-= render(:partial => "references", :locals => {:title => "Child closures", :terms => @child_closures}) if @child_closures.any?
-= render(:partial => "annotations", :locals => {:annotation_type => "direct", :annotation_count => @ontology_term.annotations.size, :items => @direct_geo})
-= render(:partial => "annotations", :locals => {:annotation_type => "closure", :annotation_count => @ontology_term.annotation_closures.size, :items => @closure_geo})
+= render(:partial => "references.html.haml", :locals => {:title => "Parent closures", :terms => @parent_closures}) if @parent_closures.any?
+= render(:partial => "references.html.haml", :locals => {:title => "Child closures", :terms => @child_closures}) if @child_closures.any?
+= render(:partial => "geo_counts.html.haml", :locals => {:geo_counts => @geo_counts}) if @geo_counts.any?
+.dataTable{:atype => 'direct'}
+  = render(:partial => "annotations.html.haml", :locals => {:annotation_type => "direct", :annotation_count => @direct_geo.total_entries, :items => @direct_geo})
+.dataTable{:atype => 'closure'}
+  = render(:partial => "annotations.html.haml", :locals => {:annotation_type => "closure", :annotation_count => @closure_geo.total_entries, :items => @closure_geo})

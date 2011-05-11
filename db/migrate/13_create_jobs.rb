@@ -4,11 +4,11 @@ class CreateJobs < ActiveRecord::Migration
       t.integer :ontology_id
       t.string :worker_key, :limit => 50
       t.string :geo_accession, :limit => 25
-      t.string :field, :limit => 50
+      t.string :field_name, :limit => 50
+      t.float :started_at, :limit => 25
+      t.float :working_at, :limit => 25
+      t.float :finished_at, :limit => 25
       t.datetime :created_at
-      t.double :started_at
-      t.double :working_at
-      t.double :finished_at
     end
 
     add_index(:jobs, :worker_key)

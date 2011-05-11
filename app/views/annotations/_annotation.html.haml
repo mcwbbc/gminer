@@ -1,12 +1,10 @@
-%tr{:class => "#{cycle('rowWhite', 'rowBlue')}"}
+%tr{:class => "#{cycle('row-odd', 'row-even')}"}
   %td{:valign => "top"}
     = geo_link(annotation.geo_accession)
   %td{:valign => "top"}
-    - if admin_user?
+    - if admin?
       = curate_link(annotation)
-      = ncbo_ontology_link(annotation.ontology_term)
     - else
       = link_to(highlight(annotation.ontology_term.name, @q), ontology_term_url(annotation.ontology_term))
-      = ncbo_ontology_link(annotation.ontology_term)
   %td{:valign => "top"}
     = annotation.in_context

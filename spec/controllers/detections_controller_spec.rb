@@ -1,6 +1,9 @@
 require 'spec_helper'
 
 describe DetectionsController do
+  before(:each) do
+    controller.stub!(:admin_required).and_return(true)
+  end
 
   #Delete this example and add some real ones
   it "should use DetectionsController" do
@@ -9,7 +12,7 @@ describe DetectionsController do
 
   describe "handling GET /detections" do
     before(:each) do
-      detection = Detection.spawn
+      detection = Factory.build(:detection)
       @detections = [detection]
       @detections.stub!(:total_pages).and_return(1)
       Detection.stub!(:page).and_return(@detections)
@@ -38,15 +41,15 @@ describe DetectionsController do
 
   describe "GET show" do
     it "assigns the requested detection as @detection" do
-      detection = Detection.spawn
-      Detection.stub!(:find).with("1234").and_return(detection)
-      get :show, :id => "1234"
+      detection = Factory.build(:detection)
+      Detection.should_receive(:first).with(:conditions => {:probeset_id => "123", :sample_id => "30"}).and_return(detection)
+      get :show, :id => "30-123"
       assigns[:detection].should equal(detection)
     end
 
     it "redirects for an invalid detection" do
-      Detection.stub!(:find).with("1234").and_raise(ActiveRecord::RecordNotFound)
-      get :show, :id => "1234"
+      Detection.should_receive(:first).with(:conditions => {:probeset_id => "123", :sample_id => "30"}).and_raise(ActiveRecord::RecordNotFound)
+      get :show, :id => "30-123"
       response.should redirect_to(detections_url)
     end
   end

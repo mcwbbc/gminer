@@ -28,7 +28,7 @@ class ProbesetsController < ApplicationController
     raise ActiveRecord::RecordNotFound if !@probeset
 
     @term_array = @probeset.generate_term_array
-    @chart_image = @term_array.any? ? @probeset.generate_gooogle_chart(@term_array) : ""
+    @chart_image = @term_array.any? ? @probeset.generate_high_chart(@term_array) : ""
 
     respond_to do |format|
       format.html
@@ -38,6 +38,31 @@ class ProbesetsController < ApplicationController
       flash[:warning] = "That probeset does not exist."
       redirect_to(probesets_url)
   end
+
+  def compare
+    # we need to convert the back slashes to forward slashes so we can find the name properly
+    probeset_id = params[:id] ? params[:id].gsub("\\", "/") : ""
+    ontology_term_id = params[:ontology_term_id]
+
+    @probeset = Probeset.first(:conditions => {:name => probeset_id})
+    raise ActiveRecord::RecordNotFound if !@probeset
+
+    @ontology_term = OntologyTerm.first(:conditions => {:term_id => ontology_term_id})
+    raise ActiveRecord::RecordNotFound if !@ontology_term
+
+    @results = Constants::DETECTION_STATUSES.inject({}) do |hash, status|
+      hash[status] = OntologyTerm.for_samples(Sample.for_probeset(ontology_term_id, probeset_id, status).map(&:geo_accession))
+      hash
+    end
+
+    respond_to do |format|
+      format.html {}
+    end
+    rescue ActiveRecord::RecordNotFound
+      flash[:warning] = "That probeset does not exist."
+      redirect_to(probesets_url)
+  end
+
 
   protected
     def find_probesets(conditions, page)

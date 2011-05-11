@@ -23,15 +23,9 @@ class CreateSamples < ActiveRecord::Migration
     add_index(:samples, :geo_accession)
     add_index(:samples, :series_item_id)
     add_index(:samples, :platform_id)
-
-    add_foreign_key(:detections, :samples, :dependent => :delete)
-    add_foreign_key(:results, :samples, :dependent => :delete)
   end
 
   def self.down
-    remove_foreign_key(:samples, :results)
-    remove_foreign_key(:samples, :detections)
-
     remove_index(:samples, :geo_accession)
     remove_index(:samples, :series_item_id)
     remove_index(:samples, :platform_id)

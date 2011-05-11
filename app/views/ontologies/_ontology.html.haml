@@ -1,11 +1,11 @@
-%tr{:class => "#{cycle('rowWhite', 'rowBlue')}"}
+%tr{:class => "#{cycle('row-odd', 'row-even')}"}
   %td{:valign => "top"}
     = link_to(highlight(ontology.name, @q), ontology_url(ontology))
   %td{:valign => "top"}
     = ontology.version
-  - admin_only do
+  - if admin?
     %td{:valign => "top"}
-      = ontology.stopwords
+      = ontology.stopwords.split(',').join(', ')
     %td{:valign => "top"}
       = link_to(t('link.edit'), edit_ontology_path(ontology))
 

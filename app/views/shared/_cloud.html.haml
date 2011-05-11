@@ -6,6 +6,4 @@
     %ol.tag-cloud
       - term_cloud(terms, Constants::TAG_CLASSES) do |term, css_class|
         %li
-          %span
-            == #{term.annotations_count} annotations for term
           = link_to(term.name, ontology_term_url(term), :class => css_class)
