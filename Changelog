@@ -1,4 +1,6 @@
-5/15/2009
-* Initial public release
+5/11/11
+* Rails 3 conversion, multiple other improvements
 10/13/2009
 * Rewrite application in Rails due to failing support of Merb
+5/15/2009
+* Initial public release
