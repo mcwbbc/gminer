@@ -1,0 +1,5 @@
+!!! XML
+%report
+  %date=@comparison_date
+  %ontologies
+    = render(:partial => "reports/ontology.xml.haml", :collection => Constants::ONTOLOGIES.keys.sort)

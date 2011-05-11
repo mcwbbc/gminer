@@ -1,0 +1,3 @@
+%tr{:class => "#{cycle('row-odd', 'row-even')}"}
+  %td{:valign => "top"}
+    = link_to(highlight(resource_index_annotation.geo_accession, @q), resource_index_annotation_url(resource_index_annotation.geo_accession))

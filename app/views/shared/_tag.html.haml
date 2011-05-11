@@ -1,0 +1,6 @@
+%li
+  %a.delete-tag{:tag_name => tag.name}
+    = image_tag('/images/icons/error.png', :alt => 'delete', :class => 'delete-tag-icon')
+  %span{:title => tag.description}
+    = tag.name
+

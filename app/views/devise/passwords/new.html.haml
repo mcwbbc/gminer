@@ -1,0 +1,7 @@
+= page_title("Forgot your password?")
+= devise_error_messages!
+.form-box
+  = simple_form_for(resource, :as => resource_name, :url => password_path(resource_name), :html => { :method => :post }) do |f|
+    = f.input(:email, :as => :email)
+    = f.button(:submit, "Send me reset password instructions")
+  = render(:partial => "devise/shared/links")

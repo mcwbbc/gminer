@@ -1,0 +1,23 @@
+= page_title("Audit GEO item annotations")
+%p
+  %form{:name => "sform", :action => "", :style => "display:inline"}
+    %table.filter-menu
+      %tr
+        %td
+
+        %td{:align => 'right'}
+          %label
+            = exclude_dropdown(@exclude)
+            tag(s):
+        %td
+          = text_field_tag(:query, params['query'], :autocomplete => 'off')
+        %td{:align => 'right'}
+          %label
+          GEO item type:
+        %td
+          = annotation_geotype_dropdown(@geotype, true)
+        %td
+          %button#refresh
+            Refresh
+.dataTable
+  = render(:partial => "item_audit_list.html.haml")

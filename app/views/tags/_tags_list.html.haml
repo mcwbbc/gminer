@@ -1,0 +1,23 @@
+%br
+- if @tags.size == 0
+  %p
+    No tags found...
+- else
+  %p
+    = found_count("tags", @tags)
+  %p
+    = render(:partial => "shared/pagination", :locals => {:items => @tags})
+  %br
+  %table{:width => "100%", :border => "0", :cellpadding => "0", :cellspacing => "2"}
+    %thead
+      %tr.row-header
+        %td{:width => "20%"}
+          Name
+        %td{:width => "50%"}
+          Description
+        %td{:width => "10%"}
+          Count
+        %td{:width => "10%"}
+          Actions
+    %tbody#staffTable
+      = render(:partial => "tag", :collection => @tags)

@@ -1,0 +1,22 @@
+%span.validate-all
+  Validate checked
+%span.invalidate-all
+  Invalidate checked
+%br
+%br
+%table{:width => "100%", :border => "0", :cellpadding => "0", :cellspacing => "2"}
+  %thead
+    %tr.row-header
+      %td{:width => "5%", :align => 'center'}
+        Selected
+        %br
+        = link_to("All", "#", :class => "check-all")
+        = link_to("None", "#", :class => "uncheck-all")
+      %td{:width => "10%"}
+        GEO Accession
+      %td{:width => "20%"}
+        Term
+      %td{:width => "70%"}
+        Field value context
+  %tbody#staffTable
+    = render(:partial => "audit_annotation.html.haml", :collection => items)

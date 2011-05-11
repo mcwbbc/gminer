@@ -1,0 +1,4 @@
+= render(:partial => "shared/curator_table.html.haml", :locals => {:title => 'Curation - All time', :items => @top_alltime_curators})
+= render(:partial => "shared/curator_table.html.haml", :locals => {:title => 'Curation - Last 24 hours', :items => @top_daily_curators})
+= render(:partial => "shared/curator_table.html.haml", :locals => {:title => 'Creation - All time', :items => @top_alltime_creators})
+= render(:partial => "shared/curator_table.html.haml", :locals => {:title => 'Creation - Last 24 hours', :items => @top_daily_creators})

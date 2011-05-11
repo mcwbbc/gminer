@@ -1,0 +1,8 @@
+%tr{:class => "#{cycle('row-odd', 'row-even')}", :tags => "#{geo_item.tags.join(", ")}"}
+  %td{:valign => "top"}
+    %a.geo-audit-link{:id => geo_item.geo_accession}
+      = geo_item.geo_accession
+  %td{:valign => "top"}
+    = geo_item.annotations.size
+  %td
+    = geo_item.tags.join(", ")

@@ -1,0 +1,6 @@
+%table
+  %tr.row-header
+    %td{:colspan => geo_counts.size}
+      GEO type counts
+  %tr
+    = render(:partial => "geo_count.html.haml", :collection => geo_counts)

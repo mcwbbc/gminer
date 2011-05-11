@@ -1,0 +1,6 @@
+%ontology
+  %name= Constants::ONTOLOGIES[ontology][:name]
+  %ncbo_ontology_id= ontology
+  - if @result_hash[ontology].keys.any?
+    %field_names
+      = render(:partial => "reports/field_name.xml.haml", :collection => @result_hash[ontology].keys.sort, :locals => {:hash => @result_hash[ontology]})

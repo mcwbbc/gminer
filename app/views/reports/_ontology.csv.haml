@@ -1,0 +1,2 @@
+- if ontology_hash[ontology].keys.any?
+  = render(:partial => "reports/field_name.csv.haml", :collection => ontology_hash[ontology].keys.sort, :locals => {:hash => ontology_hash[ontology], :comparison_date => comparison_date, :ontology_name => Constants::ONTOLOGIES[ontology][:name]})

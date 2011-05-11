@@ -1,0 +1,13 @@
+%h1
+  = @geoitem
+%table
+  %tr.row-header
+    %td
+      Field
+    %td
+      Valid
+    %td
+      Invalid
+    %td
+      Unaudited
+  = render(:partial => "annotation_field.html.haml", :collection => @fields, :locals => {:result_hash => @result_hash})

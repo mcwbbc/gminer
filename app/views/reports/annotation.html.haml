@@ -1,0 +1,20 @@
+- title t(".title")
+= page_title(t('.title'))
+.description
+  = t('.description')
+%p
+  %form{:name => "sform", :action => "", :style => "display:inline"}
+    %table.filter-menu
+      %tr
+        %td{:align => 'right'}
+          %label
+          GEO item type:
+        %td
+          = annotation_geotype_dropdown(@geotype, true)
+        %td{:align => 'right'}
+          %label
+            Ontology:
+        %td
+          = ontology_search_dropdown(@ontology)
+.dataTable
+  = render(:partial => "annotation_report.html.haml")

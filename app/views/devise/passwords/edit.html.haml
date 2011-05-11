@@ -1,0 +1,9 @@
+= page_title("Change your password")
+= devise_error_messages!
+.form-box
+  = simple_form_for(resource, :as => resource_name, :url => password_path(resource_name), :html => { :method => :put }) do |f|
+    = f.input(:reset_password_token, :as => :hidden)
+    = f.input(:password, :as => :password, :label => "New password")
+    = f.input(:password_confirmation, :as => :password, :label => "Confirm new password")
+    = f.button(:submit, "Change my password")
+  = render(:partial => "devise/shared/links")

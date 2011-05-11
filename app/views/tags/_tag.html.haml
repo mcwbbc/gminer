@@ -1,0 +1,9 @@
+%tr{:class => "#{cycle('row-odd', 'row-even')}"}
+  %td{:valign => "top"}
+    = link_to(tag.name, tag_url(tag))
+  %td{:valign => "top"}
+    = tag.description
+  %td{:valign => "top"}
+    = tag.taggings.size
+  %td{:valign => "top"}
+    = link_to("Edit", edit_tag_url(tag))

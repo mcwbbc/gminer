@@ -1,0 +1,13 @@
+.ontology-term-table
+  %table
+    %tr.row-header
+      %th(colspan='3')
+        = title
+    %tr.row-header
+      %td
+        Name
+      %td
+        Term ID
+      %td
+        Count
+    = render(:partial => "term.html.haml", :collection => items)

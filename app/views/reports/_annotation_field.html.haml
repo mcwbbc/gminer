@@ -1,0 +1,9 @@
+%tr
+  %td(valign='top')
+    = annotation_field
+  %td(valign='top' width="30%")
+    = result_hash[annotation_field][:valid].join(", ")
+  %td(valign='top' width="30%")
+    = result_hash[annotation_field][:invalid].join(", ")
+  %td(valign='top' width="30%")
+    = result_hash[annotation_field][:unaudited].join(", ")

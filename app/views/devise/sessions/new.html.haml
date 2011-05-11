@@ -1,0 +1,9 @@
+= page_title("Sign in")
+.form-box
+  = simple_form_for(resource, :as => resource_name, :url => session_path(resource_name)) do |f|
+    = f.input(:email, :as => :email)
+    = f.input(:password, :as => :password)
+    - if devise_mapping.rememberable?
+      = f.input(:remember_me, :as => :hidden, :input_html => {:value => '1'})
+    = f.button(:submit, "Sign in")
+  = render(:partial => "devise/shared/links")

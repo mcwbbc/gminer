@@ -1,0 +1,5 @@
+- if annotation_ontology_counter > 0
+  %tr
+    = render(:partial => "resource_index_annotations/annotations.html.haml", :locals => {:items => items[annotation_ontology], :annotation_ontology => annotation_ontology})
+- else
+  = render(:partial => "resource_index_annotations/annotations.html.haml", :locals => {:items => items[annotation_ontology], :annotation_ontology => annotation_ontology})

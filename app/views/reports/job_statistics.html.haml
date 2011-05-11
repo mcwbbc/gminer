@@ -1,0 +1,22 @@
+- title t(".title")
+= page_title(t('.title'))
+%br
+= link_to("Download csv file", job_statistics_reports_url(:format => "csv"))
+%br
+%br
+.dataTable
+%table{:width => "100%", :border => "0", :cellpadding => "0", :cellspacing => "2"}
+  %tr
+    %th
+      Detail
+    %th{:width => "10%"}
+      Count
+    %th{:width => "10%"}
+      NCBO Ave Time
+    %th{:width => "10%"}
+      Ave Time
+    %th{:width => "10%"}
+      Min Time
+    %th{:width => "10%"}
+      Max Time
+  = render(:partial => "geo_item.html.haml", :collection => @results_hash.keys.sort, :locals => {:hash => @results_hash} )

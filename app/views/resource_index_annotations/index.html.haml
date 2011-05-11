@@ -1,0 +1,8 @@
+= page_title("Resource Index Annotations")
+%p
+  %form{:name => "sform", :action => "", :style => "display:inline"}
+    %label
+      Filter on GEO accession:
+    = text_field_tag(:query, params['query'], :autocomplete => 'off')
+.dataTable
+  = render(:partial => "resource_index_annotations_list.html.haml")

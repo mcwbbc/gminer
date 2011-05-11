@@ -1,0 +1,28 @@
+%br
+- if @geo_items.size == 0
+  %p
+    No matching GEO items found...
+- else
+  %p
+    = found_count("GEO item", @geo_items)
+  %p
+    = render(:partial => "shared/pagination_links", :locals => {:items => @geo_items})
+  %br
+  %br
+  #container
+    #left
+      %table{:width => "100%", :border => "0", :cellpadding => "0", :cellspacing => "2"}
+        %thead
+          %tr.row-header
+            %td{:width => "20%"}
+              GEO Accession
+            %td{:width => "20%"}
+              Annotation Count
+            %td{:width => "60%"}
+              Tags
+        %tbody#staffTable
+          = render(:partial => "geo_item.html.haml", :collection => @geo_items)
+    #right
+      .info
+        Click a GEO accession ID on the left to see the annotations.
+  %br{:clear => 'both'}

@@ -1,0 +1,17 @@
+%tr
+  %td
+    = progress_geo_type
+  %td
+    = result_hash[progress_geo_type]['verified']
+  %td
+    = result_hash[progress_geo_type]['unverified']
+  %td
+    = result_hash[progress_geo_type]['unaudited']
+  %td
+    = result_hash[progress_geo_type]['manual']
+  %td
+    = result_hash[progress_geo_type]['total']
+  %td
+    = result_hash[progress_geo_type]['percent']
+- if !result_hash[progress_geo_type]['chart'].blank?
+  = high_pie("chart_#{progress_geo_type}", result_hash[progress_geo_type]['chart'])

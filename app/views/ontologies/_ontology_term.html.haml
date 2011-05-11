@@ -1,0 +1,14 @@
+%tr{:class => "#{cycle('row-odd', 'row-even')}"}
+  %td{:valign => "top", :width => "40%"}
+    = link_to(ontology_term.name, ontology_term_url(ontology_term))
+    = ncbo_ontology_link(ontology_term)
+  %td{:valign => "top"}
+    = has_annotations(ontology_term.annotations_count)
+  - if admin?
+    %td{:valign => "top"}
+      = annotation_percentage(ontology_term.annotations_count, ontology_term.valid_annotation_percentage)
+    %td{:valign => "top"}
+      = annotation_percentage(ontology_term.annotations_count, ontology_term.audited_annotation_percentage)
+      - if (ontology_term.annotations_count > 0) && (ontology_term.audited_annotation_percentage < 100)
+        %br
+        = link_to("Audit", audit_annotations_url(:query => ontology_term.name, :status => "Unaudited", :ddown => ontology_term.ontology.ncbo_id))

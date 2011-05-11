@@ -1,0 +1,32 @@
+embed_assets: on
+javascript_compressor: closure # (yui, closure)
+
+javascripts:
+  common:
+    - public/javascripts/lib/modernizr.js
+    - public/javascripts/jquery/jquery.js
+    - public/javascripts/jquery/jquery.blockUI.js
+    - public/javascripts/lib/underscore.js
+    - public/javascripts/lib/rails.js
+    - public/javascripts/jquery/jquery.highlight.js
+    - public/javascripts/lib/highcharts.js
+    - public/javascripts/lib/json2.js
+    - public/javascripts/lib/AC_OETags.js
+    - public/javascripts/lib/cytoscapeweb.js
+    - public/javascripts/application.js
+  admin:
+    - public/javascripts/jquery/jquery.contextMenu.js
+    - public/javascripts/lib/ncbo-selection.js
+    - public/javascripts/lib/ncbo-form-complete.js
+    - public/javascripts/jquery/jquery.flot.js
+    - public/javascripts/lib/dashboard.js
+    - public/javascripts/admin.js
+stylesheets:
+  common:
+    - public/stylesheets/yui/reset.css
+    - public/stylesheets/yui/fonts.css
+    - public/stylesheets/yui/base.css
+    - public/stylesheets/application.css
+  admin:
+    - public/stylesheets/admin.css
+

@@ -1,0 +1,11 @@
+- title t(".title")
+= page_title(t('.title'))
+%br
+= link_to(t('.new_link'), new_tag_url)
+%p
+  %form{:name => "sform", :action => "", :style => "display:inline"}
+    %label
+      Filter on name:
+    = text_field_tag(:query, params['query'], :autocomplete => 'off')
+.dataTable
+  = render(:partial => "tags_list.html.haml")

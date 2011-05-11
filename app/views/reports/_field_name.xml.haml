@@ -1,0 +1,23 @@
+%name= field_name
+%seenvalid
+  %current= hash[field_name]['seen_valid']
+  %previous= hash[field_name]['valid_previous']
+  %change= change_percentage(hash[field_name]['seen_valid'], hash[field_name]['valid_previous'])
+%seeninvalid
+  %current= hash[field_name]['seen_invalid']
+  %previous= hash[field_name]['invalid_previous']
+  %change= change_percentage(hash[field_name]['seen_invalid'], hash[field_name]['invalid_previous'])
+%seenunaudited
+  %current= hash[field_name]['seen_unaudited']
+  %previous= hash[field_name]['unaudited_previous']
+  %change= change_percentage(hash[field_name]['seen_unaudited'], hash[field_name]['unaudited_previous'])
+%seenmanual
+  %current= hash[field_name]['seen_manual']
+  %previous= hash[field_name]['manual_previous']
+  %change= change_percentage(hash[field_name]['seen_manual'], hash[field_name]['manual_previous'])
+%notseen
+  %current= hash[field_name]['not_seen']
+%total
+  %current= hash[field_name]['current_total']
+  %previous= hash[field_name]['previous_total']
+  %change= change_percentage(hash[field_name]['current_total'], hash[field_name]['previous_total'])

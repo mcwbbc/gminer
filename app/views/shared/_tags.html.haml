@@ -1,0 +1,16 @@
+#show.tags
+  Show tags
+#tags{:geo_accession => geo_accession}
+  #hide
+    X
+  %br
+  :javascript
+    var tags_json = #{all_tags.to_json}
+  = render(:partial => "shared/tag_form.html.haml", :locals => {:geo_accession => geo_accession, :all_tags => all_tags})
+  %ul#active.tag-list
+    = render(:partial => "shared/tag.html.haml", :collection => collection)
+  %br{:clear => 'both'}
+  %hr
+  %ul#available.tag-list
+    = render(:partial => "shared/top_tag.html.haml", :collection => top_tags)
+  %br{:clear => 'both'}

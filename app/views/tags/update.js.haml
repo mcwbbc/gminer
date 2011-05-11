@@ -1,0 +1,5 @@
+== $("#active.tag-list").html("#{escape_javascript(render(:partial => "shared/tag.html.haml", :collection => @item.tags))}");
+== $("#available.tag-list").html("#{escape_javascript(render(:partial => "shared/top_tag.html.haml", :collection => @top_tags))}");
+== var tags = #{raw(@all_tags)};
+== $('#tag_list').autocompleteArray(tags, { autoFill:true });
+

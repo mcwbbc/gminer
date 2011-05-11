@@ -1,0 +1,4 @@
+// views/annotations/create.js.haml
+== $("#table-#{@annotation.field_name}").html("#{escape_javascript(annotations_for(Annotation.load_item(@annotation.geo_accession), @annotation.field_name))}");
+== $("#new-annotation").hide();
+== displayResult(#{@result.to_json.html_safe});

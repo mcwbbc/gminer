@@ -1,0 +1,495 @@
+.rounded-left {
+  -moz-border-radius-topleft: 5px;
+  -webkit-border-top-left-radius: 5px;
+  -moz-border-radius-bottomleft: 5px;
+  -webkit-border-bottom-left-radius: 5px; }
+
+.rounded-right {
+  -moz-border-radius-topright: 5px;
+  -webkit-border-top-right-radius: 5px;
+  -moz-border-radius-bottomright: 5px;
+  -webkit-border-bottom-right-radius: 5px; }
+
+.rounded {
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px; }
+
+.page-title {
+  font-size: 182%;
+  font-weight: bold;
+  color: $txt;
+}
+
+.help {
+  color: $help_txt;
+  background-color: $help_bg;
+  border: thin solid darken($help_bg, 30%);
+  padding: 10px; }
+
+.row-header {
+  color: $row_header_txt;
+  font-weight: bold;
+  background-color: $row_header_bg; }
+
+.row-odd {
+  background-color: $row_odd_bg; }
+
+.row-even {
+  background-color: $row_even_bg; }
+
+.row-alt {
+  background-color: $row_alt_bg; }
+
+.faded {
+  filter: alpha(opacity = 20);
+  /* IE */
+  opacity: 0.2;
+  /* Safari, Opera */
+  -moz-opacity: 0.20;
+  /* FireFox */ }
+
+.clear {
+  clear: both; }
+
+.highlight {
+  background-color: yellow; }
+
+.lightred {
+  background-color: #ffffbb;
+  padding-right: 5px;
+  padding-left: 5px; }
+
+.validate-all, .invalidate-all, .view-graph {
+  border: 1px solid #000;
+  background: #ccccff;
+  padding: 5px;
+  cursor: pointer; }
+
+.context {
+  cursor: pointer; }
+
+.pie-chart {
+  float: left; }
+
+.bar-graph {
+  margin-top: 10px; }
+
+.full-text {
+  padding: 5px;
+  margin: 5px;
+  border: 1px solid #000;
+  background: #fff;
+  display: none; }
+
+#admin-box {
+  position: absolute;
+  right: 30px; }
+
+#annotation-count, #show, #tags {
+  border: 1px solid #000; }
+
+#annotation-count, #show, #tags {
+  position: relative;
+  float: left;
+  padding: 5px;
+  margin: 5px;
+  background: #eee;
+  z-index: 100; }
+
+#hide {
+  border-left: 1px solid #000;
+  border-bottom: 1px solid #000;
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  background: #fdd;
+  padding: 1px;
+  cursor: pointer; }
+
+#tags {
+  background: #eef; }
+
+#annotation-count, #show.tags {
+  display: none; }
+
+ul.tag-list {
+  list-style: none;
+  margin: 0;
+  margin-top: 5px;
+  padding: 0;
+  border: none;
+  width: 300px;
+  li {
+    list-style: none;
+    margin: 0;
+    margin-right: 10px;
+    float: left;
+    a {
+      cursor: pointer;
+      text-decoration: underline; } } }
+
+.delete-tag-icon {
+  margin: 0px;
+  border: none;
+  width: 15px;
+  height: 15px;
+  vertical-align: -15%; }
+
+.ncbolink {
+  color: #fff;
+  background: #000;
+  padding: 2px;
+  font-size: 108%; }
+
+.home-cloud-box {
+  width: 30%;
+  float: left; }
+
+.cloud-box {
+  border: 1px solid #000;
+  margin: 1em; }
+
+.cloud-box-title {
+  width: 100%;
+  background: #ddd;
+  text-align: center;
+  font-weight: bold;
+  font-size: 123.1%; }
+
+.cloud-box-content {
+  padding: .2em;
+  overflow: auto;
+  ol {
+    margin: 0;
+    margin-left: 0;
+    padding: .5em; }
+  a {
+    text-decoration: none;
+    padding-left: 0.2em;
+    padding-right: 0.2em;
+    &:hover {
+      text-decoration: underline; } } }
+
+/* display the individual items next to each other, not one-per-line */
+
+.tag-cloud {
+  li {
+    display: inline; }
+  .not-popular {
+    font-size: 70%; }
+  .not-very-popular {
+    font-size: 125%; }
+  .somewhat-popular {
+    font-size: 150%; }
+  .slightly-popular {
+    font-size: 175%; }
+  .popular {
+    font-size: 200%; }
+  .very-popular {
+    font-size: 250%; }
+  .ultra-popular {
+    font-size: 300%; }
+  .mega-popular {
+    font-size: 400%; } }
+
+/* size is purely presentational, based upon the class */
+
+.reference {
+  display: inline;
+  line-height: 2em;
+  margin-left: 0;
+  padding-left: 0;
+  li {
+    display: inline;
+    line-height: 2em;
+    margin-left: 0;
+    padding-left: 0; } }
+
+.accession {
+  display: inline;
+  line-height: 2em;
+  margin-left: 0;
+  padding-left: 0;
+  li {
+    display: inline;
+    line-height: 2em;
+    margin-left: 0;
+    padding-left: 0; }
+  a {
+    text-decoration: none;
+    border: 1px solid #000;
+    padding: 2px;
+    margin: 1px;
+    white-space: nowrap; } }
+
+.reference a {
+  text-decoration: none;
+  border: 1px solid #000;
+  padding: 2px;
+  margin: 1px;
+  white-space: nowrap; }
+
+.accession a {
+  display: block;
+  width: 85px;
+  text-align: center;
+  float: left;
+  background: #ddf; }
+
+.reference a {
+  background: #ddd; }
+
+#loading {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 100;
+  display: none; }
+
+.accession a:hover, .reference a:hover {
+  text-decoration: underline; }
+
+.accession a:hover {
+  background: #aaf; }
+
+.reference a:hover {
+  background: #aaa; }
+
+#terms, #strains {
+  width: 45%;
+  float: left; }
+
+.faded {
+  filter: alpha(opacity = 20);
+  /* IE */
+  opacity: 0.2;
+  /* Safari, Opera */
+  -moz-opacity: 0.20;
+  /* FireFox */ }
+
+#results {
+  width: 100%; }
+
+.delete-icon {
+  vertical-align: -20%; }
+
+.result-filter {
+  font-size: 1.5em; }
+
+.unverified, .verified, .unaudited {
+  border: 3px solid #000;
+  color: #fff;
+  margin: 2px;
+  padding: 5px;
+  white-space: nowrap; }
+
+.unaudited {
+  background: #ee4;
+  color: #000; }
+
+.unverified {
+  color: #fff;
+  background: #b22; }
+
+.verified {
+  color: #fff;
+  background: #2b2; }
+
+.manual-annotation {
+  border-color: #f0f; }
+
+.automatic-annotation {
+  border-color: #00f; }
+
+.manual {
+  color: #a3a; }
+
+.automatic {
+  color: #33a; }
+
+.inset {
+  border-style: inset; }
+
+.predicate-tissue, .predicate-cell_used, .predicate-strain_used {
+  background: #1CCEC5; }
+
+.predicate- {
+  background: #FF9509; }
+
+.predicate-text { }
+
+.quick-nav {
+  width: 100%;
+  position: relative;
+  height: 50px;
+  line-height: 1.2em; }
+
+.prv, .nxt {
+  font-size: 1.2em;
+  position: absolute;
+  border: 1px solid #000;
+  color: #000;
+  background: #ee4;
+  margin: .1em;
+  padding: .2em;
+  line-height: 2em;
+  width: 20em;
+  text-align: center;
+  z-index: 5; }
+
+.prv {
+  left: 0em; }
+
+.nxt {
+  right: 0em; }
+
+.tooltip {
+  position: relative;
+  cursor: help; }
+
+.popup {
+  position: absolute;
+  border: 1px solid #000;
+  color: #000;
+  background: #fff;
+  z-index: 10;
+  width: 300%;
+  padding: 1em;
+  display: none;
+  /* keeps the popup hidden if no JS available */ }
+
+#new-annotation {
+  position: absolute;
+  z-index: 10;
+  color: #000;
+  background: #eee;
+  display: none;
+  border: 3px solid #000;
+  padding: 20px 10px 20px 10px;
+  label {
+    width: 100px; }
+  input[type="submit"] {
+    margin-left: 120px;
+  } }
+
+table.filter-menu {
+  border-width: 0px 0px 0px 0px;
+  border-spacing: 0px;
+  border-style: none none none none;
+  border-collapse: collapse;
+  background-color: white;
+  th {
+    border-width: 0px 0px 0px 0px;
+    padding: 2px 2px 2px 2px;
+    -moz-border-radius: 0px 0px 0px 0px; }
+  td {
+    border-width: 0px 0px 0px 0px;
+    background-color: white;
+    -moz-border-radius: 0px 0px 0px 0px; } }
+
+.ac_results {
+  z-index: 5; }
+
+#annotation-result {
+  display: none;
+  border: 1px solid #000;
+  color: #000;
+  z-index: 120;
+  padding: 2px;
+  font-size: 10px;
+  &.success {
+    background: #cfc; }
+  &.failure {
+    background: #fcc; } }
+
+#machine, #manual {
+  width: 200px;
+  padding: 5px;
+  float: left; }
+
+ul.nav {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: none;
+  li {
+    list-style: none;
+    margin: 0;
+    a {
+      display: block;
+      padding: 2px 5px 3px 0.5em;
+      color: #000;
+      text-decoration: none;
+      width: 100%; } } }
+
+html>body ul.nav li a {
+  width: auto; }
+
+ul.nav li a:hover {
+  background-color: #2665a1;
+  color: #fff; }
+
+.annotation-table {
+  display: none;
+  margin-top: 0.5em; }
+
+.ontology-term-table {
+  width: 30%;
+  float: left;
+  margin-left: 1em;
+  table {
+    width: 100%; } }
+
+#cytoscapeweb {
+  text-align: center;
+  margin-bottom: 10px;
+  border: 1px solid #000;
+  width: 100%;
+  height: 500px;
+  .page-title {
+    margin-top: 20px; }}
+
+#toggle-cytoscape, #resource-counts {
+  cursor: pointer;
+  float: left;
+  width: 100px;
+  text-align: center;
+  border: 1px solid #000;
+  padding: 5px;
+  background: #BDFFA0;
+  margin-right: 5px;
+  margin-bottom: 5px; }
+
+#resource-counts {
+  background: #FFB247;
+  width: 125px; }
+
+.term-ncbo-link, .term-div {
+  margin-right: 5px;
+  float: left; }
+
+.term-ncbo-link {
+  line-height: 2.7em; }
+
+#top-curators {
+  position: absolute;
+  z-index: 110;
+  top: 10px;
+  left: 10px;
+  width: 220px;
+  border: 1px solid #000;
+  background: #fefefe;
+}
+
+.curator-table {
+  width: 210px;
+  margin: 5px;
+  td {
+    padding: 2px;
+    }}
+
+.annotation-comparison-table {
+  width: 100%;
+  border: none;
+  tr {
+    vertical-align: top; } }

@@ -1,0 +1,5 @@
+%td{:width => '25%'}
+  = annotation_ontology
+%td
+  - items.each do |annotation|
+    = term_div(annotation)

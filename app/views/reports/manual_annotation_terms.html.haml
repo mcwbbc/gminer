@@ -1,0 +1,6 @@
+- title t(".title")
+= page_title(t('.title'))
+.description
+  = t('.description')
+%br
+== This report is currently available as a 'csv' #{link_to('download', manual_annotation_terms_reports_url(:format => "csv"))}.

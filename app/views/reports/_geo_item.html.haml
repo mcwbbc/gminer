@@ -1,0 +1,15 @@
+%tr
+  %td
+    = geo_item
+  %td
+    = hash[geo_item][:count]
+  %td
+    = hash[geo_item][:ncbo_average_time]
+  %td
+    = hash[geo_item][:average_time]
+  %td
+    = hash[geo_item][:min_time]
+  %td
+    = hash[geo_item][:max_time]
+- if hash[geo_item][:field_names].any?
+  = render(:partial => "field_name.html.haml", :collection => hash[geo_item][:field_names].keys.sort, :locals => {:geo_item => geo_item, :hash => hash})

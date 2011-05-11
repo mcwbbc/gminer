@@ -1,0 +1,13 @@
+%tr
+  %td
+    == #{geo_item} : #{field_name} : #{hash[geo_item][:field_names][field_name][:ontology_ids][ontology][:name]}
+  %td
+    = hash[geo_item][:field_names][field_name][:ontology_ids][ontology][:count]
+  %td
+    = hash[geo_item][:field_names][field_name][:ontology_ids][ontology][:ncbo_average_time]
+  %td
+    = hash[geo_item][:field_names][field_name][:ontology_ids][ontology][:average_time]
+  %td
+    = hash[geo_item][:field_names][field_name][:ontology_ids][ontology][:min_time]
+  %td
+    = hash[geo_item][:field_names][field_name][:ontology_ids][ontology][:max_time]

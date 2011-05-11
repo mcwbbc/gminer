@@ -1,0 +1,5 @@
+= render(:partial => "shared/show_page_title", :locals => {:title => "Annotation comparison", :geo_accession => @geo_item.geo_accession})
+= link_to('Back', resource_index_annotations_url)
+%br
+%br
+= render(:partial => "show.html.haml")

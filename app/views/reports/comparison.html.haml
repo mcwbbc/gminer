@@ -1,0 +1,18 @@
+- title t(".title")
+= page_title(t('.title'))
+.description
+  = t('.description')
+%p
+  %form{:name => "sform", :action => "", :style => "display:inline"}
+    %label
+      Filter on date:
+    = comparison_date_dropdown(@comparison_date)
+%br
+%br
+.manual
+  Field has only manual annotations
+.automatic
+  Field has manual and automatic annotations
+%br
+.dataTable
+  = render(:partial => "comparison_report.html.haml")

@@ -1,0 +1,5 @@
+- @fields.each do |f|
+  %li.annotation-field
+    %label
+    = check_box_tag("fields[]", f['name'])
+    == #{f['name']} (#{f['last_annotated']})

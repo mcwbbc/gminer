@@ -1,0 +1,8 @@
+- title t('.title')
+= page_title(t('.title'))
+%br
+= simple_form_for(@tag) do |f|
+  = error_messages_for(@tag)
+  = render(:partial => "tags/form.html.haml", :object => f)
+  = f.submit(t('label.save'))
+  = f.submit(t('label.cancel'))

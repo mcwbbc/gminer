@@ -1,0 +1,15 @@
+= page_title("Compare annotations")
+%br
+= render(:partial => "probeset_information.html.haml", :locals => {:probeset => @probeset})
+== Ontology Term Name: #{@ontology_term.name}
+%br
+== Ontology Term ID: #{link_to(@ontology_term.term_id, ontology_term_url(@ontology_term))}
+%br
+%br
+= link_to('Back', probesets_url)
+%br
+%br
+%br
+= render(:partial => "ontology_term_table.html.haml", :locals => {:items => @results['P'], :title => 'Present'})
+= render(:partial => "ontology_term_table.html.haml", :locals => {:items => @results['A'], :title => 'Absent'})
+= render(:partial => "ontology_term_table.html.haml", :locals => {:items => @results['M'], :title => 'Marginal'})

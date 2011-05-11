@@ -1,0 +1,19 @@
+%table(width="100%")
+  %tr.row-header
+    %td
+      GEO Item
+    %td
+      Valid
+    %td
+      Invalid
+    %td
+      Unaudited
+    %td
+      Manual
+    %td
+      Total
+    %td
+      Percent
+  = render(:partial => "progress_geo_type.html.haml", :collection => Constants::GEO_TYPES, :locals => {:result_hash => @result_hash})
+= render(:partial => "progress_graph.html.haml", :collection => Constants::GEO_TYPES)
+%br{:clear => 'both'}

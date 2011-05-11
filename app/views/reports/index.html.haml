@@ -1,0 +1,15 @@
+- title t(".title")
+= page_title(t('.title'))
+.description
+  = t('.description')
+%ul
+  %li
+    = link_to(t('.progress'), progress_reports_url)
+  %li
+    = link_to(t('.annotation'), annotation_reports_url)
+  %li
+    = link_to(t('.statistics_link'), job_statistics_reports_url)
+  %li
+    = link_to(t('.comparison_link'), comparison_reports_url)
+  %li
+    = link_to(t('.manual_annotation_terms_link'), manual_annotation_terms_reports_url)

@@ -1,0 +1,49 @@
+#flash-messages {
+  width: 790px;
+  margin: 0;
+  padding: 0;
+  color: #000;
+  text-align: center;
+  z-index: 100; }
+
+.notice, .success, .warning, .validation, .alert {
+  font-family: $droid;
+  font-size: 13px;
+  border: 1px solid;
+  padding: 15px 10px 15px 50px;
+  background-repeat: no-repeat;
+  background-position: 10px center; }
+
+.success {
+  color: darken($success, 60%);
+  background-color: $success;
+  background-image: url('/images/icons/success.png'); }
+
+.notice {
+  color: darken($notice, 60%);
+  background-color: $notice;
+  background-image: url('/images/icons/notice.png'); }
+
+.warning, .alert, .validation {
+  color: darken($error, 50%);
+  background-color: $error;
+  background-image: url('/images/icons/error.png'); }
+
+.error_explanation {
+  background-color: $error;
+  border: 1px solid darken($error, 50%);
+  color: #000;
+  text-align: left;
+  vertical-align: top;
+  padding-top: 5px;
+  padding-left: 20px;
+  padding-bottom: 10px;
+  margin-top: 3px;
+  margin-bottom: 10px;
+  h2 {
+    color: darken($error, 50%); }
+  ul {
+    list-style-type: disc;
+    list-style-position: inside;
+    margin: 15px;
+    padding: 3px; } }

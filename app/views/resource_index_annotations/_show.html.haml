@@ -1,0 +1,14 @@
+%h2
+  Common annotations
+%table.annotation-comparison-table
+  = render(:partial => "resource_index_annotations/annotation_field.html.haml", :collection => @common_annotations.keys, :locals => {:items => @common_annotations})
+.clear
+%h2
+  GMiner only annotations
+%table.annotation-comparison-table
+  = render(:partial => "resource_index_annotations/annotation_field.html.haml", :collection => @geo_item_annotations.keys, :locals => {:items => @geo_item_annotations})
+.clear
+%h2
+  Resource Index only annotations
+%table.annotation-comparison-table
+  = render(:partial => "resource_index_annotations/annotation_field.html.haml", :collection => @resource_index_annotations.keys, :locals => {:items => @resource_index_annotations})

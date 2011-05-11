@@ -1,0 +1,12 @@
+- title t('.title')
+= page_title(t('.title'))
+%p
+  = link_to("back", tags_url)
+%p
+  %strong
+    Name:
+  = @tag
+%strong
+  Tagged items
+%p
+  = html_safe(tagged_items(@tag))

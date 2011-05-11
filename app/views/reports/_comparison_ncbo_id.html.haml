@@ -1,0 +1,58 @@
+- if result_hash[comparison_ncbo_id].keys.any?
+  %tr.row-header
+    %td{:valign => 'top', :colspan => "12"}
+      = Constants::ONTOLOGIES[comparison_ncbo_id][:name]
+    %tr.row-header
+      %td
+        Field name
+      %td{:colspan => '2'}
+        Seen - Valid
+      %td{:colspan => '2'}
+        Seen - Invalid
+      %td{:colspan => '2'}
+        Seen - Unaudited
+      %td{:colspan => '2'}
+        Seen - Manual
+      %td
+        Not Seen
+      %td{:colspan => '2'}
+        Total
+  - result_hash[comparison_ncbo_id].keys.sort.each do |field_name|
+    %tr{:class => "#{cycle('row-odd', 'row-even')}"}
+      %td{:valign => 'top', :rowspan => "2", :class => field_name_display(field_name, @comparison_field_name_hash[comparison_ncbo_id])}
+        = field_name
+      %td
+        = result_hash[comparison_ncbo_id][field_name]['seen_valid']
+      %td{:rowspan => 2, :valign => 'top'}
+        = change_formatted(result_hash[comparison_ncbo_id][field_name]['seen_valid'], result_hash[comparison_ncbo_id][field_name]['valid_previous'], "decrease")
+      %td
+        = result_hash[comparison_ncbo_id][field_name]['seen_invalid']
+      %td{:rowspan => 2, :valign => 'top'}
+        = change_formatted(result_hash[comparison_ncbo_id][field_name]['seen_invalid'], result_hash[comparison_ncbo_id][field_name]['invalid_previous'],  "increase")
+      %td
+        = result_hash[comparison_ncbo_id][field_name]['seen_unaudited']
+      %td{:rowspan => 2, :valign => 'top'}
+        = change_formatted(result_hash[comparison_ncbo_id][field_name]['seen_unaudited'], result_hash[comparison_ncbo_id][field_name]['unaudited_previous'], "decrease")
+      %td
+        = result_hash[comparison_ncbo_id][field_name]['seen_manual']
+      %td{:rowspan => 2, :valign => 'top'}
+        = change_formatted(result_hash[comparison_ncbo_id][field_name]['seen_manual'], result_hash[comparison_ncbo_id][field_name]['manual_previous'], "decrease", true)
+      %td{:valign => 'top', :rowspan => "2"}
+        = result_hash[comparison_ncbo_id][field_name]['not_seen']
+      %td
+        = result_hash[comparison_ncbo_id][field_name]['current_total']
+      %td{:rowspan => 2, :valign => 'top'}
+        = change_formatted(result_hash[comparison_ncbo_id][field_name]['current_total'], result_hash[comparison_ncbo_id][field_name]['previous_total'], "decrease")
+    %tr.previous-count
+      %td
+        = result_hash[comparison_ncbo_id][field_name]['valid_previous']
+      %td
+        = result_hash[comparison_ncbo_id][field_name]['invalid_previous']
+      %td
+        = result_hash[comparison_ncbo_id][field_name]['unaudited_previous']
+      %td
+        = result_hash[comparison_ncbo_id][field_name]['manual_previous']
+      %td
+        = result_hash[comparison_ncbo_id][field_name]['previous_total']
+    - if !result_hash[comparison_ncbo_id][field_name]['chart'].blank?
+      = high_pie("chart_#{comparison_ncbo_id}", result_hash[comparison_ncbo_id][field_name]['chart'])

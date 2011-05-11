@@ -1,0 +1,8 @@
+= link_to("View XML", comparison_reports_url(:format => "xml", :ddown => @comparison_date), :target => '_blank')
+= link_to("Download csv", comparison_reports_url(:format => "csv", :ddown => @comparison_date), :target => '_blank')
+%br
+%br
+%table(width="100%")
+  = render(:partial => "comparison_ncbo_id.html.haml", :collection => Constants::ONTOLOGIES.keys.sort, :locals => {:result_hash => @result_hash})
+= render(:partial => "comparison_graph.html.haml", :collection => Constants::ONTOLOGIES.keys.sort)
+%br{:clear => 'both'}

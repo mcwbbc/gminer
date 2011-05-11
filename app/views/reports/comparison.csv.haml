@@ -1,0 +1,2 @@
+comparison_date, ontology, field_name, seen_valid_current, seen_valid_previous, seen_valid_change, seen_invalid_current, seen_invalid_previous, seen_invalid_change, seen_unaudited_current, seen_unaudited_previous, seen_unaudited_change, seen_manual_current, seen_manual_previous, seen_manual_change, not_seen, total_current, total_previous, total_change
+= render(:partial => "reports/ontology.csv.haml", :collection => Constants::ONTOLOGIES.keys.sort, :locals => {:ontology_hash => @result_hash, :comparison_date => @comparison_date})

@@ -1,0 +1,4 @@
+%tr
+  %td{:rowspan => items[annotation_field].keys.size, :width => '15%'}
+    = annotation_field
+  = render(:partial => "resource_index_annotations/annotation_ontology.html.haml", :collection => items[annotation_field].keys, :locals => {:items => items[annotation_field]})

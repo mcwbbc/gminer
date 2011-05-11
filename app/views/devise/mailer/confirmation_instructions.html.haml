@@ -1,0 +1,9 @@
+%p
+  == Welcome to gminer #{@resource.email}!
+%p
+  You can confirm your account through the link below:
+%p
+  = link_to('Confirm my account', confirmation_url(@resource, :confirmation_token => @resource.confirmation_token))
+%p
+  You can also copy and paste this URL into your browser:
+  = confirmation_url(@resource, :confirmation_token => @resource.confirmation_token)

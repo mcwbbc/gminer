@@ -1,0 +1,7 @@
+%table.curator-table
+  %thead
+    %tr.row-header
+      %td{:colspan => 2}
+        = title
+  %tbody
+    = render(:partial => "shared/curated_annotation.html.haml", :collection => items)

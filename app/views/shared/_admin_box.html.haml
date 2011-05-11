@@ -1,0 +1,4 @@
+- if admin?
+  #admin-box
+    = render(:partial => "shared/tags.html.haml", :locals => {:collection => geo_item.tags, :geo_accession => geo_item.geo_accession, :top_tags => top_tags, :all_tags => all_tags}) if defined?(geo_item)
+    = render(:partial => "shared/annotation_counts.html.haml", :locals => {:collection => annotation_count_array}) if defined?(annotation_count_array)

@@ -1,0 +1,8 @@
+%p
+  == Probeset Name: #{link_to(probeset.name, probeset_url(probeset))}
+  %br
+  == RGD Gene: #{probeset_rgd_gene_link(probeset.rgd_gene)}
+  %br
+  == Symbol: #{probeset_symbol(probeset.symbol)}
+  %br
+  == Gene associated probesets: #{associated_probeset_links(probeset)}

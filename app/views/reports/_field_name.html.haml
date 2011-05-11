@@ -1,0 +1,15 @@
+%tr
+  %td
+    == #{geo_item} : #{field_name}
+  %td
+    = hash[geo_item][:field_names][field_name][:count]
+  %td
+    = hash[geo_item][:field_names][field_name][:ncbo_average_time]
+  %td
+    = hash[geo_item][:field_names][field_name][:average_time]
+  %td
+    = hash[geo_item][:field_names][field_name][:min_time]
+  %td
+    = hash[geo_item][:field_names][field_name][:max_time]
+- if hash[geo_item][:field_names][field_name][:ontology_ids].any?
+  = render(:partial => "ontology.html.haml", :collection => hash[geo_item][:field_names][field_name][:ontology_ids].keys.sort, :locals => {:geo_item => geo_item, :hash => hash, :field_name => field_name})
